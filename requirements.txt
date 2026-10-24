@@ -1,0 +1,7 @@
+numpy>=1.25.0
+scipy>=1.10.0
+matplotlib>=3.7.0
+pillow>=9.5.0
+pygame>=2.5.0
+PyQt6>=6.5.0
+pyqtgraph>=0.13.0

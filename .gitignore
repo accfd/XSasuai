@@ -1,0 +1,30 @@
+# Virtual Environments
+venv/
+env/
+.env
+.venv/
+ENV/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Generated Output Artefacts
+output/*.png
+output/*.jpg
+
+# IDE / Editor
+.idea/
+.vscode/
+.gemini/
+*.swp
+*.swo
+
+# OS Temporary Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
