@@ -607,12 +607,16 @@
 
     /* VIEW 3: SYSTEM GUIDE & ONBOARDING (PANDUAN & ALUR SISTEM) */
     #view-guide {
-      display: none;
+      display: flex;
       flex-direction: column;
       gap: 20px;
       max-width: 1240px;
       margin: 0 auto;
       width: 100%;
+    }
+
+    #view-console {
+      display: none;
     }
 
     .guide-hero {
@@ -1167,10 +1171,10 @@
         Cari Rekomendasi Pendaratan
       </button>
       <div class="segmented-tabs">
-        <button class="tab-btn" id="tab-btn-guide" onclick="switchView('guide')">
+        <button class="tab-btn active" id="tab-btn-guide" onclick="switchView('guide')">
           Panduan Misi
         </button>
-        <button class="tab-btn active" id="tab-btn-console" onclick="switchView('console')">
+        <button class="tab-btn" id="tab-btn-console" onclick="switchView('console')">
           Mission Console
         </button>
         <button class="tab-btn" id="tab-btn-testbed" onclick="switchView('testbed')">
@@ -1191,6 +1195,17 @@
       <p>
         <strong>Xesuai</strong> adalah sistem navigasi lokasi pendaratan presisi dan simulator trajektori penerbangan <em>Powered Descent Guidance</em> untuk misi Artemis di dataran tinggi <strong>Mons Mouton, Kutub Selatan Bulan (-84.9°S, 33.3°W)</strong>. Sistem ini mengintegrasikan data topografi elevasi riil NASA LROC LOLA, dinamika efemeris langsung NASA JPL Horizons, solver integrasi numerik RK45, serta antarmuka visual intuitif untuk menjawab 3 pertanyaan kritis misi antariksa.
       </p>
+      <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
+        <button class="btn-cta-primary" onclick="switchView('console')">
+          Buka Mission Console ➔
+        </button>
+        <button class="btn-cta-secondary" onclick="openSmartFinderModal()">
+          Cari Rekomendasi Pendaratan
+        </button>
+        <button class="btn-cta-secondary" onclick="switchView('testbed')">
+          Uji Simulator Testbed
+        </button>
+      </div>
     </div>
 
     <!-- 3 Pillars answering the 3 Key Questions -->
@@ -1206,7 +1221,7 @@
           <strong>Solusi Xesuai:</strong> Memindai model elevasi digital LOLA DEM menggunakan algoritma <em>360° Radial Raymarching</em> dengan koreksi kelengkungan Bulan, disinkronkan secara langsung dengan vektor efemeris NASA JPL Horizons untuk menjamin pencahayaan panel surya dan komunikasi <em>Direct-to-Earth (DTE)</em> tetap bebas dari halangan tebing kawah.
         </div>
         <div class="pillar-feature">
-          Instrumen: Peta LOLA DEM & Radar Polar & 360° Polar Sky-Plot Radar
+          Instrumen: Peta LOLA DEM & 360° Polar Horizon Sky-Plot
         </div>
       </div>
 
@@ -1218,10 +1233,10 @@
         <div class="pillar-desc">
           Wahana antariksa harus turun dari orbit <em>perilune</em> (kecepatan 1.690 m/s pada ketinggian 15 km) menuju sentuhan permukaan yang lembut tanpa kehabisan propelan atau menabrak dinding kawah terjal Mons Mouton.
           <br><br>
-          <strong>Solusi Xesuai:</strong> Mengimplementasikan solver numerik Runge-Kutta Orde 4/5 (RK45) presisi tinggi dengan model gravitasi non-sferis Bulan (koefisien zonal \(J_2 = 2.027 \times 10^{-4}\)), modulasi dorongan mesin (400 N – 3.200 N), pembatasan kecepatan impak aman (\(V_z \le 2.0\text{ m/s}, V_h \le 0.5\text{ m/s}\)), serta clearance kawah koridor pendekatan &gt; 150 meter.
+          <strong>Solusi Xesuai:</strong> Mengimplementasikan solver numerik Runge-Kutta Orde 4/5 (RK45) presisi tinggi dengan model gravitasi non-sferis Bulan (koefisien zonal J₂ = 2.027 × 10⁻⁴), modulasi dorongan mesin (400 N – 3.200 N), pembatasan kecepatan impak aman (Vz ≤ 2.0 m/s, Vh ≤ 0.5 m/s), serta jarak bebas kawah koridor pendekatan &gt; 150 meter.
         </div>
         <div class="pillar-feature">
-          Instrumen: RK45 Powered Descent Solver Solver & Delta-V Budget
+          Instrumen: RK45 Powered Descent Guidance & Budget Delta-V
         </div>
       </div>
 
