@@ -180,38 +180,62 @@
       homeMoonInitialized = true;
     }
 
-    function revealHomeChallenges() {
-      const details = document.getElementById("home-details-section");
-      const ctaPill = document.getElementById("homeMoonCtaPill");
-      if (!details) return;
+    let currentOnboardingStep = 1;
 
-      playAvionicBeep(650, 'sine');
+    function goToOnboarding(step) {
+      if (step < 1 || step > 3) return;
+      currentOnboardingStep = step;
+      playAvionicBeep(560 + (step * 70), 'sine');
 
-      if (details.style.display === "none" || details.style.opacity === "0") {
-        details.style.display = "block";
-        setTimeout(() => {
-          details.style.opacity = "1";
-          const tantanganHeader = document.getElementById("section-tantangan-title");
-          if (tantanganHeader) {
-            tantanganHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        }, 30);
-        if (ctaPill) {
-          ctaPill.textContent = "Tantangan Pendaratan Terbuka ↓";
-          ctaPill.style.color = "var(--emerald-safe)";
-        }
-      } else {
-        const tantanganHeader = document.getElementById("section-tantangan-title");
-        if (tantanganHeader) {
-          tantanganHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      for (let i = 1; i <= 3; i++) {
+        const el = document.getElementById("onboarding-step-" + i);
+        if (!el) continue;
+        if (i === step) {
+          el.style.display = "flex";
+          setTimeout(() => {
+            el.style.opacity = "1";
+            el.style.transform = "translateY(0)";
+          }, 20);
+        } else {
+          el.style.opacity = "0";
+          el.style.transform = "translateY(6px)";
+          el.style.display = "none";
         }
       }
+
+      // Update active indicator buttons across all steps
+      document.querySelectorAll(".onboarding-indicator-dot").forEach((dot, idx) => {
+        const dotStep = (idx % 3) + 1;
+        if (dotStep === step) {
+          dot.classList.add("active");
+        } else {
+          dot.classList.remove("active");
+        }
+      });
+
+      // Resize 3D Moon if returning to step 1
+      if (step === 1 && homeMoonRenderer && homeMoonCamera) {
+        const container = document.getElementById("homeMoonContainer");
+        if (container) {
+          const nw = container.clientWidth || 900;
+          const nh = container.clientHeight || 320;
+          homeMoonCamera.aspect = nw / nh;
+          homeMoonCamera.updateProjectionMatrix();
+          homeMoonRenderer.setSize(nw, nh);
+        }
+      }
+
+      // Smooth scroll to top of view-home container
+      const homeView = document.getElementById("view-home");
+      if (homeView) homeView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function revealHomeChallenges() {
+      goToOnboarding(2);
     }
 
     function scrollToWorkflow() {
-      playAvionicBeep(680, 'sine');
-      const elem = document.getElementById("section-workflow");
-      if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      goToOnboarding(3);
     }
 
     function toggleHomeGlobeRotation() {
