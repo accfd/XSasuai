@@ -920,10 +920,13 @@
 
     let skyplotTimeout = null;
     function debounceSkyplotUpdate(dtStr) {
+      if (!dtStr) dtStr = "2026-11-14 12:00";
       if (skyplotTimeout) clearTimeout(skyplotTimeout);
       skyplotTimeout = setTimeout(async () => {
         try {
-          const [date, time] = dtStr.split(" ");
+          const parts = dtStr.split(" ");
+          const date = parts[0] || "2026-11-14";
+          const time = parts[1] || "12:00";
           const res = await fetch("/api/evaluate", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -938,8 +941,9 @@
           }
         } catch (e) {
           console.error("Gagal update skyplot:", e);
+          document.getElementById("skyplot-box").innerHTML = `<span style="font-size: 11px; color: var(--coral-crit)">Gagal memuat radar skyplot: ${e}</span>`;
         }
-      }, 150);
+      }, 50);
     }
 
     // 4. Trajectory PDI Calculation
@@ -1149,10 +1153,12 @@
     document.getElementById("timeline-slider").oninput = updateEvaluationFromSlider;
 
     (async () => {
+      // Panggil skyplot dan trajektori langsung agar tidak menunggu timeline
+      debounceSkyplotUpdate("2026-11-14 12:00");
+      document.getElementById("btn-recalc-pdi").click();
       await loadSites();
       await loadTimeline();
       updateEvaluationFromSlider();
-      document.getElementById("btn-recalc-pdi").click();
     })();
   </script>
 </body>
