@@ -1960,17 +1960,92 @@
         nav_recommendation: "Rekomendasi",
         nav_visualization: "Visualisasi",
         nav_simulation: "Simulasi",
-        
-        // Solusi 1
+
+        // Beranda - Slide 1
+        home_title: "XASUAI — Sistem Navigasi Lokasi Pendaratan di Bulan",
+        home_desc: "XASUAI adalah sistem yang membantu menentukan lokasi dan waktu pendaratan terbaik bagi wahana Artemis di <strong>Mons Mouton, Kutub Selatan Bulan</strong>. Sistem ini menganalisis kondisi lingkungan, bentuk permukaan Bulan, serta pergerakan wahana untuk memastikan pendaratan berlangsung aman dan terkendali.",
+        home_cta: "Klik Bulan untuk Melanjutkan &darr;",
+
+        // Beranda - Slide 2 (Tantangan Utama)
+        home_chal_title: "Tantangan Utama Pendaratan di Kutub Selatan Bulan",
+        home_chal_desc: "Ada tiga masalah utama yang harus diatasi sebelum wahana dapat mendarat dengan aman di Mons Mouton.",
+        home_m1_tag: "MASALAH 1",
+        home_m1_cat: "Lingkungan Ekstrem",
+        home_m1_title: "Keterbatasan Sinar Matahari dan Komunikasi",
+        home_m1_q: "Apa masalahnya?",
+        home_m1_desc: "Di Kutub Selatan Bulan, sinar Matahari dan arah Bumi berada pada sudut yang sangat rendah. Akibatnya, suhu ekstrem turun hingga <strong>-240°C</strong> mengganggu daya listrik, serta perbukitan menghalangi sinyal komunikasi langsung ke Bumi.",
+        home_m1_sol_tag: "Solusi 1 — Rekomendasi Waktu Pendaratan",
+        home_m1_sol_desc: "Sistem menganalisis pergerakan Matahari & Bumi untuk mencari jendela waktu saat lokasi mendapat cukup cahaya dan jalur komunikasi langsung bebas rintangan.",
+
+        home_m2_tag: "MASALAH 2",
+        home_m2_cat: "Topografi Terjal",
+        home_m2_title: "Permukaan Tidak Rata dan Lereng Curam",
+        home_m2_q: "Apa masalahnya?",
+        home_m2_desc: "Permukaan Mons Mouton dipenuhi kawah terjal dan lereng curam. Mendarat di kemiringan berlebih dapat membuat wahana tergelincir atau terbalik, dan tebing tinggi di sekitarnya dapat memutus garis pandang antena ke Bumi.",
+        home_m2_sol_tag: "Solusi 2 — Visualisasi & Analisis Topografi",
+        home_m2_sol_desc: "Sistem memetakan kontur 2D/3D & profil horizon Mons Mouton untuk mengukur batas kelerengan aman serta memverifikasi elevasi tebing penghalang sinyal.",
+
+        home_m3_tag: "MASALAH 3",
+        home_m3_cat: "Dinamika Wahana",
+        home_m3_title: "Kecepatan Wahana & Risiko Kecelakaan",
+        home_m3_q: "Apa masalahnya?",
+        home_m3_desc: "Wahana melaju dengan kecepatan orbital sangat tinggi (~1,7 km/s). Pengereman bertenaga harus presisi; kesalahan pengereman dapat menghabiskan propelan sebelum touchdown atau menyebabkan wahana menghantam permukaan Bulan.",
+        home_m3_sol_tag: "Solusi 3 — Simulasi Penerbangan & Pendaratan",
+        home_m3_sol_desc: "Sistem menyimulasikan panduan penerbangan 6-DOF, modulasi dorongan pendorong, dan konsumsi propelan untuk menjamin pendaratan vertikal yang mulus.",
+
+        // Beranda - Slide 3 (Alur Kerja)
+        home_flow_title: "Alur Kerja XASUAI — 3 Tahap Penyelesaian",
+        home_flow_desc: "Setiap tahap dirancang untuk menyelesaikan satu masalah utama secara berurutan. Klik salah satu tahap untuk mulai!",
+        home_step1_chip: "1. Rekomendasi",
+        home_step2_chip: "2. Visualisasi",
+        home_step3_chip: "3. Simulasi",
+        home_step1_badge: "TAHAP 1",
+        home_step1_sol: "Solusi Masalah 1",
+        home_step1_title: "Menentukan Waktu Pendaratan",
+        home_step1_eng: "Mesin Rekomendasi (MCDA Engine)",
+        home_step1_d1: "Sistem menganalisis data pergerakan Matahari, posisi Bumi, dan profil elevasi selama 336 jam menggunakan data ephemeris NASA JPL Horizons dan peta topografi LOLA DEM.",
+        home_step1_d2: "Menghitung skor multi-kriteria untuk memilih jendela waktu pendaratan dengan iluminasi optimal serta visibilitas sinyal Bumi tanpa terhalang bayangan kawah.",
+        home_step1_btn: "BUKA MESIN REKOMENDASI &rarr;",
+
+        home_step2_badge: "TAHAP 2",
+        home_step2_sol: "Solusi Masalah 2",
+        home_step2_title: "Memeriksa Kondisi Medan",
+        home_step2_eng: "Portal Visualisasi & Analisis Topografi",
+        home_step2_d1: "Menyajikan 3 mode visualisasi: globe orbital 3D dari luar angkasa, peta kelerengan 2D dari LOLA DEM, dan model elevasi 3D interaktif.",
+        home_step2_d2: "Memverifikasi kemiringan lereng aman (0,08°) dan memastikan jalur sinyal radio ke Bumi bebas hambatan tebing kawah.",
+        home_step2_btn: "BUKA PORTAL VISUALISASI &rarr;",
+
+        home_step3_badge: "TAHAP 3",
+        home_step3_sol: "Solusi Masalah 3",
+        home_step3_title: "Menguji Dinamika Pendaratan",
+        home_step3_eng: "Simulator Penerbangan & Pendaratan 3D",
+        home_step3_d1: "Menyimulasikan seluruh fase penerbangan dari peluncuran Bumi (TLI), transit translunar 384.400 km, orbit polar Bulan, hingga Powered Descent Initiation (PDI).",
+        home_step3_d2: "Menguji manuver pendaratan vertikal SpaceX Starship HLS hingga menyentuh Mons Mouton Crest dengan kecepatan aman 0,80 m/s.",
+        home_step3_btn: "BUKA SIMULATOR PENERBANGAN &rarr;",
+
+        // Solusi 1 - Rekomendasi
         sol1_tag: "SOLUSI 1 — REKOMENDASI WAKTU PENDARATAN",
         sol1_title: "Pencarian Jadwal Peluncuran & Pendaratan Terbaik",
         sol1_desc: "Pilih bulan dan tahun rencana misi. Sistem akan menganalisis lintasan orbit Matahari dan posisi Bumi untuk menemukan momen pencahayaan optimal dan komunikasi langsung bebas rintangan tebing kawah.",
         sol1_lbl_month: "Bulan:",
         sol1_lbl_year: "Tahun:",
         sol1_btn_calc: "HITUNG JADWAL REKOMENDASI",
-        sol1_lnk_saved: "Lihat Hasil Rekomendasi Tersimpan",
-        
-        // Solusi 2
+        sol1_lnk_saved: "Lihat Hasil Rekomendasi Tersimpan &darr;",
+
+        // Solusi 1 - Slide 3 Hasil
+        rec_back_btn: "Ubah Periode Misi",
+        rec_status_badge: "STATUS: OPTIMAL & AMAN",
+        rec_res_title: "Hasil Rekomendasi Jadwal Misi",
+        rec_res_target: "Target Lokasi: <strong>Mons Mouton Crest (-84.9°S, 33.3°W)</strong>",
+        rec_col_launch_tag: "LEPAS LANDAS DARI BUMI",
+        rec_col_launch_desc: "Peluncuran roket dari Bumi menuju lintasan translunar",
+        rec_transit_tag: "4 Hari Perjalanan",
+        rec_col_land_tag: "PENDARATAN DI BULAN",
+        rec_col_land_desc: "Pendaratan SpaceX Starship HLS di Mons Mouton Crest",
+        rec_box_why_title: "Mengapa Waktu Ini Dipilih?",
+        rec_btn_to_vis: "Lihat Titik Pendaratan di Visualisasi &rarr;",
+
+        // Solusi 2 - Menu
         sol2_tag: "SOLUSI 2 — VISUALISASI & ANALISIS TOPOGRAFI",
         sol2_title: "Eksplorasi Medan dan Pemeriksaan Lokasi Pendaratan",
         sol2_desc: "Pilih mode visualisasi berikut untuk memeriksa kondisi permukaan Mons Mouton secara detail. Mulai dari tampilan Bulan dari orbit, peta kemiringan lereng 2D, hingga model topografi 3D untuk memeriksa jalur sinyal yang bebas hambatan tebing.",
@@ -1988,7 +2063,43 @@
         sol2_c3_btn: "Buka Topografi 3D &rarr;",
         sol2_target_pill: "Target Pendaratan Terpilih: <strong>Mons Mouton Crest (-84,9°S, 33,3°W)</strong> • Elevasi: <strong>+5.920 m</strong>",
 
-        // Solusi 3
+        // Solusi 2 - Slide 2 (Globe 3D)
+        vis_globe_back: "Kembali ke Menu Visualisasi",
+        vis_globe_title: "Navigasi Orbital 3D — Menuju Mons Mouton Crest",
+        vis_globe_target: "Target: Mons Mouton Crest (-84,9°S, 33,3°W)",
+        vis_globe_fly_btn: "Fly-To Mons Mouton",
+        vis_globe_reset_btn: "Tampilan Global",
+        vis_globe_btn_next: "Lanjut: Peta Kelerengan 2D &rarr;",
+
+        // Solusi 2 - Slide 3 (Peta 2D)
+        vis_map_back: "Kembali ke Menu Visualisasi",
+        vis_map_title: "Inspeksi Kelerengan & Kontur Medan 2D (LOLA DEM)",
+        vis_map_target: "Lokasi: Mons Mouton Crest (-84,9°S, 33,3°W)",
+        vis_map_hint: "Gunakan Roda Gulir untuk Zoom • Klik & Tarik untuk Menggeser Peta",
+        vis_map_btn_next: "Lanjut: Topografi 3D Mons Mouton &rarr;",
+
+        // Solusi 2 - Slide 4 (Topografi 3D & Jalur Sinyal)
+        s4_back: "Kembali ke Menu Visualisasi",
+        s4_data_valid: "DATA VALID: NASA LOLA DEM + JPL HORIZONS DE441",
+        s4_title: "Visualisasi 3D Topografi Mons Mouton Crest dan Pemeriksaan Jalur Sinyal",
+        s4_subtitle: "Analisis kondisi permukaan, ketinggian tebing kawah, jalur sinyal langsung ke Bumi (DTE), dan pencahayaan Matahari.",
+        s4_lbl_layer: "Lapisan Peta:",
+        s4_opt_mcda: "✦ Lapisan 1: Zona Kelayakan (MCDA Viridis)",
+        s4_opt_dem: "✦ Lapisan 2: Topografi Elevasi (NASA LOLA DEM)",
+        s4_opt_slope: "✦ Lapisan 3: Kemiringan Lereng (Slope Safety ≤ 10°)",
+        s4_verif_tag: "VERIFIKASI KEAMANAN LOKASI PENDARATAN",
+        s4_verif_heading: "Mengapa Lokasi Ini Aman untuk Pendaratan?",
+        s4_verif_desc: "Berdasarkan hasil analisis topografi 3D, Mons Mouton Crest memenuhi seluruh kriteria keselamatan pendaratan dengan 3 keunggulan:",
+        s4_r1_title: "Jalur Sinyal ke Bumi Bebas Hambatan Tebing",
+        s4_r1_desc: "Mons Mouton adalah dataran tinggi (+5.920 m) jauh di atas dinding kawah. Pada model 3D, garis laser cyan menunjukkan pandangan langsung ke Bumi dengan sudut bebas pandang +12,35° di atas bibir tebing tertinggi (<em>zero loss-of-signal</em>).",
+        s4_r2_title: "Pasokan Cahaya Matahari Optimal",
+        s4_r2_desc: "Posisi puncak dataran tinggi menerima sinar Matahari secara kontinu tanpa terhalang bayangan tebing kawah, memastikan pasokan listrik panel surya aktif selama 14 hari penuh operasi di permukaan Bulan.",
+        s4_r3_title: "Permukaan Datar dan Sangat Stabil",
+        s4_r3_desc: "Kemiringan lereng hanya 0,08°, jauh di bawah batas maksimum keselamatan NASA (10°). Kaki pendarat wahana dapat menyentuh permukaan secara kokoh tanpa risiko tergelincir atau terguling.",
+        s4_nav_hint: "<strong>Petunjuk Navigasi 3D:</strong> Geser tetikus untuk memutar tampilan. Gunakan roda tetikus untuk zoom.",
+        s4_btn_next: "Lanjut: Uji Pendaratan melalui Simulator Penerbangan &rarr;",
+
+        // Solusi 3 - Simulasi
         sol3_tag: "SOLUSI 3 — SIMULASI MISI PENUH & DINAMIKA PENDARATAN",
         sol3_title: "Simulator 3D Misi Penuh (Bumi ke Bulan & HLS)",
         sol3_desc: "Simulasi interaktif 60 FPS lintasan lengkap dari peluncuran Bumi (TLI), transit translunar, orbit lunar polar, hingga Powered Descent Initiation (PDI) mendarat mulus di Mons Mouton Crest.",
@@ -2001,8 +2112,12 @@
         sol3_c3_tag: "FASE 3",
         sol3_c3_title: "PDI & Pendaratan HLS",
         sol3_c3_desc: "Inisiasi pengereman bertenaga (PDI) 720 detik, manuver pitch-up terkontrol, dan touchdown vertikal lembut di Mons Mouton Crest (V_z 0,80 m/s).",
-        sol3_btn_launch: "LUNCURKAN SIMULATOR 3D MISI PENUH (TAB BARU)",
-        sol3_bottom_pill: "Mode Layar Penuh 60 FPS • Telemetri Real-Time • Visualisasi Efemeris NASA SPICE"
+        sol3_btn_launch: "LUNCURKAN SIMULATOR 3D MISI PENUH (TAB BARU) ↗",
+        sol3_bottom_pill: "Mode Layar Penuh 60 FPS • Telemetri Real-Time • Visualisasi Efemeris NASA SPICE",
+        sol3_target_header: "TARGET PENDARATAN TERPILIH",
+        sol3_target_name: "Mons Mouton Crest (-84,9°S, 33,3°W)",
+        sol3_target_elev: "Elevasi: +5.920 m",
+        sol3_target_status: "Status: VERIFIKASI GO (AMAN)"
       },
       en: {
         brand_title: "XASUAI — Lunar Landing Site Navigation System",
@@ -2010,17 +2125,92 @@
         nav_recommendation: "Recommendation",
         nav_visualization: "Visualization",
         nav_simulation: "Simulation",
-        
-        // Solusi 1
+
+        // Home - Slide 1
+        home_title: "XASUAI — Lunar Landing Site Navigation System",
+        home_desc: "XASUAI is an advanced mission navigation system determining optimal landing sites and launch windows for Artemis spacecraft at <strong>Mons Mouton, Lunar South Pole</strong>. It evaluates environmental hazards, lunar surface topography, and spacecraft dynamics to guarantee safe, controlled landings.",
+        home_cta: "Click Moon to Proceed &darr;",
+
+        // Home - Slide 2 (Core Challenges)
+        home_chal_title: "Core Challenges of Landing at the Lunar South Pole",
+        home_chal_desc: "Three primary aerospace engineering challenges must be resolved before any spacecraft can touch down safely at Mons Mouton.",
+        home_m1_tag: "PROBLEM 1",
+        home_m1_cat: "Extreme Environment",
+        home_m1_title: "Solar Power & Direct Communication Limits",
+        home_m1_q: "What is the challenge?",
+        home_m1_desc: "At the Lunar South Pole, both the Sun and Earth graze the horizon at extremely shallow angles. Temperatures drop to <strong>-240°C</strong> threatening power systems, while surrounding ridges block direct radio links to Earth.",
+        home_m1_sol_tag: "Solution 1 — Landing Schedule Recommendation",
+        home_m1_sol_desc: "The system tracks Sun and Earth ephemeris to pinpoint mission windows offering uninterrupted solar charging and line-of-sight communications.",
+
+        home_m2_tag: "PROBLEM 2",
+        home_m2_cat: "Rugged Topography",
+        home_m2_title: "Uneven Surface & Steep Crater Slopes",
+        home_m2_q: "What is the challenge?",
+        home_m2_desc: "The lunar surface around Mons Mouton features steep crater slopes and deep shadows. Landing on excessive slopes risks rover tip-over, and high surrounding ridges can obstruct high-gain antennas.",
+        home_m2_sol_tag: "Solution 2 — Topography Visualization & Analysis",
+        home_m2_sol_desc: "The system renders 2D/3D contour maps and horizon profiles of Mons Mouton to verify safe slope thresholds and ensure positive clearance over crater rims.",
+
+        home_m3_tag: "PROBLEM 3",
+        home_m3_cat: "Spacecraft Dynamics",
+        home_m3_title: "High Orbital Velocity & Touchdown Risks",
+        home_m3_q: "What is the challenge?",
+        home_m3_desc: "The lander travels at orbital velocity (~1.7 km/s). Powered braking must be executed flawlessly; guidance errors can deplete propellant prematurely or lead to catastrophic surface impact.",
+        home_m3_sol_tag: "Solution 3 — Flight & Landing Simulation",
+        home_m3_sol_desc: "The system simulates 6-DOF flight guidance, thruster modulation, and fuel budgeting to ensure a smooth, vertical soft touchdown.",
+
+        // Home - Slide 3 (Workflow)
+        home_flow_title: "XASUAI Workflow — 3-Stage Mission Architecture",
+        home_flow_desc: "Each stage solves a critical mission challenge in sequence. Click any stage to explore!",
+        home_step1_chip: "1. Recommendation",
+        home_step2_chip: "2. Visualization",
+        home_step3_chip: "3. Simulation",
+        home_step1_badge: "STAGE 1",
+        home_step1_sol: "Solution for Problem 1",
+        home_step1_title: "Determining Optimal Landing Windows",
+        home_step1_eng: "Recommendation Engine (MCDA)",
+        home_step1_d1: "Analyzes 336 hours of Sun/Earth ephemeris and elevation profiles using NASA JPL Horizons and LOLA DEM data.",
+        home_step1_d2: "Computes multi-criteria score to select landing windows with optimal illumination and direct Earth visibility.",
+        home_step1_btn: "OPEN RECOMMENDATION ENGINE &rarr;",
+
+        home_step2_badge: "STAGE 2",
+        home_step2_sol: "Solution for Problem 2",
+        home_step2_title: "Inspecting Lunar Terrain Conditions",
+        home_step2_eng: "Topography & Horizon Visualization Portal",
+        home_step2_d1: "Features 3 interactive modes: orbital 3D globe, 2D LOLA slope safety map, and real 3D terrain elevation.",
+        home_step2_d2: "Verifies safe slopes (0.08°) and validates antenna line-of-sight elevation over surrounding crater crests.",
+        home_step2_btn: "OPEN VISUALIZATION PORTAL &rarr;",
+
+        home_step3_badge: "STAGE 3",
+        home_step3_sol: "Solution for Problem 3",
+        home_step3_title: "Testing Flight & Landing Dynamics",
+        home_step3_eng: "3D Flight & Descent Landing Simulator",
+        home_step3_d1: "Simulates the entire flight trajectory: Earth launch (TLI), 384,400 km translunar transit, polar orbit insertion, down to PDI.",
+        home_step3_d2: "Validates SpaceX Starship HLS powered descent and vertical soft touchdown at Mons Mouton Crest at a gentle 0.80 m/s.",
+        home_step3_btn: "OPEN FLIGHT SIMULATOR &rarr;",
+
+        // Solution 1 - Recommendation
         sol1_tag: "SOLUTION 1 — LANDING SCHEDULE RECOMMENDATION",
         sol1_title: "Optimal Launch & Landing Schedule Search",
         sol1_desc: "Select mission target month and year. The system analyzes solar illumination and Earth direct line-of-sight to find optimal sunlight and crater-clear communication windows.",
         sol1_lbl_month: "Month:",
         sol1_lbl_year: "Year:",
         sol1_btn_calc: "CALCULATE OPTIMAL SCHEDULE",
-        sol1_lnk_saved: "View Saved Recommendations",
-        
-        // Solusi 2
+        sol1_lnk_saved: "View Saved Recommendations &darr;",
+
+        // Solution 1 - Slide 3 Results
+        rec_back_btn: "Change Mission Period",
+        rec_status_badge: "STATUS: OPTIMAL & SAFE",
+        rec_res_title: "Mission Schedule Recommendation Results",
+        rec_res_target: "Target Site: <strong>Mons Mouton Crest (-84.9°S, 33.3°W)</strong>",
+        rec_col_launch_tag: "EARTH LAUNCH",
+        rec_col_launch_desc: "Rocket launch from Earth into translunar trajectory",
+        rec_transit_tag: "4-Day Transit",
+        rec_col_land_tag: "LUNAR TOUCHDOWN",
+        rec_col_land_desc: "SpaceX Starship HLS landing at Mons Mouton Crest",
+        rec_box_why_title: "Why Was This Window Selected?",
+        rec_btn_to_vis: "View Landing Site in Visualization &rarr;",
+
+        // Solution 2 - Menu
         sol2_tag: "SOLUTION 2 — TOPOGRAPHY VISUALIZATION & ANALYSIS",
         sol2_title: "Terrain Exploration and Landing Site Inspection",
         sol2_desc: "Select a visualization mode to examine Mons Mouton surface conditions in detail: from orbital 3D Moon globe, 2D slope safety map, to 3D terrain line-of-sight elevation.",
@@ -2038,7 +2228,43 @@
         sol2_c3_btn: "Open 3D Topography &rarr;",
         sol2_target_pill: "Selected Landing Site: <strong>Mons Mouton Crest (-84.9°S, 33.3°W)</strong> • Elevation: <strong>+5,920 m</strong>",
 
-        // Solusi 3
+        // Solution 2 - Slide 2 (Globe 3D)
+        vis_globe_back: "Back to Visualization Menu",
+        vis_globe_title: "3D Orbital Navigation — Approaching Mons Mouton Crest",
+        vis_globe_target: "Target: Mons Mouton Crest (-84.9°S, 33.3°W)",
+        vis_globe_fly_btn: "Fly-To Mons Mouton",
+        vis_globe_reset_btn: "Global Overview",
+        vis_globe_btn_next: "Next: 2D Slope Map &rarr;",
+
+        // Solution 2 - Slide 3 (2D Map)
+        vis_map_back: "Back to Visualization Menu",
+        vis_map_title: "2D Slope & Terrain Contour Inspection (LOLA DEM)",
+        vis_map_target: "Location: Mons Mouton Crest (-84.9°S, 33.3°W)",
+        vis_map_hint: "Use Scroll Wheel to Zoom • Click & Drag to Pan Map",
+        vis_map_btn_next: "Next: 3D Topography &rarr;",
+
+        // Solution 2 - Slide 4 (3D Terrain & Signal Path)
+        s4_back: "Back to Visualization Menu",
+        s4_data_valid: "VALIDATED DATA: NASA LOLA DEM + JPL HORIZONS DE441",
+        s4_title: "3D Terrain Visualization & Signal Path Verification at Mons Mouton Crest",
+        s4_subtitle: "Analysis of surface terrain, crater rim elevations, direct-to-Earth (DTE) communication lines, and solar illumination.",
+        s4_lbl_layer: "Map Layer:",
+        s4_opt_mcda: "✦ Layer 1: Feasibility Zone (MCDA Viridis)",
+        s4_opt_dem: "✦ Layer 2: Surface Elevation (NASA LOLA DEM)",
+        s4_opt_slope: "✦ Layer 3: Slope Safety (Slope Safety ≤ 10°)",
+        s4_verif_tag: "LANDING SITE SAFETY VERIFICATION",
+        s4_verif_heading: "Why Is This Site Safe for Touchdown?",
+        s4_verif_desc: "Based on 3D topographic analysis, Mons Mouton Crest fulfills all NASA safety requirements with 3 critical advantages:",
+        s4_r1_title: "Direct Line-of-Sight Signal to Earth (Zero Blockage)",
+        s4_r1_desc: "Mons Mouton is an elevated plateau (+5,920 m) towering over adjacent crater walls. The cyan laser line shows direct line-of-sight to Earth with +12.35° clearance above the highest crater rim (zero loss-of-signal).",
+        s4_r2_title: "Optimal Continuous Solar Illumination",
+        s4_r2_desc: "The plateau crest receives persistent sunlight unobstructed by surrounding crater shadows, guaranteeing continuous solar power for lander and rover systems during lunar surface operations.",
+        s4_r3_title: "Flat & Highly Stable Landing Plateau",
+        s4_r3_desc: "The surface slope measures merely 0.08°, well below NASA's 10° maximum hazard threshold. Lander landing pads touch down securely with zero roll-over or sliding risk.",
+        s4_nav_hint: "<strong>3D Navigation Guide:</strong> Drag mouse to rotate. Scroll wheel to zoom.",
+        s4_btn_next: "Next: Test Landing via Flight Simulator &rarr;",
+
+        // Solution 3 - Simulation
         sol3_tag: "SOLUTION 3 — FULL MISSION SIMULATION & LANDING DYNAMICS",
         sol3_title: "Full-Mission 3D Simulator (Earth-to-Moon & HLS)",
         sol3_desc: "Interactive 60 FPS simulation of the complete trajectory from Earth launch (TLI), translunar transit, lunar polar insertion, down to Powered Descent Initiation (PDI) at Mons Mouton Crest.",
@@ -2051,8 +2277,12 @@
         sol3_c3_tag: "PHASE 3",
         sol3_c3_title: "PDI & HLS Touchdown",
         sol3_c3_desc: "Powered Descent Initiation (PDI) 720s, controlled pitch-up maneuver, and soft vertical touchdown at Mons Mouton Crest (V_z 0.80 m/s).",
-        sol3_btn_launch: "LAUNCH FULL MISSION 3D SIMULATOR (NEW TAB)",
-        sol3_bottom_pill: "60 FPS Fullscreen Mode • Real-Time Telemetry • NASA SPICE Ephemeris Visualization"
+        sol3_btn_launch: "LAUNCH FULL MISSION 3D SIMULATOR (NEW TAB) ↗",
+        sol3_bottom_pill: "60 FPS Fullscreen Mode • Real-Time Telemetry • NASA SPICE Ephemeris Visualization",
+        sol3_target_header: "SELECTED LANDING TARGET",
+        sol3_target_name: "Mons Mouton Crest (-84.9°S, 33.3°W)",
+        sol3_target_elev: "Elevation: +5,920 m",
+        sol3_target_status: "Status: VERIFIED GO (SAFE)"
       }
     };
 
@@ -2063,9 +2293,10 @@
 
     let currentAppLanguage = localStorage.getItem('xasuai_lang') || 'id';
 
-    function setLanguage(lang) {
-      if (!I18N_DICT[lang]) lang = 'id';
+    function setLanguage(lang, silent = false) {
+      if (lang !== 'en' && lang !== 'id') lang = 'id';
       currentAppLanguage = lang;
+      window.currentAppLanguage = lang;
       localStorage.setItem('xasuai_lang', lang);
       document.documentElement.lang = lang;
 
@@ -2084,12 +2315,25 @@
 
       // Update data-i18n DOM elements
       const dict = I18N_DICT[lang];
-      document.querySelectorAll("[data-i18n]").forEach(el => {
-        const key = el.getAttribute("data-i18n");
-        if (dict[key]) {
-          el.innerHTML = dict[key];
-        }
-      });
+      if (dict) {
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+          const key = el.getAttribute("data-i18n");
+          if (dict[key]) {
+            el.innerHTML = dict[key];
+          }
+        });
+      }
+
+      // Update 3D layer dropdown options if present
+      const layerSelect = document.getElementById("select-3d-layer");
+      if (layerSelect && dict) {
+        const optMcda = layerSelect.querySelector("option[value='mcda']");
+        const optDem = layerSelect.querySelector("option[value='dem']");
+        const optSlope = layerSelect.querySelector("option[value='slope']");
+        if (optMcda && dict.s4_opt_mcda) optMcda.textContent = dict.s4_opt_mcda;
+        if (optDem && dict.s4_opt_dem) optDem.textContent = dict.s4_opt_dem;
+        if (optSlope && dict.s4_opt_slope) optSlope.textContent = dict.s4_opt_slope;
+      }
 
       // Update month select options preserving selection
       const monthSelect = document.getElementById("select-mission-month");
@@ -2105,7 +2349,23 @@
           monthSelect.appendChild(opt);
         });
       }
+
+      // Immediate Toast notification & Audio feedback for user interaction
+      if (!silent) {
+        if (typeof showToast === 'function') {
+          showToast(lang === 'id' ? "🇮🇩 Bahasa berhasil diubah ke Bahasa Indonesia" : "🇬🇧 Language switched to English");
+        }
+        if (typeof playAvionicBeep === 'function') {
+          playAvionicBeep(lang === 'id' ? 620 : 750, 'sine', 0.08);
+        }
+      }
     }
+
+    // Expose functions globally on window
+    window.setLanguage = setLanguage;
+    window.applyAppLanguage = setLanguage;
+    window.playAvionicBeep = playAvionicBeep;
+    window.showToast = showToast;
 
     // Terapkan bahasa saat runtime awal
     setLanguage(currentAppLanguage);

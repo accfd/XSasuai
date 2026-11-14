@@ -9,7 +9,34 @@
   <link rel="shortcut icon" href="/favicon.ico">
   <link rel="preload" as="image" href="/data/moon_1024.jpg">
   <script src="/three.min.js"></script>
-  <link rel="stylesheet" href="/css/style.css?v=22">
+  <link rel="stylesheet" href="/css/style.css?v=60">
+  <script>
+    // Bulletproof Early Language Switcher Initializer
+    window.currentAppLanguage = localStorage.getItem('xasuai_lang') || 'id';
+    document.documentElement.lang = window.currentAppLanguage;
+    window.setLanguage = function(lang) {
+      if (lang !== 'en' && lang !== 'id') lang = 'id';
+      window.currentAppLanguage = lang;
+      localStorage.setItem('xasuai_lang', lang);
+      document.documentElement.lang = lang;
+      const bId = document.getElementById("btn-lang-id");
+      const bEn = document.getElementById("btn-lang-en");
+      if (bId && bEn) {
+        if (lang === 'id') { bId.classList.add("active"); bEn.classList.remove("active"); }
+        else { bEn.classList.add("active"); bId.classList.remove("active"); }
+      }
+      if (window.applyAppLanguage) window.applyAppLanguage(lang);
+    };
+    document.addEventListener("DOMContentLoaded", function() {
+      const lang = window.currentAppLanguage;
+      const bId = document.getElementById("btn-lang-id");
+      const bEn = document.getElementById("btn-lang-en");
+      if (bId && bEn) {
+        if (lang === 'id') { bId.classList.add("active"); bEn.classList.remove("active"); }
+        else { bEn.classList.add("active"); bId.classList.remove("active"); }
+      }
+    });
+  </script>
 </head>
 <body>
 
@@ -40,9 +67,9 @@
 
       <!-- Language Switcher (ID / EN) -->
       <div class="lang-switcher" id="lang-switcher" title="Ganti Bahasa / Switch Language">
-        <button class="lang-btn active" id="btn-lang-id" onclick="setLanguage('id'); playAvionicBeep(600, 'sine');">ID</button>
+        <button type="button" class="lang-btn active" id="btn-lang-id" onclick="setLanguage('id');">ID</button>
         <span class="lang-divider">|</span>
-        <button class="lang-btn" id="btn-lang-en" onclick="setLanguage('en'); playAvionicBeep(600, 'sine');">EN</button>
+        <button type="button" class="lang-btn" id="btn-lang-en" onclick="setLanguage('en');">EN</button>
       </div>
     </div>
   </header>
@@ -60,10 +87,10 @@
       <!-- =================================================================== -->
       <section id="home-slide-1" class="home-slide-section">
         <div style="max-width: 960px; margin: auto 0; text-align: center; width: 100%;">
-          <h1 style="font-size: 26px; font-weight: 900; color: var(--text-primary); margin: 0 0 10px; letter-spacing: -0.5px;">
+          <h1 data-i18n="home_title" style="font-size: 26px; font-weight: 900; color: var(--text-primary); margin: 0 0 10px; letter-spacing: -0.5px;">
             XASUAI — Sistem Navigasi Lokasi Pendaratan di Bulan
           </h1>
-          <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; max-width: 860px; margin: 0 auto 16px;">
+          <p data-i18n="home_desc" style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; max-width: 860px; margin: 0 auto 16px;">
             XASUAI adalah sistem yang membantu menentukan lokasi dan waktu pendaratan terbaik bagi wahana Artemis di <strong>Mons Mouton, Kutub Selatan Bulan</strong>. Sistem ini menganalisis kondisi lingkungan, bentuk permukaan Bulan, serta pergerakan wahana untuk memastikan pendaratan berlangsung aman dan terkendali.
           </p>
 
@@ -72,7 +99,7 @@
 
           <!-- Teks Simpel Petunjuk -->
           <p id="homeMoonCtaPill" onclick="slideHomeTo(2)" style="font-size: 13px; color: var(--text-muted); margin: 0 auto; cursor: pointer; transition: color 0.2s ease; user-select: none; font-weight: 600;" onmouseover="this.style.color='var(--artemis-blue)';" onmouseout="this.style.color='var(--text-muted)';">
-            Klik Bulan untuk Melanjutkan &darr;
+            <span data-i18n="home_cta">Klik Bulan untuk Melanjutkan &darr;</span>
           </p>
         </div>
       </section>
@@ -82,10 +109,10 @@
       <!-- =================================================================== -->
       <section id="home-slide-2" class="home-slide-section">
         <div style="max-width: 1140px; margin: auto 0; text-align: center; width: 100%;">
-          <h2 style="font-size: 24px; font-weight: 900; color: var(--text-primary); margin: 0 0 6px; letter-spacing: -0.5px;">
+          <h2 data-i18n="home_chal_title" style="font-size: 24px; font-weight: 900; color: var(--text-primary); margin: 0 0 6px; letter-spacing: -0.5px;">
             Tantangan Utama Pendaratan di Kutub Selatan Bulan
           </h2>
-          <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0 auto 20px; max-width: 760px;">
+          <p data-i18n="home_chal_desc" style="font-size: 13.5px; color: var(--text-secondary); margin: 0 auto 20px; max-width: 760px;">
             Ada tiga masalah utama yang harus diatasi sebelum wahana dapat mendarat dengan aman di Mons Mouton.
           </p>
 
@@ -95,26 +122,26 @@
             <div style="background: #fffafa; border: 1px solid #fecaca; border-top: 4px solid #b91c1c; border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <span style="background: #b91c1c; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800;">MASALAH 1</span>
-                  <span style="font-size: 11px; font-weight: 700; color: #991b1b;">Lingkungan Ekstrem</span>
+                  <span data-i18n="home_m1_tag" style="background: #b91c1c; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800;">MASALAH 1</span>
+                  <span data-i18n="home_m1_cat" style="font-size: 11px; font-weight: 700; color: #991b1b;">Lingkungan Ekstrem</span>
                 </div>
-                <div style="font-size: 13px; font-weight: 800; color: #b91c1c; margin-bottom: 8px; line-height: 1.35;">
+                <div data-i18n="home_m1_title" style="font-size: 13px; font-weight: 800; color: #b91c1c; margin-bottom: 8px; line-height: 1.35;">
                   Keterbatasan Sinar Matahari dan Komunikasi
                 </div>
                 <div style="margin-bottom: 10px;">
-                  <div style="font-size: 10.5px; font-weight: 800; color: #991b1b; text-transform: uppercase; margin-bottom: 3px;">
+                  <div data-i18n="home_m1_q" style="font-size: 10.5px; font-weight: 800; color: #991b1b; text-transform: uppercase; margin-bottom: 3px;">
                     Apa masalahnya?
                   </div>
-                  <p style="font-size: 12px; line-height: 1.55; color: var(--text-secondary); margin: 0;">
+                  <p data-i18n="home_m1_desc" style="font-size: 12px; line-height: 1.55; color: var(--text-secondary); margin: 0;">
                     Di Kutub Selatan Bulan, sinar Matahari dan arah Bumi berada pada sudut yang sangat rendah. Akibatnya, suhu ekstrem turun hingga <strong>-240°C</strong> mengganggu daya listrik, serta perbukitan menghalangi sinyal komunikasi langsung ke Bumi.
                   </p>
                 </div>
               </div>
               <div style="background: #ffffff; border: 1px solid #fed7d7; border-radius: 6px; padding: 10px; margin-top: 8px;">
-                <div style="font-size: 11px; font-weight: 800; color: #b91c1c; margin-bottom: 3px;">
+                <div data-i18n="home_m1_sol_tag" style="font-size: 11px; font-weight: 800; color: #b91c1c; margin-bottom: 3px;">
                   Solusi 1 — Rekomendasi Waktu Pendaratan
                 </div>
-                <div style="font-size: 11.5px; line-height: 1.45; color: var(--text-secondary); margin: 0;">
+                <div data-i18n="home_m1_sol_desc" style="font-size: 11.5px; line-height: 1.45; color: var(--text-secondary); margin: 0;">
                   Sistem menganalisis pergerakan Matahari &amp; Bumi untuk mencari jendela waktu saat lokasi mendapat cukup cahaya dan jalur komunikasi langsung bebas rintangan.
                 </div>
               </div>
@@ -124,26 +151,26 @@
             <div style="background: #fffdf5; border: 1px solid #fde68a; border-top: 4px solid #b45309; border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <span style="background: #b45309; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800;">MASALAH 2</span>
-                  <span style="font-size: 11px; font-weight: 700; color: #92400e;">Topografi Terjal</span>
+                  <span data-i18n="home_m2_tag" style="background: #b45309; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800;">MASALAH 2</span>
+                  <span data-i18n="home_m2_cat" style="font-size: 11px; font-weight: 700; color: #92400e;">Topografi Terjal</span>
                 </div>
-                <div style="font-size: 13px; font-weight: 800; color: #b45309; margin-bottom: 8px; line-height: 1.35;">
+                <div data-i18n="home_m2_title" style="font-size: 13px; font-weight: 800; color: #b45309; margin-bottom: 8px; line-height: 1.35;">
                   Permukaan Tidak Rata dan Lereng Curam
                 </div>
                 <div style="margin-bottom: 10px;">
-                  <div style="font-size: 10.5px; font-weight: 800; color: #92400e; text-transform: uppercase; margin-bottom: 3px;">
+                  <div data-i18n="home_m2_q" style="font-size: 10.5px; font-weight: 800; color: #92400e; text-transform: uppercase; margin-bottom: 3px;">
                     Apa masalahnya?
                   </div>
-                  <p style="font-size: 12px; line-height: 1.55; color: var(--text-secondary); margin: 0;">
+                  <p data-i18n="home_m2_desc" style="font-size: 12px; line-height: 1.55; color: var(--text-secondary); margin: 0;">
                     Permukaan Mons Mouton dipenuhi kawah terjal dan lereng curam. Mendarat di kemiringan berlebih dapat membuat wahana tergelincir atau terbalik, dan tebing tinggi di sekitarnya dapat memutus garis pandang antena ke Bumi.
                   </p>
                 </div>
               </div>
               <div style="background: #ffffff; border: 1px solid #fef3c7; border-radius: 6px; padding: 10px; margin-top: 8px;">
-                <div style="font-size: 11px; font-weight: 800; color: #b45309; margin-bottom: 3px;">
+                <div data-i18n="home_m2_sol_tag" style="font-size: 11px; font-weight: 800; color: #b45309; margin-bottom: 3px;">
                   Solusi 2 — Visualisasi &amp; Analisis Topografi
                 </div>
-                <div style="font-size: 11.5px; line-height: 1.45; color: var(--text-secondary); margin: 0;">
+                <div data-i18n="home_m2_sol_desc" style="font-size: 11.5px; line-height: 1.45; color: var(--text-secondary); margin: 0;">
                   Sistem memetakan kontur 2D/3D &amp; profil horizon Mons Mouton untuk mengukur batas kelerengan aman serta memverifikasi elevasi tebing penghalang sinyal.
                 </div>
               </div>
@@ -153,26 +180,26 @@
             <div style="background: #f8faff; border: 1px solid #bfdbfe; border-top: 4px solid #1d4ed8; border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <span style="background: #1d4ed8; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800;">MASALAH 3</span>
-                  <span style="font-size: 11px; font-weight: 700; color: #1e40af;">Dinamika Wahana</span>
+                  <span data-i18n="home_m3_tag" style="background: #1d4ed8; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 800;">MASALAH 3</span>
+                  <span data-i18n="home_m3_cat" style="font-size: 11px; font-weight: 700; color: #1e40af;">Dinamika Wahana</span>
                 </div>
-                <div style="font-size: 13px; font-weight: 800; color: #1d4ed8; margin-bottom: 8px; line-height: 1.35;">
+                <div data-i18n="home_m3_title" style="font-size: 13px; font-weight: 800; color: #1d4ed8; margin-bottom: 8px; line-height: 1.35;">
                   Kecepatan Wahana &amp; Risiko Kecelakaan
                 </div>
                 <div style="margin-bottom: 10px;">
-                  <div style="font-size: 10.5px; font-weight: 800; color: #1e40af; text-transform: uppercase; margin-bottom: 3px;">
+                  <div data-i18n="home_m3_q" style="font-size: 10.5px; font-weight: 800; color: #1e40af; text-transform: uppercase; margin-bottom: 3px;">
                     Apa masalahnya?
                   </div>
-                  <p style="font-size: 12px; line-height: 1.55; color: var(--text-secondary); margin: 0;">
+                  <p data-i18n="home_m3_desc" style="font-size: 12px; line-height: 1.55; color: var(--text-secondary); margin: 0;">
                     Wahana melaju dengan kecepatan orbital sangat tinggi (~1,7 km/s). Pengereman bertenaga harus presisi; kesalahan pengereman dapat menghabiskan propelan sebelum touchdown atau menyebabkan wahana menghantam permukaan Bulan.
                   </p>
                 </div>
               </div>
               <div style="background: #ffffff; border: 1px solid #dbeafe; border-radius: 6px; padding: 10px; margin-top: 8px;">
-                <div style="font-size: 11px; font-weight: 800; color: #1d4ed8; margin-bottom: 3px;">
+                <div data-i18n="home_m3_sol_tag" style="font-size: 11px; font-weight: 800; color: #1d4ed8; margin-bottom: 3px;">
                   Solusi 3 — Simulasi Penerbangan &amp; Pendaratan
                 </div>
-                <div style="font-size: 11.5px; line-height: 1.45; color: var(--text-secondary); margin: 0;">
+                <div data-i18n="home_m3_sol_desc" style="font-size: 11.5px; line-height: 1.45; color: var(--text-secondary); margin: 0;">
                   Sistem menyimulasikan panduan penerbangan 6-DOF, modulasi dorongan pendorong, dan konsumsi propelan untuk menjamin pendaratan vertikal yang mulus.
                 </div>
               </div>
@@ -186,26 +213,26 @@
       <!-- =================================================================== -->
       <section id="home-slide-3" class="home-slide-section">
         <div style="max-width: 1140px; margin: auto 0; text-align: center; width: 100%;">
-          <h2 style="font-size: 24px; font-weight: 900; color: var(--text-primary); margin: 0 0 6px; letter-spacing: -0.5px;">
+          <h2 data-i18n="home_flow_title" style="font-size: 24px; font-weight: 900; color: var(--text-primary); margin: 0 0 6px; letter-spacing: -0.5px;">
             Alur Kerja XASUAI — 3 Tahap Penyelesaian
           </h2>
-          <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0 auto 12px; max-width: 760px;">
+          <p data-i18n="home_flow_desc" style="font-size: 13.5px; color: var(--text-secondary); margin: 0 auto 12px; max-width: 760px;">
             Setiap tahap dirancang untuk menyelesaikan satu masalah utama secara berurutan. Klik salah satu tahap untuk mulai!
           </p>
 
           <!-- Alur Urutan Chip -->
           <div style="display: inline-flex; align-items: center; justify-content: center; gap: 10px; background: var(--bg-surface); padding: 5px 16px; border-radius: var(--radius-pill); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); margin-bottom: 16px;">
-            <span style="font-size: 11.5px; font-weight: 800; color: #b91c1c; display: inline-flex; align-items: center; gap: 5px;">
+            <span data-i18n="home_step1_chip" style="font-size: 11.5px; font-weight: 800; color: #b91c1c; display: inline-flex; align-items: center; gap: 5px;">
               <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #b91c1c;"></span>
               1. Rekomendasi
             </span>
             <span style="color: #b91c1c; font-size: 13px; font-weight: 900;">&rarr;</span>
-            <span style="font-size: 11.5px; font-weight: 800; color: #b45309; display: inline-flex; align-items: center; gap: 5px;">
+            <span data-i18n="home_step2_chip" style="font-size: 11.5px; font-weight: 800; color: #b45309; display: inline-flex; align-items: center; gap: 5px;">
               <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #b45309;"></span>
               2. Visualisasi
             </span>
             <span style="color: #b45309; font-size: 13px; font-weight: 900;">&rarr;</span>
-            <span style="font-size: 11.5px; font-weight: 800; color: #1d4ed8; display: inline-flex; align-items: center; gap: 5px;">
+            <span data-i18n="home_step3_chip" style="font-size: 11.5px; font-weight: 800; color: #1d4ed8; display: inline-flex; align-items: center; gap: 5px;">
               <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #1d4ed8;"></span>
               3. Simulasi
             </span>
@@ -217,25 +244,25 @@
             <div class="interactive-card" onclick="switchView('rekomendasi'); playAvionicBeep(640, 'sine');" style="background: #fffafa; border: 1px solid #fecaca; border-top: 4px solid #b91c1c; border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); cursor: pointer;" title="Klik untuk membuka Tahap 1: Mesin Rekomendasi">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <span style="background: #b91c1c; color: #ffffff; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;">TAHAP 1</span>
-                  <span style="font-size: 11px; font-weight: 700; color: #991b1b; font-style: italic;">Solusi Masalah 1</span>
+                  <span data-i18n="home_step1_badge" style="background: #b91c1c; color: #ffffff; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;">TAHAP 1</span>
+                  <span data-i18n="home_step1_sol" style="font-size: 11px; font-weight: 700; color: #991b1b; font-style: italic;">Solusi Masalah 1</span>
                 </div>
-                <h3 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
+                <h3 data-i18n="home_step1_title" style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
                   Menentukan Waktu Pendaratan
                 </h3>
-                <div style="font-size: 11.5px; font-weight: 700; color: #b91c1c; margin-bottom: 8px;">
+                <div data-i18n="home_step1_eng" style="font-size: 11.5px; font-weight: 700; color: #b91c1c; margin-bottom: 8px;">
                   Mesin Rekomendasi (MCDA Engine)
                 </div>
-                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.55; margin: 0 0 10px;">
+                <p data-i18n="home_step1_d1" style="font-size: 12px; color: var(--text-secondary); line-height: 1.55; margin: 0 0 10px;">
                   Sistem menganalisis data pergerakan Matahari, posisi Bumi, dan profil elevasi selama 336 jam menggunakan data ephemeris NASA JPL Horizons dan peta topografi LOLA DEM.
                 </p>
-                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.55; margin: 0;">
+                <p data-i18n="home_step1_d2" style="font-size: 12px; color: var(--text-secondary); line-height: 1.55; margin: 0;">
                   Menghitung skor multi-kriteria untuk memilih jendela waktu pendaratan dengan iluminasi optimal serta visibilitas sinyal Bumi tanpa terhalang bayangan kawah.
                 </p>
               </div>
               <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed #fecaca;">
                 <div class="action-hint" style="font-size: 11.5px; font-weight: 800; color: #b91c1c; display: flex; align-items: center; gap: 6px;">
-                  <span>BUKA MESIN REKOMENDASI</span>
+                  <span data-i18n="home_step1_btn">BUKA MESIN REKOMENDASI &rarr;</span>
                   <span>&rarr;</span>
                 </div>
               </div>
@@ -245,8 +272,8 @@
             <div class="interactive-card" onclick="switchView('visualisasi'); playAvionicBeep(720, 'sine');" style="background: #fffdf5; border: 1px solid #fde68a; border-top: 4px solid #b45309; border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); cursor: pointer;" title="Klik untuk membuka Tahap 2: Visualisasi Topografi">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <span style="background: #b45309; color: #ffffff; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;">TAHAP 2</span>
-                  <span style="font-size: 11px; font-weight: 700; color: #92400e; font-style: italic;">Solusi Masalah 2</span>
+                  <span data-i18n="home_step2_badge" style="background: #b45309; color: #ffffff; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;">TAHAP 2</span>
+                  <span data-i18n="home_step2_sol" style="font-size: 11px; font-weight: 700; color: #92400e; font-style: italic;">Solusi Masalah 2</span>
                 </div>
                 <h3 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
                   Memeriksa Kondisi Permukaan
@@ -273,8 +300,8 @@
             <div class="interactive-card" onclick="switchView('simulasi'); playAvionicBeep(800, 'sine');" style="background: #f8faff; border: 1px solid #bfdbfe; border-top: 4px solid #1d4ed8; border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); cursor: pointer;" title="Klik untuk membuka Tahap 3: Simulator Penerbangan">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <span style="background: #1d4ed8; color: #ffffff; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;">TAHAP 3</span>
-                  <span style="font-size: 11px; font-weight: 700; color: #1e40af; font-style: italic;">Solusi Masalah 3</span>
+                  <span data-i18n="home_step3_badge" style="background: #1d4ed8; color: #ffffff; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;">TAHAP 3</span>
+                  <span data-i18n="home_step3_sol" style="font-size: 11px; font-weight: 700; color: #1e40af; font-style: italic;">Solusi Masalah 3</span>
                 </div>
                 <h3 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
                   Menguji Proses Pendaratan
@@ -628,13 +655,13 @@
                 <span>Kembali ke Menu Visualisasi</span>
               </button>
               <span class="card-title" style="font-size: 17px; font-weight: 800;">
-                Navigasi Orbital 3D — Menuju Mons Mouton Crest
+                <span data-i18n="vis_globe_title">Navigasi Orbital 3D — Menuju Mons Mouton Crest</span>
               </span>
             </div>
             
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
               <span class="badge-slope-safe" id="lbl-active-coords-globe" style="font-size: 11px; font-weight: 800; padding: 4px 10px;">
-                Target: Mons Mouton Crest (-84,9°S, 33,3°W)
+                <span data-i18n="vis_globe_target">Target: Mons Mouton Crest (-84,9°S, 33,3°W)</span>
               </span>
             </div>
           </div>
@@ -692,12 +719,12 @@
                 <span>Kembali ke Menu Visualisasi</span>
               </button>
               <span class="card-title" style="font-size: 17px; font-weight: 800;">
-                Inspeksi Kelerengan &amp; Kontur Medan 2D (LOLA DEM)
+                <span data-i18n="vis_map_title">Inspeksi Kelerengan &amp; Kontur Medan 2D (LOLA DEM)</span>
               </span>
             </div>
             
             <span class="badge-slope-safe" id="lbl-active-coords-dem" style="font-size: 11px; font-weight: 800; padding: 4px 10px;">
-              Lokasi: Mons Mouton Crest (-84,9°S, 33,3°W)
+              <span data-i18n="vis_map_target">Lokasi: Mons Mouton Crest (-84,9°S, 33,3°W)</span>
             </span>
           </div>
 
@@ -769,21 +796,20 @@
             <div style="display: flex; align-items: center; gap: 10px;">
               <button onclick="scrollToVisSlide('menu')" style="background: none; border: none; color: var(--text-muted); font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px;" onmouseover="this.style.color='var(--artemis-blue)'" onmouseout="this.style.color='var(--text-muted)'">
                 <span>&uarr;</span>
-                <span>Kembali ke Menu Visualisasi</span>
+                <span data-i18n="s4_back">Kembali ke Menu Visualisasi</span>
               </button>
             </div>
-            <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; font-size: 10.5px; font-weight: 800; padding: 3px 12px; border-radius: 999px; display: flex; align-items: center; gap: 6px;">
-              <span style="width: 7px; height: 7px; background: #10b981; border-radius: 50%;"></span>
+            <div data-i18n="s4_data_valid" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; font-size: 10.5px; font-weight: 800; padding: 3px 12px; border-radius: 999px; display: flex; align-items: center; gap: 6px;">
               DATA VALID: NASA LOLA DEM + JPL HORIZONS DE441
             </div>
           </div>
 
           <!-- Section Heading Compact -->
           <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border-light); flex-shrink: 0;">
-            <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0;">
+            <h3 data-i18n="s4_title" style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0;">
               Visualisasi 3D Topografi Mons Mouton Crest dan Pemeriksaan Jalur Sinyal
             </h3>
-            <span style="font-size: 11px; color: var(--text-secondary);">
+            <span data-i18n="s4_subtitle" style="font-size: 11px; color: var(--text-secondary);">
               Analisis kondisi permukaan, ketinggian tebing kawah, jalur sinyal langsung ke Bumi (DTE), dan pencahayaan Matahari.
             </span>
           </div>
@@ -798,7 +824,7 @@
               <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; z-index: 10; flex-shrink: 0;">
                 <!-- Layer Dropdown -->
                 <div style="display: flex; gap: 8px; align-items: center;">
-                  <label for="select-3d-layer" style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Lapisan Peta:</label>
+                  <label data-i18n="s4_lbl_layer" for="select-3d-layer" style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Lapisan Peta:</label>
                   <select id="select-3d-layer" onchange="switch3DLayer(this.value)" style="background: #0b1329; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer; outline: none; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
                     <option value="mcda">✦ Lapisan 1: Zona Kelayakan (MCDA Viridis)</option>
                     <option value="dem">✦ Lapisan 2: Topografi Elevasi (NASA LOLA DEM)</option>
@@ -822,13 +848,13 @@
               
               <!-- Card Header Penjelasan -->
               <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 8px 12px; flex-shrink: 0;">
-                <div style="font-size: 10.5px; font-weight: 800; color: var(--artemis-blue); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 2px;">
+                <div data-i18n="s4_verif_tag" style="font-size: 10.5px; font-weight: 800; color: var(--artemis-blue); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 2px;">
                   VERIFIKASI KEAMANAN LOKASI PENDARATAN
                 </div>
-                <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 2px;">
+                <h4 data-i18n="s4_verif_heading" style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 2px;">
                   Mengapa Lokasi Ini Aman untuk Pendaratan?
                 </h4>
-                <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+                <p data-i18n="s4_verif_desc" style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.4; margin: 0;">
                   Berdasarkan hasil analisis topografi 3D, Mons Mouton Crest memenuhi seluruh kriteria keselamatan pendaratan dengan 3 keunggulan:
                 </p>
               </div>
@@ -840,9 +866,9 @@
                 <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #0284c7; border-radius: var(--radius-sm); padding: 8px 12px; box-shadow: var(--shadow-sm);">
                   <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
                     <span style="font-size: 14px;">📡</span>
-                    <strong style="font-size: 12px; color: #0369a1;">Jalur Sinyal ke Bumi Bebas Hambatan Tebing</strong>
+                    <strong data-i18n="s4_r1_title" style="font-size: 12px; color: #0369a1;">Jalur Sinyal ke Bumi Bebas Hambatan Tebing</strong>
                   </div>
-                  <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+                  <p data-i18n="s4_r1_desc" style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin: 0;">
                     Mons Mouton adalah dataran tinggi (+5.920 m) jauh di atas dinding kawah. Pada model 3D, garis laser cyan menunjukkan pandangan langsung ke Bumi dengan sudut bebas pandang +12,35° di atas bibir tebing tertinggi (<em>zero loss-of-signal</em>).
                   </p>
                 </div>
@@ -851,9 +877,9 @@
                 <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #f59e0b; border-radius: var(--radius-sm); padding: 8px 12px; box-shadow: var(--shadow-sm);">
                   <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
                     <span style="font-size: 14px;">☀️</span>
-                    <strong style="font-size: 12px; color: #b45309;">Pasokan Cahaya Matahari Optimal</strong>
+                    <strong data-i18n="s4_r2_title" style="font-size: 12px; color: #b45309;">Pasokan Cahaya Matahari Optimal</strong>
                   </div>
-                  <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+                  <p data-i18n="s4_r2_desc" style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin: 0;">
                     Posisi puncak dataran tinggi menerima sinar Matahari secara kontinu tanpa terhalang bayangan tebing kawah, memastikan pasokan listrik panel surya aktif selama 14 hari penuh operasi di permukaan Bulan.
                   </p>
                 </div>
@@ -862,9 +888,9 @@
                 <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #10b981; border-radius: var(--radius-sm); padding: 8px 12px; box-shadow: var(--shadow-sm);">
                   <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
                     <span style="font-size: 14px;">📐</span>
-                    <strong style="font-size: 12px; color: #047857;">Permukaan Datar dan Sangat Stabil</strong>
+                    <strong data-i18n="s4_r3_title" style="font-size: 12px; color: #047857;">Permukaan Datar dan Sangat Stabil</strong>
                   </div>
-                  <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+                  <p data-i18n="s4_r3_desc" style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin: 0;">
                     Kemiringan lereng hanya 0,08°, jauh di bawah batas maksimum keselamatan NASA (10°). Kaki pendarat wahana dapat menyentuh permukaan secara kokoh tanpa risiko tergelincir atau terguling.
                   </p>
                 </div>
@@ -877,11 +903,11 @@
 
           <!-- Bottom CTA to Simulator -->
           <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 6px; border-top: 1px solid var(--border-light); margin-top: auto; flex-shrink: 0;">
-            <div style="font-size: 10.5px; color: var(--text-secondary);">
+            <div data-i18n="s4_nav_hint" style="font-size: 10.5px; color: var(--text-secondary);">
               <strong>Petunjuk Navigasi 3D:</strong> Geser tetikus untuk memutar tampilan. Gunakan roda tetikus untuk zoom.
             </div>
             <button class="btn-finder-hero" onclick="switchView('simulasi'); playAvionicBeep(800, 'sine');" style="padding: 7px 18px; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(14, 116, 144, 0.35); flex-shrink: 0; white-space: nowrap;">
-              <span>Lanjut: Uji Pendaratan melalui Simulator Penerbangan</span>
+              <span data-i18n="s4_btn_next">Lanjut: Uji Pendaratan melalui Simulator Penerbangan &rarr;</span>
               <span>&rarr;</span>
             </button>
           </div>
@@ -1081,6 +1107,6 @@
   </div>
 
   <!-- JAVASCRIPT SYSTEM ENGINE -->
-  <script src="/js/app.js?v=27"></script>
+  <script src="/js/app.js?v=60"></script>
 </body>
 </html>
