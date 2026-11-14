@@ -1333,63 +1333,133 @@
 
         <!-- 3 Peringatan Bahaya Operasional Kritis (Critical Mission Hazards) -->
         <div style="text-align: left; margin-bottom: 28px;">
-          <div style="font-size: 11px; font-weight: 800; color: #f87171; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;">
-            CRITICAL MISSION HAZARDS // LUNAR SOUTH POLE ENVIRONMENT
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 800; color: #f87171; letter-spacing: 1px; text-transform: uppercase;">
+              CRITICAL MISSION HAZARDS // LUNAR SOUTH POLE ENVIRONMENT
+            </div>
+            <span style="font-size: 11px; color: #94a3b8; font-weight: 600;">
+              Tantangan Kritis yang Wajib Diatasi Sebelum Pendaratan
+            </span>
           </div>
+
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
-            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: var(--radius-md); padding: 16px;">
-              <div style="font-size: 12px; font-weight: 800; color: #f87171; letter-spacing: 0.5px; margin-bottom: 6px;">
-                HAZARD 01 — KEGELAPAN ABADI (PERMANENT SHADOWS)
+            <!-- Hazard 1 -> Maps to Tahap 1 -->
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
+                  <div style="font-size: 12px; font-weight: 800; color: #f87171; letter-spacing: 0.5px;">
+                    HAZARD 01 — FLUKTUASI PENYINARAN &amp; BLACKOUT KOMUNIKASI
+                  </div>
+                </div>
+                <p style="font-size: 12px; line-height: 1.6; color: #cbd5e1; margin: 0 0 12px;">
+                  Sudut datang surya dan elevasi Bumi sangat rendah (&le; 2.5°). Wahana berisiko terjebak di dalam bayangan abadi (suhu ekstrem <strong>-240°C</strong> yang membekukan sel baterai) serta kehilangan sinyal kendali telemetri Bumi.
+                </p>
               </div>
-              <p style="font-size: 12px; line-height: 1.6; color: #cbd5e1; margin: 0;">
-                Sudut datang surya sangat rendah (&le; 2.5°), menyebabkan suhu kriogenik ekstrem (<strong>-240°C</strong>) yang membekukan sel baterai kimiawi, melumpuhkan propelan, dan memutus total suplai daya panel surya (0% blackout).
-              </p>
+              <div style="padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 10px; font-weight: 800; color: #38bdf8; display: flex; align-items: center; justify-content: space-between;">
+                <span>TARGET PENYELESAIAN:</span>
+                <span style="background: rgba(14, 116, 144, 0.3); border: 1px solid rgba(56, 189, 248, 0.35); padding: 2px 8px; border-radius: 4px;">DISELESAIKAN OLEH TAHAP 1 &rarr;</span>
+              </div>
             </div>
-            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: var(--radius-md); padding: 16px;">
-              <div style="font-size: 12px; font-weight: 800; color: #fbbf24; letter-spacing: 0.5px; margin-bottom: 6px;">
-                HAZARD 02 — TEBING CURAM &amp; MEDAN EKSTREM
+
+            <!-- Hazard 2 -> Maps to Tahap 2 -->
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
+                  <div style="font-size: 12px; font-weight: 800; color: #fbbf24; letter-spacing: 0.5px;">
+                    HAZARD 02 — KEMIRINGAN LERENG CURAM &amp; RINTANGAN TEBING
+                  </div>
+                </div>
+                <p style="font-size: 12px; line-height: 1.6; color: #cbd5e1; margin: 0 0 12px;">
+                  Topografi kawah Mons Mouton dikelilingi jurang ribuan meter. Ambang batas Artemis HLS mewajibkan <strong>kemiringan lereng &lt; 10°</strong> guna mencegah bahaya wahana terbalik (rollover), dan bibir kawah tidak boleh memblokir antena.
+                </p>
               </div>
-              <p style="font-size: 12px; line-height: 1.6; color: #cbd5e1; margin: 0;">
-                Kawah jurang terjal ribuan meter di sekitar Mons Mouton. Ambang batas struktural pendarat Artemis HLS terkunci ketat pada <strong>kemiringan lereng &lt; 10°</strong> guna mencegah risiko fatal wahana terbalik (rollover catastrophic failure).
-              </p>
+              <div style="padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 10px; font-weight: 800; color: #34d399; display: flex; align-items: center; justify-content: space-between;">
+                <span>TARGET PENYELESAIAN:</span>
+                <span style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); padding: 2px 8px; border-radius: 4px;">DISELESAIKAN OLEH TAHAP 2 &rarr;</span>
+              </div>
             </div>
-            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: var(--radius-md); padding: 16px;">
-              <div style="font-size: 12px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; margin-bottom: 6px;">
-                HAZARD 03 — PEMUTUSAN SINYAL BUMI (BLACKOUT DTE)
+
+            <!-- Hazard 3 -> Maps to Tahap 3 -->
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
+                  <div style="font-size: 12px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px;">
+                    HAZARD 03 — DESELERASI KECEPATAN ORBIT &amp; RISIKO CRASH
+                  </div>
+                </div>
+                <p style="font-size: 12px; line-height: 1.6; color: #cbd5e1; margin: 0 0 12px;">
+                  Wahana meluncur dari kecepatan orbit 1.690 m/s pada ketinggian 15 km menuju pendaratan. Kesalahan profil gaya dorong dapat menghabiskan propelan di udara atau mengakibatkan hantaman permukaan yang fatal (hard crash).
+                </p>
               </div>
-              <p style="font-size: 12px; line-height: 1.6; color: #cbd5e1; margin: 0;">
-                Posisi Bumi yang menggantung rendah di cakrawala mudah terhalang oleh tingginya dinding kawah, yang dapat memutus jalur transmisi langsung (Direct-To-Earth) dan komunikasi telemetri kendali seketika.
-              </p>
+              <div style="padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 10px; font-weight: 800; color: #60a5fa; display: flex; align-items: center; justify-content: space-between;">
+                <span>TARGET PENYELESAIAN:</span>
+                <span style="background: rgba(2, 132, 199, 0.25); border: 1px solid rgba(2, 132, 199, 0.4); padding: 2px 8px; border-radius: 4px;">DISELESAIKAN OLEH TAHAP 3 &rarr;</span>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- 3 Tahapan Alur Kerja Operasional (Mission Flow) -->
         <div style="text-align: left; margin-bottom: 32px;">
-          <div style="font-size: 11px; font-weight: 800; color: #38bdf8; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;">
-            OPERATIONAL MISSION FLOW // 3-PHASE EXECUTION
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <div style="font-size: 11px; font-weight: 800; color: #38bdf8; letter-spacing: 1px; text-transform: uppercase;">
+              OPERATIONAL MISSION FLOW // 3-PHASE EXECUTION
+            </div>
+            <span style="font-size: 11px; color: #94a3b8; font-weight: 600;">
+              Solusi Terpadu Sistem XASUAI untuk Mengatasi Setiap Ancaman
+            </span>
           </div>
+
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
-            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(14, 116, 144, 0.4); border-radius: var(--radius-md); padding: 18px;">
-              <span class="step-badge" style="background: var(--artemis-blue); color: #ffffff; padding: 2px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 1</span>
-              <h4 style="font-size: 14px; font-weight: 800; color: #ffffff; margin: 10px 0 6px;">Rekomendasi (MCDA Engine)</h4>
-              <p style="font-size: 12px; color: #94a3b8; line-height: 1.6; margin: 0;">
-                Solver multi-kriteria memindai 336 jam efemeris JPL Horizons &amp; model LOLA DEM untuk menentukan jendela peluncuran dan pendaratan teraman.
-              </p>
+            <!-- Tahap 1: Solusi Hazard 1 -->
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(14, 116, 144, 0.45); border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span class="step-badge" style="background: var(--artemis-blue); color: #ffffff; padding: 2px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 1</span>
+                  <span style="font-size: 10px; font-weight: 800; color: #f87171;">SOLUSI HAZARD 01</span>
+                </div>
+                <h4 style="font-size: 14px; font-weight: 800; color: #ffffff; margin: 0 0 6px;">Rekomendasi (MCDA Engine)</h4>
+                <p style="font-size: 12px; color: #94a3b8; line-height: 1.6; margin: 0 0 10px;">
+                  Solver multi-kriteria memindai 336 jam efemeris JPL Horizons &amp; model LOLA DEM untuk mengunci jendela waktu dengan <strong>100% suplai daya surya</strong> dan komunikasi DTE bebas bayangan kawah.
+                </p>
+              </div>
+              <div style="font-size: 11px; font-weight: 700; color: #38bdf8;">
+                Hasil: 14 Nov 2026, 14:55 UTC (Skor 0.94 / 1.0)
+              </div>
             </div>
-            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: var(--radius-md); padding: 18px;">
-              <span class="step-badge" style="background: var(--emerald-safe); color: #ffffff; padding: 2px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 2</span>
-              <h4 style="font-size: 14px; font-weight: 800; color: #ffffff; margin: 10px 0 6px;">Visualisasi Topografi (2D/3D &amp; Horizon)</h4>
-              <p style="font-size: 12px; color: #94a3b8; line-height: 1.6; margin: 0;">
-                Evaluasi kontur tanah LOLA 2D (zoom/pan mikroskopik), Globe 3D Three.js, dan verifikasi radar cakrawala 360° bebas rintangan kawah.
-              </p>
+
+            <!-- Tahap 2: Solusi Hazard 2 -->
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(16, 185, 129, 0.45); border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span class="step-badge" style="background: var(--emerald-safe); color: #ffffff; padding: 2px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 2</span>
+                  <span style="font-size: 10px; font-weight: 800; color: #fbbf24;">SOLUSI HAZARD 02</span>
+                </div>
+                <h4 style="font-size: 14px; font-weight: 800; color: #ffffff; margin: 0 0 6px;">Visualisasi Topografi (2D/3D &amp; Horizon)</h4>
+                <p style="font-size: 12px; color: #94a3b8; line-height: 1.6; margin: 0 0 10px;">
+                  Evaluasi kontur tanah LOLA 2D (zoom/pan mikroskopik $1\times - 5\times$) untuk memvalidasi <strong>kemiringan lereng datar 0.08°</strong>, Globe 3D satelit, dan radar radial raymarching 360° klirens bibir kawah.
+                </p>
+              </div>
+              <div style="font-size: 11px; font-weight: 700; color: #34d399;">
+                Hasil: Lereng 0.08° &lt; 10° | Klirens Sinyal +10.25°
+              </div>
             </div>
-            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(2, 132, 199, 0.4); border-radius: var(--radius-md); padding: 18px;">
-              <span class="step-badge" style="background: #0284c7; color: #ffffff; padding: 2px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 3</span>
-              <h4 style="font-size: 14px; font-weight: 800; color: #ffffff; margin: 10px 0 6px;">Simulasi Penerbangan (6-DOF Flight Dynamics)</h4>
-              <p style="font-size: 12px; color: #94a3b8; line-height: 1.6; margin: 0;">
-                Validasi penerbangan dari peluncuran Bumi, orbit polar, Powered Descent, hingga touchdown vertikal (Vz = 0.80 m/s) di puncak Mons Mouton.
-              </p>
+
+            <!-- Tahap 3: Solusi Hazard 3 -->
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(2, 132, 199, 0.45); border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span class="step-badge" style="background: #0284c7; color: #ffffff; padding: 2px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 3</span>
+                  <span style="font-size: 10px; font-weight: 800; color: #38bdf8;">SOLUSI HAZARD 03</span>
+                </div>
+                <h4 style="font-size: 14px; font-weight: 800; color: #ffffff; margin: 0 0 6px;">Simulasi Penerbangan (6-DOF Flight Dynamics)</h4>
+                <p style="font-size: 12px; color: #94a3b8; line-height: 1.6; margin: 0 0 10px;">
+                  Propagasi gravitasi non-sferis LP150Q (J2) dan solver RK45 bimbingan Kluever adaptif untuk mengendalikan pengereman retro hingga <strong>touchdown pendaratan lunak vertikal (Vz = 0.80 m/s)</strong>.
+                </p>
+              </div>
+              <div style="font-size: 11px; font-weight: 700; color: #60a5fa;">
+                Hasil: Vz = 0.80 m/s (&le; 1.5 m/s) | Propelan Sisa 25.6%
+              </div>
             </div>
           </div>
         </div>
