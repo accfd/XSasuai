@@ -1547,7 +1547,22 @@
         const resp = await fetch("/web_data/terrain_3d_data.json");
         realTerrainData = await resp.json();
       } catch (err) {
-        console.warn("Gagal load terrain_3d_data.json:", err);
+        console.warn("Gagal load terrain_3d_data.json, memakai fallback aman:", err);
+      }
+
+      // Fallback data terrain bila endpoint belum selesai membaca
+      if (!realTerrainData) {
+        realTerrainData = {
+          sites: [
+            { key: "ALPHA", name: "Mons Mouton Crest", norm_x: 0.52, norm_y: 0.48, elev_ratio: 0.88, slope_deg: 0.08, elev_m: 5920 }
+          ],
+          ephemeris: {
+            earth_az: 42.5,
+            earth_elev: 12.35,
+            sun_az: 115.0,
+            sun_elev: 1.8
+          }
+        };
       }
 
       // Preload Textures
@@ -1556,7 +1571,7 @@
       terrainTextures["dem"] = texLoader.load("/web_data/textures/tex_dem.png");
       terrainTextures["slope"] = texLoader.load("/web_data/textures/tex_slope.png");
 
-      // Build Real Terrain Mesh from Heightmap
+      // Build Real Terrain Mesh (Instan Frame 0 dengan elevasi dasar + penyempurnaan heightmap)
       buildRealTerrainMesh();
 
       // Setup Mouse Orbit Controls
@@ -1576,7 +1591,9 @@
             }
           });
         }
-        horizonRenderer.render(horizonScene, horizonCamera);
+        if (horizonRenderer && horizonScene && horizonCamera) {
+          horizonRenderer.render(horizonScene, horizonCamera);
+        }
       }
       animateHorizon();
       horizonViewerInitialized = true;
@@ -1625,64 +1642,80 @@
     }
 
     function buildRealTerrainMesh() {
+      const meshW = 36.0;
+      const meshH = 18.0;
+      const segW = 100;
+      const segH = 50;
+
+      // 1. Inisialisasi Mesh Geometri Dasar Langsung Muncul (Zero Latency)
+      const geo = new THREE.PlaneGeometry(meshW, meshH, segW, segH);
+      geo.rotateX(-Math.PI / 2);
+      const posAttr = geo.attributes.position;
+
+      // Bentuk elevasi dataran tinggi dasar Mons Mouton
+      for (let i = 0; i < posAttr.count; i++) {
+        const vx = posAttr.getX(i);
+        const vz = posAttr.getZ(i);
+        const dist = Math.sqrt(vx * vx + vz * vz);
+        const hBase = Math.max(0, 1.0 - Math.pow(dist / 16.0, 2)) * 3.8;
+        posAttr.setY(i, hBase);
+      }
+      geo.computeVertexNormals();
+
+      terrainMeshMat = new THREE.MeshStandardMaterial({
+        map: terrainTextures[active3DLayerKey] || terrainTextures["mcda"],
+        roughness: 0.85,
+        metalness: 0.15,
+        flatShading: false
+      });
+
+      const terrainMesh = new THREE.Mesh(geo, terrainMeshMat);
+      terrainMeshGroup.add(terrainMesh);
+
+      // Wireframe halus pendukung estetika radar
+      const wireMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.08 });
+      terrainMeshGroup.add(new THREE.Mesh(geo, wireMat));
+
+      // Pasang Pin Mons Mouton & Laser Sinyal Bumi Langsung
+      placeRealSitePins(meshW, meshH);
+      updateActiveSiteBeams(meshW, meshH);
+
+      // 2. Sempurnakan elevasi dengan data asli NASA LOLA heightmap.png
       const heightImg = new Image();
-      heightImg.crossOrigin = "anonymous";
-      heightImg.src = "/web_data/textures/heightmap.png";
       heightImg.onload = () => {
-        const offCanvas = document.createElement("canvas");
-        const ctx = offCanvas.getContext("2d");
-        const w = heightImg.width || 369;
-        const h = heightImg.height || 180;
-        offCanvas.width = w;
-        offCanvas.height = h;
-        ctx.drawImage(heightImg, 0, 0);
-        const imgData = ctx.getImageData(0, 0, w, h).data;
+        try {
+          const offCanvas = document.createElement("canvas");
+          const ctx = offCanvas.getContext("2d");
+          const w = heightImg.width || 369;
+          const h = heightImg.height || 180;
+          offCanvas.width = w;
+          offCanvas.height = h;
+          ctx.drawImage(heightImg, 0, 0);
+          const imgData = ctx.getImageData(0, 0, w, h).data;
 
-        const meshW = 36.0;
-        const meshH = 36.0 * (h / w);
-        const segW = Math.min(120, w - 1);
-        const segH = Math.min(60, h - 1);
-
-        const geo = new THREE.PlaneGeometry(meshW, meshH, segW, segH);
-        geo.rotateX(-Math.PI / 2);
-        const posAttr = geo.attributes.position;
-
-        for (let i = 0; i < posAttr.count; i++) {
-          const vx = posAttr.getX(i);
-          const vz = posAttr.getZ(i);
-
-          const u = (vx + meshW / 2) / meshW;
-          const v = (vz + meshH / 2) / meshH;
-
-          const px = Math.min(w - 1, Math.max(0, Math.floor(u * w)));
-          const py = Math.min(h - 1, Math.max(0, Math.floor(v * h)));
-
-          const idx = (py * w + px) * 4;
-          const hNorm = imgData[idx] / 255.0; // 0.0 to 1.0
-
-          // Vertical displacement matching plateau elevation
-          posAttr.setY(i, hNorm * 5.8);
+          for (let i = 0; i < posAttr.count; i++) {
+            const vx = posAttr.getX(i);
+            const vz = posAttr.getZ(i);
+            const u = (vx + meshW / 2) / meshW;
+            const v = (vz + meshH / 2) / meshH;
+            const px = Math.min(w - 1, Math.max(0, Math.floor(u * w)));
+            const py = Math.min(h - 1, Math.max(0, Math.floor(v * h)));
+            const idx = (py * w + px) * 4;
+            const hNorm = imgData[idx] / 255.0;
+            posAttr.setY(i, hNorm * 5.8);
+          }
+          geo.computeVertexNormals();
+          posAttr.needsUpdate = true;
+          placeRealSitePins(meshW, meshH);
+          updateActiveSiteBeams(meshW, meshH);
+        } catch (err) {
+          console.warn("Displacement heightmap warning:", err);
         }
-        geo.computeVertexNormals();
-
-        terrainMeshMat = new THREE.MeshStandardMaterial({
-          map: terrainTextures[active3DLayerKey] || terrainTextures["mcda"],
-          roughness: 0.85,
-          metalness: 0.15,
-          flatShading: false
-        });
-
-        const mesh = new THREE.Mesh(geo, terrainMeshMat);
-        terrainMeshGroup.add(mesh);
-
-        // Add subtle wireframe
-        const wireMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.08 });
-        terrainMeshGroup.add(new THREE.Mesh(geo, wireMat));
-
-        // Place Candidate Pins (Alpha, Beta, Gamma)
-        placeRealSitePins(meshW, meshH);
-        updateActiveSiteBeams(meshW, meshH);
       };
+      heightImg.onerror = (e) => {
+        console.warn("Gagal muat heightmap.png, elevasi dataran tinggi dasar tetap aktif:", e);
+      };
+      heightImg.src = "/web_data/textures/heightmap.png";
     }
 
     function placeRealSitePins(meshW, meshH) {

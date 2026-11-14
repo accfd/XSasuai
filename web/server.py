@@ -232,6 +232,7 @@ class MainIndexHandler(tornado.web.RequestHandler):
 class NoCacheStaticFileHandler(tornado.web.StaticFileHandler):
     """Menonaktifkan cache browser untuk menjamin perubahan file statis langsung muncul."""
     def set_extra_headers(self, path):
+        self.set_header("Access-Control-Allow-Origin", "*")
         self.set_header("Cache-Control", "no-cache, no-store, must-revalidate")
         self.set_header("Pragma", "no-cache")
         self.set_header("Expires", "0")
@@ -240,6 +241,7 @@ class NoCacheStaticFileHandler(tornado.web.StaticFileHandler):
 class CacheStaticFileHandler(tornado.web.StaticFileHandler):
     """Memberikan cache browser untuk file data statis besar seperti tekstur gambar 3D Bulan."""
     def set_extra_headers(self, path):
+        self.set_header("Access-Control-Allow-Origin", "*")
         self.set_header("Cache-Control", "public, max-age=86400")
 
 

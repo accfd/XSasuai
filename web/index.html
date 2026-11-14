@@ -762,10 +762,10 @@
       <!-- SLIDE 4: VISUALISASI 3D REALISTIS BERDASARKAN SCAN_TERRAIN.PY (1 LAYAR PENUH) -->
       <!-- =================================================================== -->
       <section id="vis-slide-terrain" class="visualisasi-slide-section">
-        <div style="max-width: 1240px; width: 100%; height: 100%; max-height: calc(100vh - 110px); background: #ffffff; border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 14px 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); position: relative; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;">
+        <div style="max-width: 1240px; width: 100%; min-height: 520px; max-height: calc(100vh - 84px); background: #ffffff; border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 12px 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); position: relative; box-sizing: border-box; display: flex; flex-direction: column; overflow: hidden;">
           
           <!-- Top bar with Back Button & Status -->
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-shrink: 0;">
             <div style="display: flex; align-items: center; gap: 10px;">
               <button onclick="scrollToVisSlide('menu')" style="background: none; border: none; color: var(--text-muted); font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px;" onmouseover="this.style.color='var(--artemis-blue)'" onmouseout="this.style.color='var(--text-muted)'">
                 <span>&uarr;</span>
@@ -779,8 +779,8 @@
           </div>
 
           <!-- Section Heading Compact -->
-          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border-light);">
-            <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border-light); flex-shrink: 0;">
+            <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0;">
               Visualisasi 3D Topografi Mons Mouton Crest dan Pemeriksaan Jalur Sinyal
             </h3>
             <span style="font-size: 11px; color: var(--text-secondary);">
@@ -789,17 +789,17 @@
           </div>
 
           <!-- Split Grid: Real 3D Terrain (Left) + Penjelasan Ramah Awam (Right) -->
-          <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; flex: 1; min-height: 0; margin-bottom: 8px;">
+          <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 14px; flex: 1; min-height: 0; margin-bottom: 8px; overflow: hidden;">
             
             <!-- Left Column: Real 3D Terrain Canvas & Controls (1 Titik Konsisten: Mons Mouton Crest) -->
             <div style="background: #030712; border: 1px solid #1e293b; border-radius: var(--radius-md); padding: 8px; position: relative; overflow: hidden; height: 100%; display: flex; flex-direction: column; box-sizing: border-box;">
               
               <!-- 3D Header Toolbar (Dropdown Layer Switcher & View Reset) -->
-              <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; z-index: 10;">
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 6px; z-index: 10; flex-shrink: 0;">
                 <!-- Layer Dropdown -->
                 <div style="display: flex; gap: 8px; align-items: center;">
                   <label for="select-3d-layer" style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Lapisan Peta:</label>
-                  <select id="select-3d-layer" onchange="switch3DLayer(this.value)" style="background: #0b1329; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 6px; padding: 5px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; outline: none; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                  <select id="select-3d-layer" onchange="switch3DLayer(this.value)" style="background: #0b1329; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 6px; padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer; outline: none; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
                     <option value="mcda">✦ Lapisan 1: Zona Kelayakan (MCDA Viridis)</option>
                     <option value="dem">✦ Lapisan 2: Topografi Elevasi (NASA LOLA DEM)</option>
                     <option value="slope">✦ Lapisan 3: Kemiringan Lereng (Slope Safety &le; 10°)</option>
@@ -807,74 +807,65 @@
                 </div>
                 <!-- Controls -->
                 <div style="display: flex; gap: 8px; align-items: center;">
-                  <button class="btn-hud" onclick="reset3DView()" title="Reset Kamera / Tampilan Awal" style="font-size: 14px; padding: 4px 10px; line-height: 1; background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2); cursor: pointer; border-radius: 6px;">
+                  <button class="btn-hud" onclick="reset3DView()" title="Reset Kamera / Tampilan Awal" style="font-size: 13px; padding: 3px 9px; line-height: 1; background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2); cursor: pointer; border-radius: 6px;">
                     &#x27F3;
                   </button>
                 </div>
               </div>
 
               <!-- 3D Canvas Viewport (Expanded Full Height, no footer clutter) -->
-              <div id="threeHorizonContainer" style="width: 100%; flex: 1; min-height: 320px; position: relative; border-radius: 6px; overflow: hidden;"></div>
+              <div id="threeHorizonContainer" style="width: 100%; flex: 1; min-height: 240px; position: relative; border-radius: 6px; overflow: hidden;"></div>
             </div>
 
             <!-- Right Column: Penjelasan Ramah Awam (Menggantikan Kode / Grafik Rumit) -->
-            <div style="display: flex; flex-direction: column; gap: 10px; box-sizing: border-box;">
+            <div style="display: flex; flex-direction: column; gap: 8px; box-sizing: border-box; overflow-y: auto; max-height: 100%; padding-right: 2px;">
               
               <!-- Card Header Penjelasan -->
-              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 12px 14px;">
-                <div style="font-size: 11px; font-weight: 800; color: var(--artemis-blue); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 3px;">
+              <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 8px 12px; flex-shrink: 0;">
+                <div style="font-size: 10.5px; font-weight: 800; color: var(--artemis-blue); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 2px;">
                   VERIFIKASI KEAMANAN LOKASI PENDARATAN
                 </div>
-                <h4 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
+                <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 2px;">
                   Mengapa Lokasi Ini Aman untuk Pendaratan?
                 </h4>
-                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 0;">
-                  Berdasarkan hasil analisis topografi 3D, titik Mons Mouton Crest memenuhi kriteria keselamatan pendaratan karena memiliki tiga keunggulan utama berikut.
+                <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+                  Berdasarkan hasil analisis topografi 3D, Mons Mouton Crest memenuhi seluruh kriteria keselamatan pendaratan dengan 3 keunggulan:
                 </p>
               </div>
 
               <!-- 3 Kartu Alasan Keamanan Manusiawi (Rapat & Konsisten Tanpa Gap Lebar) -->
-              <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
                 
                 <!-- Alasan 1: Sinyal Bumi Aman dari Tebing -->
-                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #0284c7; border-radius: var(--radius-sm); padding: 10px 14px; box-shadow: var(--shadow-sm);">
-                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
-                    <span style="font-size: 16px;">📡</span>
-                    <strong style="font-size: 12.5px; color: #0369a1;">Jalur Sinyal ke Bumi Bebas Hambatan Tebing</strong>
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #0284c7; border-radius: var(--radius-sm); padding: 8px 12px; box-shadow: var(--shadow-sm);">
+                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                    <span style="font-size: 14px;">📡</span>
+                    <strong style="font-size: 12px; color: #0369a1;">Jalur Sinyal ke Bumi Bebas Hambatan Tebing</strong>
                   </div>
-                  <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.45; margin: 0;">
-                    Mons Mouton merupakan dataran tinggi dengan elevasi +5.920 meter. Posisi ini membuat antena wahana berada jauh di atas dinding kawah di sekitarnya.
-                  </p>
-                  <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.45; margin: 4px 0 0;">
-                    Pada model 3D, garis berwarna cyan menunjukkan jalur sinyal radio yang mengarah langsung ke Bumi. Jalur tersebut memiliki sudut bebas pandang +12,35° di atas tebing tertinggi, sehingga sinyal komunikasi tidak terhalang oleh tebing (<em>zero loss-of-signal</em>).
+                  <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+                    Mons Mouton adalah dataran tinggi (+5.920 m) jauh di atas dinding kawah. Pada model 3D, garis laser cyan menunjukkan pandangan langsung ke Bumi dengan sudut bebas pandang +12,35° di atas bibir tebing tertinggi (<em>zero loss-of-signal</em>).
                   </p>
                 </div>
 
                 <!-- Alasan 2: Cahaya Surya Terus Menerus -->
-                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #f59e0b; border-radius: var(--radius-sm); padding: 10px 14px; box-shadow: var(--shadow-sm);">
-                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
-                    <span style="font-size: 16px;">☀️</span>
-                    <strong style="font-size: 12.5px; color: #b45309;">Pasokan Cahaya Matahari yang Optimal</strong>
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #f59e0b; border-radius: var(--radius-sm); padding: 8px 12px; box-shadow: var(--shadow-sm);">
+                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                    <span style="font-size: 14px;">☀️</span>
+                    <strong style="font-size: 12px; color: #b45309;">Pasokan Cahaya Matahari Optimal</strong>
                   </div>
-                  <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.45; margin: 0;">
-                    Posisi Mons Mouton Crest di dataran tinggi memungkinkan wahana menerima sinar Matahari secara langsung tanpa terhalang bayangan tebing kawah di sekitarnya.
-                  </p>
-                  <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.45; margin: 4px 0 0;">
-                    Kondisi ini membantu menjaga pasokan listrik dari panel surya agar instrumen sains dapat beroperasi selama 14 hari penuh di permukaan Bulan.
+                  <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+                    Posisi puncak dataran tinggi menerima sinar Matahari secara kontinu tanpa terhalang bayangan tebing kawah, memastikan pasokan listrik panel surya aktif selama 14 hari penuh operasi di permukaan Bulan.
                   </p>
                 </div>
 
                 <!-- Alasan 3: Permukaan Datar dan Aman -->
-                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #10b981; border-radius: var(--radius-sm); padding: 10px 14px; box-shadow: var(--shadow-sm);">
-                  <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 3px;">
-                    <span style="font-size: 16px;">📐</span>
-                    <strong style="font-size: 12.5px; color: #047857;">Permukaan Datar dan Stabil</strong>
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #10b981; border-radius: var(--radius-sm); padding: 8px 12px; box-shadow: var(--shadow-sm);">
+                  <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 2px;">
+                    <span style="font-size: 14px;">📐</span>
+                    <strong style="font-size: 12px; color: #047857;">Permukaan Datar dan Sangat Stabil</strong>
                   </div>
-                  <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.45; margin: 0;">
-                    Lokasi ini memiliki kemiringan lereng hanya 0,08°, sehingga tergolong sangat datar dan stabil. Nilai tersebut jauh di bawah batas kemiringan maksimum 10° yang ditetapkan dalam kriteria keselamatan pendaratan NASA.
-                  </p>
-                  <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.45; margin: 4px 0 0;">
-                    Dengan kondisi tersebut, kaki pendarat wahana dapat menyentuh permukaan dengan lebih stabil tanpa risiko tergelincir atau terbalik.
+                  <p style="font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+                    Kemiringan lereng hanya 0,08°, jauh di bawah batas maksimum keselamatan NASA (10°). Kaki pendarat wahana dapat menyentuh permukaan secara kokoh tanpa risiko tergelincir atau terguling.
                   </p>
                 </div>
 
@@ -885,11 +876,11 @@
           </div>
 
           <!-- Bottom CTA to Simulator -->
-          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 6px; border-top: 1px solid var(--border-light);">
-            <div style="font-size: 11px; color: var(--text-secondary);">
-              <strong>Petunjuk Navigasi 3D:</strong> Geser tetikus untuk memutar tampilan. Gunakan roda tetikus untuk memperbesar atau memperkecil tampilan.
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 6px; border-top: 1px solid var(--border-light); margin-top: auto; flex-shrink: 0;">
+            <div style="font-size: 10.5px; color: var(--text-secondary);">
+              <strong>Petunjuk Navigasi 3D:</strong> Geser tetikus untuk memutar tampilan. Gunakan roda tetikus untuk zoom.
             </div>
-            <button class="btn-finder-hero" onclick="switchView('simulasi'); playAvionicBeep(800, 'sine');" style="padding: 8px 20px; font-size: 12.5px; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(14, 116, 144, 0.35);">
+            <button class="btn-finder-hero" onclick="switchView('simulasi'); playAvionicBeep(800, 'sine');" style="padding: 7px 18px; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(14, 116, 144, 0.35); flex-shrink: 0; white-space: nowrap;">
               <span>Lanjut: Uji Pendaratan melalui Simulator Penerbangan</span>
               <span>&rarr;</span>
             </button>
