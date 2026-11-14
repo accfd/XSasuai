@@ -1,1247 +1,1580 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Xesuai — Artemis III Lunar Mission Simulator</title>
-  <script src="three.min.js"></script>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artemis II Mission Tracker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-    body {
-      background: #04060b;
-      color: #ffffff;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Space Grotesk", sans-serif;
-      overflow: hidden;
-      user-select: none;
-    }
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-    #canvas-container {
-      width: 100vw;
-      height: 100vh;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 1;
-    }
+body {
+  background: #0a0a0f;
+  color: #fff;
+  font-family: 'Space Grotesk', sans-serif;
+  overflow: hidden;
+  cursor: grab;
+}
+body:active { cursor: grabbing; }
 
-    /* HEADER - TOP CENTER */
-    #header {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 25;
-      text-align: center;
-      pointer-events: none;
-    }
+/* Control hints */
+.control-hints {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  font-size: 14px;
+  color: #fff;
+  line-height: 2;
+  pointer-events: none;
+  text-align: center;
+  opacity: 1;
+  transition: opacity 1s ease-out;
+}
+.control-hints.fade-out {
+  opacity: 0;
+}
+.control-hints .hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.control-hints kbd {
+  background: rgba(255,255,255,0.2);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+}
 
-    .logo-text {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 5px;
-      text-transform: uppercase;
-      color: #38bdf8;
-      margin-bottom: 4px;
-    }
+#canvas-container { 
+  width: 100vw; 
+  height: 100vh; 
+  position: fixed;
+  top: 0;
+  left: 0;
+}
 
-    .mission-title {
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      color: #ffffff;
-      text-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
-    }
+/* Header - Top Center */
+#header {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  text-align: center;
+  pointer-events: none;
+}
 
-    .date-display {
-      font-family: "JetBrains Mono", "Courier New", monospace;
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.7);
-      margin-top: 4px;
-      letter-spacing: 1px;
-    }
+.logo-text {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 4px;
+}
 
-    .nav-back-link {
-      pointer-events: auto;
-      display: inline-block;
-      margin-top: 6px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      color: rgba(255, 255, 255, 0.45);
-      text-decoration: none;
-      text-transform: uppercase;
-      transition: color 0.2s;
-    }
-    .nav-back-link:hover {
-      color: #38bdf8;
-    }
+.mission-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #ffffff;
+}
 
-    /* LEFT PANEL - FLOATING TELEMETRY CARDS */
-    #left-panel {
-      position: fixed;
-      top: 50%;
-      left: 24px;
-      transform: translateY(-50%);
-      z-index: 25;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      pointer-events: auto;
-    }
+.subtitle-link {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+  margin-top: 6px;
+  text-decoration: none;
+  transition: color 0.2s;
+  pointer-events: auto;
+  display: inline-block;
+}
+.subtitle-link:hover {
+  color: rgba(255,255,255,0.8);
+}
 
-    .stat-card {
-      background: linear-gradient(135deg, rgba(0, 20, 40, 0.8), rgba(0, 10, 20, 0.65));
-      border: 1px solid rgba(0, 180, 255, 0.25);
-      border-radius: 12px;
-      padding: 12px 18px;
-      min-width: 170px;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    }
+/* Left Panel - Telemetry */
+#left-panel {
+  position: fixed;
+  top: 50%;
+  left: 20px;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-    .stat-label {
-      font-size: 9px;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.5);
-      margin-bottom: 4px;
-    }
+.stat-card {
+  background: linear-gradient(135deg, rgba(0,20,40,0.8), rgba(0,10,20,0.6));
+  border: 1px solid rgba(0,180,255,0.15);
+  border-radius: 12px;
+  padding: 16px 20px;
+  min-width: 160px;
+  backdrop-filter: blur(20px);
+}
 
-    .stat-value {
-      font-family: "JetBrains Mono", "Courier New", monospace;
-      font-size: 19px;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: -0.5px;
-    }
-    .stat-value.highlight {
-      color: #00d4ff;
-      text-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
-    }
-    .stat-value.gold {
-      color: #facc15;
-      text-shadow: 0 0 10px rgba(250, 204, 21, 0.6);
-    }
+.stat-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(0,200,255,0.6);
+  margin-bottom: 6px;
+}
 
-    .stat-unit {
-      font-size: 11px;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 0.45);
-      margin-left: 3px;
-    }
+.stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  color: #fff;
+}
 
-    /* RIGHT PANEL - CAMERA CONTROLS */
-    #right-panel {
-      position: fixed;
-      top: 50%;
-      right: 24px;
-      transform: translateY(-50%);
-      z-index: 25;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      pointer-events: auto;
-    }
+.stat-unit {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  margin-left: 4px;
+}
 
-    .cam-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 10px;
-      padding: 11px 18px;
-      color: rgba(255, 255, 255, 0.7);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      min-width: 155px;
-      text-align: center;
-      backdrop-filter: blur(12px);
-    }
-    .cam-btn:hover {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.3);
-      color: #ffffff;
-    }
-    .cam-btn.active {
-      background: linear-gradient(135deg, rgba(0, 180, 255, 0.25), rgba(0, 120, 200, 0.15));
-      border-color: rgba(0, 180, 255, 0.6);
-      color: #00d4ff;
-      box-shadow: 0 0 15px rgba(0, 180, 255, 0.3);
-    }
+/* Telemetry Toggle Button (mobile only) */
+.telemetry-toggle {
+  display: none;
+  position: fixed;
+  bottom: 190px;
+  left: 10px;
+  z-index: 21;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,180,255,0.3);
+  background: linear-gradient(135deg, rgba(0,20,40,0.9), rgba(0,10,20,0.7));
+  backdrop-filter: blur(20px);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
 
-    .cam-divider {
-      height: 1px;
-      background: rgba(255, 255, 255, 0.1);
-      margin: 4px 0;
-    }
+.telemetry-toggle:hover {
+  border-color: rgba(0,180,255,0.5);
+  background: linear-gradient(135deg, rgba(0,30,60,0.9), rgba(0,20,40,0.7));
+}
 
-    /* BOTTOM PANEL - TIMELINE & CONTROLS */
-    #bottom-panel {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 30;
-      padding: 24px 40px 24px;
-      background: linear-gradient(to top, rgba(4, 6, 11, 0.98) 0%, rgba(4, 6, 11, 0.7) 70%, transparent 100%);
-      pointer-events: auto;
-    }
+.telemetry-toggle.active {
+  border-color: rgba(0,200,255,0.6);
+  box-shadow: 0 0 15px rgba(0,180,255,0.3);
+}
 
-    .bottom-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+.toggle-icon {
+  font-size: 20px;
+}
 
-    /* TIMELINE TRACK */
-    .timeline-container {
-      width: 100%;
-    }
+/* Right Panel - Camera Controls */
+#right-panel {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
-    .timeline-track {
-      position: relative;
-      width: 100%;
-      height: 6px;
-      background: rgba(255, 255, 255, 0.12);
-      border-radius: 3px;
-      cursor: pointer;
-    }
+.cam-btn {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 12px 20px;
+  color: rgba(255,255,255,0.6);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+  text-align: center;
+}
 
-    .timeline-progress {
-      position: absolute;
-      left: 0;
-      top: 0;
-      height: 100%;
-      background: linear-gradient(90deg, #00d4ff, #facc15);
-      border-radius: 3px;
-      pointer-events: none;
-      box-shadow: 0 0 12px rgba(0, 212, 255, 0.6);
-    }
+.cam-btn:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.2);
+  color: #fff;
+}
 
-    .timeline-slider {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 100%;
-      height: 6px;
-      background: transparent;
-      position: absolute;
-      top: 0;
-      left: 0;
-      cursor: pointer;
-      outline: none;
-    }
+.cam-icon {
+  margin-right: 6px;
+  font-size: 14px;
+}
 
-    .timeline-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: #ffffff;
-      cursor: pointer;
-      box-shadow: 0 0 12px rgba(255, 255, 255, 0.9), 0 0 20px rgba(0, 212, 255, 0.9);
-      border: 2px solid #00d4ff;
-      transition: transform 0.1s ease;
-    }
-    .timeline-slider::-webkit-slider-thumb:hover {
-      transform: scale(1.3);
-    }
+.cam-divider {
+  height: 1px;
+  background: rgba(255,255,255,0.1);
+  margin: 4px 0;
+}
 
-    /* PHASE MARKERS */
-    .timeline-phases {
-      position: relative;
-      height: 18px;
-      margin-top: 8px;
-    }
+.cam-btn.active {
+  background: linear-gradient(135deg, rgba(0,180,255,0.2), rgba(0,120,200,0.1));
+  border-color: rgba(0,180,255,0.4);
+  color: #00d4ff;
+}
 
-    .phase-marker {
-      position: absolute;
-      font-size: 10px;
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.4);
-      cursor: pointer;
-      transform: translateX(-50%);
-      transition: color 0.2s;
-    }
-    .phase-marker:hover, .phase-marker.active {
-      color: #00d4ff;
-      font-weight: 700;
-    }
-    .phase-marker.active {
-      text-shadow: 0 0 8px rgba(0, 212, 255, 0.7);
-    }
+/* Bottom Panel - Timeline & Controls */
+#bottom-panel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  padding: 20px 40px 24px;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+}
 
-    /* PLAYBACK ROW */
-    .playback-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 4px;
-    }
+.bottom-content {
+  max-width: 1000px;
+  margin: 0 auto;
+}
 
-    .playback-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
+/* Mission Info Row */
+.mission-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
 
-    .play-btn {
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1.5px solid rgba(255, 255, 255, 0.3);
-      color: #ffffff;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      font-weight: 800;
-      transition: all 0.2s ease;
-      position: relative;
-      z-index: 35;
-    }
-    .play-btn:hover {
-      background: rgba(0, 212, 255, 0.25);
-      border-color: #00d4ff;
-      transform: scale(1.08);
-      box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
-    }
-    .play-btn:active {
-      transform: scale(0.95);
-    }
+.phase-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-    .phase-display {
-      font-size: 14px;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: 0.5px;
-    }
-    .phase-subtext {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.5);
-      margin-top: 2px;
-    }
+.phase-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #00ff88;
+  box-shadow: 0 0 12px #00ff88;
+  animation: pulse 2s infinite;
+}
 
-    .playback-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.9); }
+}
 
-    .speed-selector {
-      display: flex;
-      gap: 4px;
-      background: rgba(255, 255, 255, 0.05);
-      padding: 3px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
+.phase-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #00ff88;
+  letter-spacing: 1px;
+}
 
-    .speed-btn {
-      background: transparent;
-      border: none;
-      color: rgba(255, 255, 255, 0.5);
-      font-family: "JetBrains Mono", "Courier New", monospace;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 5px 9px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .speed-btn:hover {
-      color: #ffffff;
-    }
-    .speed-btn.active {
-      background: rgba(0, 212, 255, 0.25);
-      color: #00d4ff;
-      font-weight: 700;
-    }
+.met-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  color: #fff;
+  letter-spacing: 1px;
+}
 
-    .met-badge {
-      font-family: "JetBrains Mono", "Courier New", monospace;
-      font-size: 13px;
-      font-weight: 700;
-      color: #ffffff;
-      background: rgba(255, 255, 255, 0.08);
-      padding: 8px 14px;
-      border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-    }
+.date-display {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+}
 
-    /* CONTROL HINTS OVERLAY */
-    .control-hints {
-      position: fixed;
-      bottom: 115px;
-      right: 28px;
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.4);
-      letter-spacing: 0.5px;
-      pointer-events: none;
-      z-index: 10;
-    }
+/* Playback Controls */
+.playback-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
 
-    @media (max-width: 900px) {
-      #left-panel { left: 12px; }
-      #right-panel { right: 12px; }
-      .mission-title { font-size: 20px; }
-      .stat-card { min-width: 130px; padding: 10px 14px; }
-      .stat-value { font-size: 16px; }
-      .cam-btn { min-width: 120px; padding: 8px 12px; font-size: 11px; }
-      #bottom-panel { padding: 16px 20px; }
-    }
-  </style>
+.playback-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 25px;
+  padding: 4px;
+}
+
+.play-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #00d4ff, #0088cc);
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.play-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0,180,255,0.4);
+}
+
+.play-btn.paused {
+  background: linear-gradient(135deg, #ff6b35, #cc4422);
+}
+
+.ctrl-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  font-size: 16px;
+}
+
+.ctrl-btn:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.1);
+}
+
+.speed-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 12px;
+}
+
+.speed-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.speed-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.speed-btn:hover {
+  border-color: rgba(255,255,255,0.3);
+  color: #fff;
+}
+
+.speed-btn.active {
+  background: rgba(255,107,53,0.2);
+  border-color: rgba(255,107,53,0.5);
+  color: #ff6b35;
+}
+
+/* Timeline Slider */
+.timeline-container {
+  width: 100%;
+}
+
+.timeline-track {
+  position: relative;
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.timeline-progress {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #00d4ff, #ff6b35);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.timeline-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: pointer;
+  margin: 0;
+}
+
+.timeline-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+  margin-top: -5px;
+}
+
+.timeline-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.timeline-phases {
+  position: relative;
+  height: 20px;
+  margin-top: 8px;
+}
+
+.phase-marker {
+  position: absolute;
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.5px;
+  transition: color 0.2s;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+/* Position markers at actual phase times on the slider */
+/* timeRange = 9.05 - 0.141 = 8.909 days (data ends at ~day 9.05) */
+#pm-orbit { left: 0%; transform: translateX(0); }
+#pm-tli { left: 10.2%; }     /* day 1.05: (1.05-0.141)/8.909 */
+#pm-coast { left: 22%; }     /* visual adjustment */
+#pm-flyby { left: 57.9%; }   /* day 5.3: (5.3-0.141)/8.909 */
+#pm-return { left: 69%; }    /* day 6.3: (6.3-0.141)/8.909 */
+#pm-entry { left: 100%; transform: translateX(-100%); }
+
+.phase-marker.active {
+  color: #00d4ff;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  /* Header - title left */
+  #header { 
+    top: 16px; 
+    left: 16px;
+    transform: none;
+    text-align: left;
+  }
+  .logo-text { display: none; }
+  .subtitle-link { display: none; }
+  .mission-title { font-size: 20px; }
+  
+  /* Simulator link - top right on mobile */
+  .simulator-link {
+    top: 16px;
+    right: 16px;
+  }
+  
+  /* Camera panel - left aligned below header */
+  #right-panel {
+    top: 55px;
+    left: 16px;
+    right: auto;
+    transform: none;
+    flex-direction: row;
+    gap: 6px;
+  }
+  
+  /* Hide maneuvers and divider from right panel on mobile */
+  #right-panel .cam-divider,
+  #right-panel #btn-maneuvers {
+    display: none;
+  }
+  
+  /* Hide icons on camera buttons on mobile */
+  #right-panel .cam-icon { display: none; }
+  
+  .cam-btn {
+    padding: 8px 12px;
+    font-size: 11px;
+    min-width: auto;
+  }
+  
+  /* Hide MET timer on mobile */
+  .met-display { display: none; }
+  
+  /* Show telemetry toggle button */
+  .telemetry-toggle { display: flex; align-items: center; justify-content: center; }
+  
+  /* Maneuvers button - next to telemetry toggle on mobile */
+  .mobile-maneuvers-btn {
+    display: flex !important;
+    position: fixed;
+    bottom: 190px;
+    left: 60px;
+    z-index: 21;
+  }
+  
+  /* Collapsible telemetry panel */
+  #left-panel {
+    top: auto;
+    bottom: 190px;
+    left: 110px;
+    transform: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 6px;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  
+  #left-panel.collapsed-mobile {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-20px);
+  }
+  
+  #left-panel.expanded-mobile {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+  }
+  
+  .stat-card {
+    padding: 10px 14px;
+    min-width: 100px;
+  }
+  .stat-value { font-size: 16px; }
+  .stat-label { font-size: 8px; }
+  
+  #bottom-panel { padding: 12px 16px 16px; }
+  .playback-row { flex-wrap: wrap; gap: 10px; }
+  .speed-selector { margin-left: 0; margin-top: 8px; width: 100%; justify-content: center; }
+  
+  .phase-marker { font-size: 8px; }
+  #pm-coast { left: 25%; }
+  #pm-return { left: 72%; }
+  
+  /* Control hints - show mobile version */
+  .control-hints .desktop-hint { display: none; }
+  .control-hints .mobile-hint { display: flex; }
+}
+
+/* Desktop: hide mobile hints, show desktop hints */
+.control-hints .mobile-hint { display: none; }
+.control-hints .desktop-hint { display: flex; }
+
+/* Simulator link - always visible top right */
+.simulator-link {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 25;
+  backdrop-filter: blur(10px);
+  pointer-events: auto;
+}
+
+/* Hide mobile-only maneuvers button on desktop */
+.mobile-maneuvers-btn {
+  display: none;
+}
+</style>
 </head>
 <body>
 
-  <!-- 3D WEBGL CANVAS -->
-  <div id="canvas-container"></div>
+<div id="canvas-container"></div>
 
-  <!-- HEADER -->
-  <div id="header">
-    <div class="logo-text">NASA ARTEMIS III &bull; LUNAR LANDING NAVIGATOR</div>
-    <div class="mission-title">XESUAI MISSION SIMULATOR</div>
-    <div class="date-display" id="date-display">Tue, 10 Nov 2026 12:00:00 UTC</div>
-    <a href="/" class="nav-back-link">&larr; KEMBALI KE MISSION CONSOLE</a>
+<!-- Control Hints -->
+<div class="control-hints" id="control-hints">
+  <div class="hint desktop-hint"><kbd>Drag</kbd> Rotate</div>
+  <div class="hint desktop-hint"><kbd>Right-click drag</kbd> Pan</div>
+  <div class="hint mobile-hint">Drag to rotate</div>
+  <div class="hint mobile-hint">Two fingers to pan</div>
+</div>
+
+<!-- Header -->
+<div id="header">
+  <div class="mission-title">ARTEMIS II</div>
+  <a href="https://fajrul.com" class="subtitle-link" target="_blank">FAJRUL FX <span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-box-arrow-up-right" viewBox="0 0 16 16">
+    <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5"/>
+    <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z"/>
+  </svg></span> </a>
+</div>
+
+<!-- Back to Console link -->
+<a href="/" class="cam-btn" style="position: fixed; top: 20px; left: 20px; z-index: 30; text-decoration: none; padding: 10px 16px; font-size: 12px; background: rgba(0, 20, 40, 0.85); border: 1px solid rgba(0, 180, 255, 0.3); color: #00d4ff; display: inline-flex; align-items: center; gap: 6px;">
+  <span>&larr;</span> Konsol Misi Xesuai
+</a>
+
+<!-- Simulator link -->
+<a href="simulation.html" class="cam-btn simulator-link" style="text-decoration:none;"><span class="cam-icon">🧪</span> Simulator</a>
+
+<!-- Left Panel - Telemetry -->
+<button class="telemetry-toggle" id="telemetry-toggle" onclick="toggleTelemetry()">
+  <span class="toggle-icon">📊</span>
+</button>
+<!-- Mobile only: Maneuvers button next to telemetry -->
+<button class="cam-btn mobile-maneuvers-btn" id="btn-maneuvers-mobile" onclick="toggleManeuvers()"><span class="cam-icon">🔥</span></button>
+<div id="left-panel" class="collapsed-mobile">
+  <div class="stat-card">
+    <div class="stat-label">Earth Distance</div>
+    <div class="stat-value"><span id="dist-earth">—</span><span class="stat-unit">km</span></div>
   </div>
-
-  <!-- LEFT PANEL (FLOATING TELEMETRY CARDS) -->
-  <div id="left-panel">
-    <div class="stat-card">
-      <div class="stat-label">JARAK DARI BUMI</div>
-      <div class="stat-value"><span id="dist-earth">185</span><span class="stat-unit">KM</span></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">JARAK DARI BULAN</div>
-      <div class="stat-value"><span id="dist-moon">384,400</span><span class="stat-unit">KM</span></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">KETINGGIAN TARGET</div>
-      <div class="stat-value gold"><span id="altitude-val">185</span><span class="stat-unit" id="altitude-unit">KM</span></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">KECEPATAN WAHANA</div>
-      <div class="stat-value highlight"><span id="velocity-val">7.80</span><span class="stat-unit">KM/S</span></div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">SISA PROPELAN</div>
-      <div class="stat-value"><span id="fuel-val">1,250.0</span><span class="stat-unit">KG (100%)</span></div>
-    </div>
+  <div class="stat-card">
+    <div class="stat-label">Moon Distance</div>
+    <div class="stat-value"><span id="dist-moon">—</span><span class="stat-unit">km</span></div>
   </div>
-
-  <!-- RIGHT PANEL (CAMERA CONTROLS) -->
-  <div id="right-panel">
-    <button class="cam-btn active" id="btn-cam-overview" onclick="setCamera('overview')">Tinjauan Bebas</button>
-    <button class="cam-btn" id="btn-cam-earth" onclick="setCamera('earth')">Fokus Bumi</button>
-    <button class="cam-btn" id="btn-cam-moon" onclick="setCamera('moon')">Fokus Bulan</button>
-    <button class="cam-btn" id="btn-cam-lander" onclick="setCamera('lander')">Ikuti Wahana</button>
-    <div class="cam-divider"></div>
-    <button class="cam-btn" id="btn-cam-mons" onclick="setCamera('mons')">Mons Mouton Ground</button>
+  <div class="stat-card">
+    <div class="stat-label">Velocity</div>
+    <div class="stat-value"><span id="velocity">—</span><span class="stat-unit">km/s</span></div>
   </div>
+</div>
 
-  <!-- CONTROL HINTS -->
-  <div class="control-hints">
-    Rotasi: Drag Kiri &bull; Zoom: Scroll &bull; Geser: Drag Kanan &bull; Spasi: Play/Pause
-  </div>
+<!-- Right Panel - Camera Controls -->
+<div id="right-panel">
+  <button class="cam-btn" id="btn-follow" onclick="setCamera('follow')"><span class="cam-icon">🚀</span> Orion</button>
+  <button class="cam-btn" onclick="setCamera('earth')"><span class="cam-icon">🌍</span> Earth</button>
+  <button class="cam-btn" onclick="setCamera('moon')"><span class="cam-icon">🌙</span> Moon</button>
+  <button class="cam-btn active" onclick="setCamera('overview')"><span class="cam-icon">👁</span> Overview</button>
+  <div class="cam-divider"></div>
+  <button class="cam-btn" id="btn-maneuvers" onclick="toggleManeuvers()"><span class="cam-icon">🔥</span> Maneuvers</button>
+</div>
 
-  <!-- BOTTOM PANEL -->
-  <div id="bottom-panel">
-    <div class="bottom-inner">
-      <div class="timeline-container">
-        <div class="timeline-track" id="timeline-track">
-          <div class="timeline-progress" id="timeline-progress" style="width: 0%;"></div>
-          <input type="range" class="timeline-slider" id="timeline-slider" min="0" max="10000" value="0">
-        </div>
-        <div class="timeline-phases">
-          <span class="phase-marker active" id="pm-leo" style="left: 0%;" onclick="jumpTo(0)">LEO Orbit (Parkir)</span>
-          <span class="phase-marker" id="pm-tli" style="left: 10%;" onclick="jumpTo(1000)">Injeksi TLI</span>
-          <span class="phase-marker" id="pm-coast" style="left: 45%;" onclick="jumpTo(4500)">Transit Translunar (L1)</span>
-          <span class="phase-marker" id="pm-loi" style="left: 88%;" onclick="jumpTo(8800)">Orbit Bulan (LOI)</span>
-          <span class="phase-marker" id="pm-pdi" style="left: 96%;" onclick="jumpTo(9600)">PDI Pendaratan</span>
-          <span class="phase-marker" id="pm-touchdown" style="left: 100%;" onclick="jumpTo(10000)">Touchdown</span>
-        </div>
+<!-- Bottom Panel -->
+<div id="bottom-panel">
+  <div class="bottom-content">
+    <!-- Mission Info -->
+    <div class="mission-info">
+      <div class="phase-badge">
+        <div class="phase-dot"></div>
+        <span class="phase-text" id="phase-text">Translunar Coast</span>
       </div>
-
-      <div class="playback-row">
-        <div class="playback-left">
-          <button class="play-btn" id="btn-play" onclick="togglePlay()">&#9658;</button>
-          <div>
-            <div class="phase-display" id="phase-title">[FASE 1] Peluncuran & Orbit Parkir Bumi</div>
-            <div class="phase-subtext" id="phase-desc">Wahana di orbit 185 km bersiap untuk dorongan Trans-Lunar Injection.</div>
-          </div>
-        </div>
-
-        <div class="playback-right">
-          <div class="speed-selector">
-            <button class="speed-btn active" id="spd-1" onclick="setSpeed(1)">1x</button>
-            <button class="speed-btn" id="spd-10" onclick="setSpeed(10)">10x</button>
-            <button class="speed-btn" id="spd-100" onclick="setSpeed(100)">100x</button>
-            <button class="speed-btn" id="spd-1000" onclick="setSpeed(1000)">1000x</button>
-            <button class="speed-btn" id="spd-5000" onclick="setSpeed(5000)">5000x</button>
-          </div>
-          <div class="met-badge" id="met-display">MET: 00d 00h 00m 00s</div>
-        </div>
+      <div class="met-display" id="met-display">T+00:00:00:00</div>
+      <div class="date-display" id="date-display">Apr 2, 2026 · 12:00 UTC</div>
+    </div>
+    
+    <!-- Playback Controls -->
+    <div class="playback-row">
+      <div class="playback-controls">
+        <button class="ctrl-btn" onclick="skipBackward()" title="Skip Back 1 Hour">⏪</button>
+        <button class="play-btn" id="play-btn" onclick="togglePlay()" title="Play/Pause">▶</button>
+        <button class="ctrl-btn" onclick="skipForward()" title="Skip Forward 1 Hour">⏩</button>
+      </div>
+      
+      <div class="speed-selector">
+        <span class="speed-label">Speed</span>
+        <button class="speed-btn" onclick="setSpeed(1)">1×</button>
+        <button class="speed-btn active" onclick="setSpeed(1000)">1K×</button>
+        <button class="speed-btn" onclick="setSpeed(5000)">5K×</button>
+        <button class="speed-btn" onclick="setSpeed(10000)">10K×</button>
+        <button class="speed-btn" onclick="setSpeed(30000)">30K×</button>
+      </div>
+    </div>
+    
+    <!-- Timeline -->
+    <div class="timeline-container">
+      <div class="timeline-track">
+        <div class="timeline-progress" id="timeline-progress"></div>
+        <input type="range" class="timeline-slider" id="timeline-slider" 
+               min="0" max="10000" value="0" oninput="onTimelineScrub(this.value)">
+      </div>
+      <div class="timeline-phases">
+        <span class="phase-marker" id="pm-orbit">Earth Orbit</span>
+        <span class="phase-marker" id="pm-tli">TLI</span>
+        <span class="phase-marker" id="pm-coast">Coast</span>
+        <span class="phase-marker" id="pm-flyby">Lunar Flyby</span>
+        <span class="phase-marker" id="pm-return">Return</span>
+        <span class="phase-marker" id="pm-entry">End</span>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- THREE.JS HIGH FIDELITY SIMULATION SCRIPT (100% OFFLINE & RESILIENT) -->
-  <script>
-    // ═══════════════════════════════════════════
-    // 1. SETUP THREE.JS ENGINE & LIGHTWEIGHT CONTROLLER
-    // ═══════════════════════════════════════════
-    const container = document.getElementById('canvas-container');
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x04060b);
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/"
+  }
+}
+</script>
 
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 12000);
-    camera.position.set(160, 140, 360);
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+import { Line2 } from 'three/addons/lines/Line2.js';
+import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+import { NASA_TRAJ, NASA_MOON, TRAJ_START_DAY, TRAJ_END_DAY, TRAJ_STEP_DAYS, TRAJ_N, TLI_INDEX } from './trajectory.js';
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    if (renderer.toneMapping !== undefined) {
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.25;
-    }
-    container.appendChild(renderer.domElement);
+// ═══════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════
+const EARTH_RADIUS_KM = 6371;
+const MOON_RADIUS_KM = 1737;
+const SCALE = 1 / 4000;
+const LAUNCH_TIME = Date.UTC(2026, 3, 1, 22, 35, 0);
+const MISSION_DAYS = TRAJ_END_DAY; // Use actual data end time
+const MISSION_DURATION_MS = MISSION_DAYS * 86400000;
+const J2000_MS = Date.UTC(2000, 0, 1, 12, 0, 0);
 
-    // Orbit Controls dengan Damping Halus (Persis Fajrul OrbitControls)
-    let isMouseDown = false;
-    let mouseButton = 0;
-    let prevMouseX = 0;
-    let prevMouseY = 0;
-    let camSpherical = { radius: 420, theta: 0.85, phi: 1.15 };
-    let targetSpherical = { radius: 420, theta: 0.85, phi: 1.15 };
-    let camTarget = new THREE.Vector3(120, 0, 30);
-    let targetLook = new THREE.Vector3(120, 0, 30);
+const eR = EARTH_RADIUS_KM * SCALE;
+const mR = MOON_RADIUS_KM * SCALE;
+const TLI_DAY = TRAJ_START_DAY + TLI_INDEX * TRAJ_STEP_DAYS;
 
-    window.addEventListener('mousedown', (e) => {
-      if (e.target.closest('#left-panel, #right-panel, #bottom-panel, #header')) return;
-      isMouseDown = true;
-      mouseButton = e.button;
-      prevMouseX = e.clientX;
-      prevMouseY = e.clientY;
-    });
+// ═══════════════════════════════════════════
+// INTERPOLATION
+// ═══════════════════════════════════════════
+function catmullRom(p0, p1, p2, p3, t) {
+  const t2 = t * t, t3 = t2 * t;
+  return new THREE.Vector3(
+    0.5 * ((2*p1.x) + (-p0.x+p2.x)*t + (2*p0.x-5*p1.x+4*p2.x-p3.x)*t2 + (-p0.x+3*p1.x-3*p2.x+p3.x)*t3),
+    0.5 * ((2*p1.y) + (-p0.y+p2.y)*t + (2*p0.y-5*p1.y+4*p2.y-p3.y)*t2 + (-p0.y+3*p1.y-3*p2.y+p3.y)*t3),
+    0.5 * ((2*p1.z) + (-p0.z+p2.z)*t + (2*p0.z-5*p1.z+4*p2.z-p3.z)*t2 + (-p0.z+3*p1.z-3*p2.z+p3.z)*t3)
+  );
+}
 
-    window.addEventListener('mouseup', () => { isMouseDown = false; });
+function horizonsToThree(d) {
+  return new THREE.Vector3(d[0], d[2], -d[1]);
+}
 
-    window.addEventListener('mousemove', (e) => {
-      if (!isMouseDown) return;
-      const dx = e.clientX - prevMouseX;
-      const dy = e.clientY - prevMouseY;
-      prevMouseX = e.clientX;
-      prevMouseY = e.clientY;
+function getInterpolatedPos(data, day) {
+  const N = data.length;
+  if (day <= TRAJ_START_DAY) return horizonsToThree(data[0]);
+  const maxDay = TRAJ_START_DAY + (N - 1) * TRAJ_STEP_DAYS;
+  if (day >= maxDay) return horizonsToThree(data[N - 1]);
 
-      if (mouseButton === 0) {
-        // Rotasi
-        targetSpherical.theta -= dx * 0.005;
-        targetSpherical.phi = Math.max(0.08, Math.min(Math.PI - 0.08, targetSpherical.phi - dy * 0.005));
-      } else if (mouseButton === 2) {
-        // Pan
-        targetLook.x -= dx * 0.25;
-        targetLook.y += dy * 0.25;
-      }
-    });
+  const fIdx = (day - TRAJ_START_DAY) / TRAJ_STEP_DAYS;
+  const i = Math.floor(fIdx);
+  const t = fIdx - i;
 
-    window.addEventListener('wheel', (e) => {
-      targetSpherical.radius = Math.max(6, Math.min(2500, targetSpherical.radius + e.deltaY * 0.45));
-    }, { passive: true });
+  const i0 = Math.max(0, i - 1);
+  const i1 = Math.min(N - 1, i);
+  const i2 = Math.min(N - 1, i + 1);
+  const i3 = Math.min(N - 1, i + 2);
 
-    window.addEventListener('contextmenu', (e) => { e.preventDefault(); });
+  return catmullRom(
+    horizonsToThree(data[i0]),
+    horizonsToThree(data[i1]),
+    horizonsToThree(data[i2]),
+    horizonsToThree(data[i3]), t
+  );
+}
 
-    // ═══════════════════════════════════════════
-    // 2. LIGHTING & REALISTIC SUN
-    // ═══════════════════════════════════════════
-    const ambientLight = new THREE.AmbientLight(0x162238, 0.8);
-    scene.add(ambientLight);
+function getMoonPos(day) { return getInterpolatedPos(NASA_MOON, day); }
+function getTrajectoryPos(day) { return getInterpolatedPos(NASA_TRAJ, day); }
 
-    const sunDir = new THREE.DirectionalLight(0xffffff, 2.8);
-    sunDir.position.set(500, 150, 400);
-    scene.add(sunDir);
-
-    // Sun Glow Sprite (Bintang Matahari bercahaya)
-    (() => {
-      const c = document.createElement('canvas');
-      c.width = 128; c.height = 128;
-      const ctx = c.getContext('2d');
-      const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
-      grad.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-      grad.addColorStop(0.2, 'rgba(255, 240, 200, 0.85)');
-      grad.addColorStop(0.5, 'rgba(255, 180, 80, 0.3)');
-      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 128, 128);
-      const tex = new THREE.CanvasTexture(c);
-      const sunSprite = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: tex, transparent: true, blending: THREE.AdditiveBlending
-      }));
-      sunSprite.position.copy(sunDir.position).normalize().multiplyScalar(750);
-      sunSprite.scale.set(65, 65, 1);
-      scene.add(sunSprite);
-    })();
-
-    // ═══════════════════════════════════════════
-    // 3. DEEP SPACE STARFIELD
-    // ═══════════════════════════════════════════
-    (() => {
-      const count = 3800;
-      const pos = new Float32Array(count * 3);
-      const col = new Float32Array(count * 3);
-      for (let i = 0; i < count; i++) {
-        const r = 2500 + Math.random() * 2000;
-        const th = Math.random() * Math.PI * 2;
-        const ph = Math.acos(Math.random() * 2 - 1);
-        pos[i*3] = r * Math.sin(ph) * Math.cos(th);
-        pos[i*3+1] = r * Math.sin(ph) * Math.sin(th);
-        pos[i*3+2] = r * Math.cos(ph);
-
-        const tone = Math.random();
-        if (tone > 0.8) {
-          col[i*3] = 0.7; col[i*3+1] = 0.85; col[i*3+2] = 1.0;
-        } else if (tone > 0.6) {
-          col[i*3] = 1.0; col[i*3+1] = 0.95; col[i*3+2] = 0.8;
-        } else {
-          col[i*3] = 1.0; col[i*3+1] = 1.0; col[i*3+2] = 1.0;
-        }
-      }
-      const g = new THREE.BufferGeometry();
-      g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-      g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-      scene.add(new THREE.Points(g, new THREE.PointsMaterial({
-        size: 1.5, vertexColors: true, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending
-      })));
-    })();
-
-    // ═══════════════════════════════════════════
-    // 4. PLANET BUMI (ATMOSPHERIC SHADER + NASA TEXTURE)
-    // ═══════════════════════════════════════════
-    const textureLoader = new THREE.TextureLoader();
-    const earthGroup = new THREE.Group();
-    earthGroup.position.set(0, 0, 0);
-    scene.add(earthGroup);
-
-    const eR = 18;
-    const earthGeo = new THREE.SphereGeometry(eR, 80, 60);
-    const earthMat = new THREE.MeshStandardMaterial({
-      roughness: 0.75,
-      metalness: 0.1,
-      color: 0xffffff
-    });
-    textureLoader.load('/data/earth_blue_marble.jpg', (tex) => {
-      earthMat.map = tex;
-      earthMat.needsUpdate = true;
-    });
-    const earthMesh = new THREE.Mesh(earthGeo, earthMat);
-    earthGroup.add(earthMesh);
-
-    // Atmospheric Rayleigh Scattering Rim Shader
-    const atmosGeo = new THREE.SphereGeometry(eR * 1.04, 60, 40);
-    const atmosMat = new THREE.ShaderMaterial({
-      transparent: true,
-      side: THREE.FrontSide,
-      depthWrite: false,
-      uniforms: {
-        glowColor: { value: new THREE.Color(0x00aaff) },
-        coeff: { value: 0.5 },
-        power: { value: 3.2 }
-      },
-      vertexShader: `
-        varying vec3 vNormal;
-        varying vec3 vWorldPos;
-        void main() {
-          vNormal = normalize(normalMatrix * normal);
-          vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform vec3 glowColor;
-        uniform float coeff;
-        uniform float power;
-        varying vec3 vNormal;
-        varying vec3 vWorldPos;
-        void main() {
-          vec3 viewDir = normalize(cameraPosition - vWorldPos);
-          float rim = 1.0 - max(0.0, dot(viewDir, vNormal));
-          gl_FragColor = vec4(glowColor, pow(rim, power) * coeff);
-        }
-      `
-    });
-    earthGroup.add(new THREE.Mesh(atmosGeo, atmosMat));
-
-    // LEO Orbit Ring (185 km)
-    (() => {
-      const r = eR * 1.18;
-      const pts = [];
-      for (let i = 0; i <= 96; i++) {
-        const th = (i / 96) * Math.PI * 2;
-        pts.push(new THREE.Vector3(Math.cos(th) * r, Math.sin(th * 0.3) * 2, Math.sin(th) * r));
-      }
-      const g = new THREE.BufferGeometry().setFromPoints(pts);
-      const m = new THREE.LineBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.4 });
-      earthGroup.add(new THREE.Line(g, m));
-    })();
-
-    // ═══════════════════════════════════════════
-    // 5. BULAN (ORBIT DINAMIS MENGITARI BUMI + NASA LOLA TEXTURE)
-    // ═══════════════════════════════════════════
-    const MOON_ORBIT_RADIUS = 260;
-    const LUNAR_PERIOD_SECONDS = 27.32166 * 86400;
-    const LUNAR_OMEGA = (2 * Math.PI) / LUNAR_PERIOD_SECONDS;
-    const LUNAR_INCLINATION = 5.14 * (Math.PI / 180);
-    const T_ARRIVAL = 345600;
-    const THETA_ARRIVAL = 0.55;
-
-    function getMoonOrbitPosition(sec) {
-      const theta = THETA_ARRIVAL - LUNAR_OMEGA * (T_ARRIVAL - sec);
-      return new THREE.Vector3(
-        Math.cos(theta) * MOON_ORBIT_RADIUS,
-        Math.sin(theta) * MOON_ORBIT_RADIUS * Math.sin(LUNAR_INCLINATION),
-        Math.sin(theta) * MOON_ORBIT_RADIUS * Math.cos(LUNAR_INCLINATION)
+function buildTrajectoryCurve() {
+  const pts = [];
+  const SUBDIV = 2; // Reduced since we have 10-min interval data (1284 points)
+  // Start from index 0 to include Earth orbit phase
+  for (let i = 0; i < TRAJ_N - 1; i++) {
+    for (let s = 0; s < SUBDIV; s++) {
+      const t = s / SUBDIV;
+      const i0 = Math.max(0, i - 1);
+      const i3 = Math.min(TRAJ_N - 1, i + 2);
+      const p = catmullRom(
+        horizonsToThree(NASA_TRAJ[i0]),
+        horizonsToThree(NASA_TRAJ[i]),
+        horizonsToThree(NASA_TRAJ[i + 1]),
+        horizonsToThree(NASA_TRAJ[i3]), t
       );
+      pts.push(new THREE.Vector3(p.x * SCALE, p.y * SCALE, p.z * SCALE));
     }
+  }
+  const last = horizonsToThree(NASA_TRAJ[TRAJ_N - 1]);
+  pts.push(new THREE.Vector3(last.x * SCALE, last.y * SCALE, last.z * SCALE));
+  return pts;
+}
 
-    // Cincin Lintasan Orbit Bulan Mengitari Bumi (360 derajat)
-    (() => {
-      const orbitPts = [];
-      for (let i = 0; i <= 144; i++) {
-        const th = (i / 144) * Math.PI * 2;
-        orbitPts.push(new THREE.Vector3(
-          Math.cos(th) * MOON_ORBIT_RADIUS,
-          Math.sin(th) * MOON_ORBIT_RADIUS * Math.sin(LUNAR_INCLINATION),
-          Math.sin(th) * MOON_ORBIT_RADIUS * Math.cos(LUNAR_INCLINATION)
-        ));
-      }
-      const g = new THREE.BufferGeometry().setFromPoints(orbitPts);
-      const m = new THREE.LineDashedMaterial({
-        color: 0xffffff, transparent: true, opacity: 0.18, dashSize: 4, gapSize: 3
-      });
-      const orbitLine = new THREE.Line(g, m);
-      orbitLine.computeLineDistances();
-      scene.add(orbitLine);
-    })();
+// ═══════════════════════════════════════════
+// THREE.JS SETUP
+// ═══════════════════════════════════════════
+const container = document.getElementById('canvas-container');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.01, 8000);
+camera.position.set(80, 50, 120);
 
-    // Garis Vektor Koneksi Bumi-Bulan
-    const emLineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), getMoonOrbitPosition(0)]);
-    const emLineMat = new THREE.LineDashedMaterial({
-      color: 0x00d4ff, transparent: true, opacity: 0.22, dashSize: 3, gapSize: 2
-    });
-    const emLine = new THREE.Line(emLineGeo, emLineMat);
-    emLine.computeLineDistances();
-    scene.add(emLine);
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.1;
+container.appendChild(renderer.domElement);
 
-    // Objek 3D Bulan
-    const moonGroup = new THREE.Group();
-    moonGroup.position.copy(getMoonOrbitPosition(0));
-    scene.add(moonGroup);
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.4, 0.3, 0.9);
+composer.addPass(bloom);
 
-    const mR = 5.2;
-    const moonGeo = new THREE.SphereGeometry(mR, 80, 60);
-    const moonMat = new THREE.MeshStandardMaterial({
-      roughness: 0.95,
-      metalness: 0.05,
-      color: 0xdddddd
-    });
-    textureLoader.load('/data/moon_1024.jpg', (tex) => {
-      moonMat.map = tex;
-      moonMat.needsUpdate = true;
-    });
-    const moonMesh = new THREE.Mesh(moonGeo, moonMat);
-    moonGroup.add(moonMesh);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 0.5;
+controls.maxDistance = 1200;
+controls.enablePan = true;
+controls.screenSpacePanning = true;
+controls.mouseButtons = {
+  LEFT: THREE.MOUSE.ROTATE,
+  MIDDLE: THREE.MOUSE.DOLLY,
+  RIGHT: THREE.MOUSE.PAN
+};
+controls.target.set(0, 0, -50);
 
-    // Mons Mouton Selenographic Coordinates (-84.9°S, 33.3°W)
-    function latLonToMoonVec(lat, lon, radius) {
-      const phi = (90 + lat) * (Math.PI / 180);
-      const theta = (lon + 180) * (Math.PI / 180);
-      return new THREE.Vector3(
-        -radius * Math.sin(phi) * Math.cos(theta),
-        radius * Math.cos(phi),
-        radius * Math.sin(phi) * Math.sin(theta)
-      );
+const textureLoader = new THREE.TextureLoader();
+
+// ═══════════════════════════════════════════
+// STARFIELD (subtle background)
+// ═══════════════════════════════════════════
+(() => {
+  const N = 20000;
+  const pos = new Float32Array(N * 3);
+  const col = new Float32Array(N * 3);
+  for (let i = 0; i < N; i++) {
+    const r = 1500 + Math.random() * 3000;
+    const theta = Math.random() * Math.PI * 2;
+    const phi = Math.acos(2 * Math.random() - 1);
+    pos[i*3] = r * Math.sin(phi) * Math.cos(theta);
+    pos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+    pos[i*3+2] = r * Math.cos(phi);
+    const c = 0.4 + Math.random() * 0.4;
+    col[i*3] = c * 0.9; 
+    col[i*3+1] = c * (0.9 + Math.random() * 0.1); 
+    col[i*3+2] = Math.min(1, c);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  scene.add(new THREE.Points(g, new THREE.PointsMaterial({
+    size: 0.35, vertexColors: true, transparent: true, opacity: 0.55,
+    sizeAttenuation: true, blending: THREE.AdditiveBlending
+  })));
+})();
+
+// ═══════════════════════════════════════════
+// EARTH
+// ═══════════════════════════════════════════
+const earthGroup = new THREE.Group();
+const earthGeo = new THREE.SphereGeometry(eR, 128, 64);
+const earthMat = new THREE.MeshStandardMaterial({
+  color: 0x4488cc, roughness: 0.8, metalness: 0.1, emissive: 0x112244, emissiveIntensity: 0.15
+});
+
+textureLoader.load('/data/earth_blue_marble.jpg', (tex) => {
+  earthMat.map = tex;
+  earthMat.color.set(0xffffff);
+  earthMat.emissive.set(0x050510);
+  earthMat.needsUpdate = true;
+}, undefined, () => {
+  textureLoader.load('https://unpkg.com/three-globe@2.31.1/example/img/earth-blue-marble.jpg', (tex) => {
+    earthMat.map = tex;
+    earthMat.color.set(0xffffff);
+    earthMat.emissive.set(0x050510);
+    earthMat.needsUpdate = true;
+  });
+});
+
+const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+earthGroup.add(earthMesh);
+
+// Atmosphere
+const atmosGeo = new THREE.SphereGeometry(eR * 1.04, 64, 32);
+const atmosMat = new THREE.ShaderMaterial({
+  transparent: true, side: THREE.FrontSide, depthWrite: false,
+  uniforms: { glowColor: { value: new THREE.Color(0x00aaff) }, coeff: { value: 0.5 }, power: { value: 3.5 } },
+  vertexShader: `
+    varying vec3 vNormal; varying vec3 vWorldPos;
+    void main() {
+      vNormal = normalize(normalMatrix * normal);
+      vWorldPos = (modelMatrix * vec4(position, 1.0)).xyz;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }`,
+  fragmentShader: `
+    uniform vec3 glowColor; uniform float coeff; uniform float power;
+    varying vec3 vNormal; varying vec3 vWorldPos;
+    void main() {
+      vec3 viewDir = normalize(cameraPosition - vWorldPos);
+      float rim = 1.0 - max(0.0, dot(viewDir, vNormal));
+      float intensity = coeff * pow(rim, power);
+      gl_FragColor = vec4(glowColor, intensity * 0.12);
+    }`
+});
+earthGroup.add(new THREE.Mesh(atmosGeo, atmosMat));
+
+const earthLabel = createLabel('EARTH', '#00bbff');
+earthLabel.position.set(0, eR + 2.5, 0);
+earthGroup.add(earthLabel);
+scene.add(earthGroup);
+
+// ═══════════════════════════════════════════
+// MOON
+// ═══════════════════════════════════════════
+const moonGroup = new THREE.Group();
+const moonGeo = new THREE.SphereGeometry(mR, 64, 32);
+const moonMat = new THREE.MeshStandardMaterial({
+  color: 0xaaaaaa, roughness: 1.0, metalness: 0.0, emissive: 0x111111, emissiveIntensity: 0.1
+});
+
+textureLoader.load('/data/moon_1024.jpg', (tex) => {
+  moonMat.map = tex;
+  moonMat.color.set(0xcccccc);
+  moonMat.needsUpdate = true;
+}, undefined, () => {
+  textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/moon_1024.jpg', (tex) => {
+    moonMat.map = tex;
+    moonMat.color.set(0xcccccc);
+    moonMat.needsUpdate = true;
+  });
+});
+
+const moonMesh = new THREE.Mesh(moonGeo, moonMat);
+moonGroup.add(moonMesh);
+
+const moonLabel = createLabel('MOON', '#ccccdd');
+moonLabel.position.set(0, mR + 1.5, 0);
+moonGroup.add(moonLabel);
+scene.add(moonGroup);
+
+// Moon orbit path
+(() => {
+  const orbitPts = NASA_MOON.map(d => {
+    const p = horizonsToThree(d);
+    return new THREE.Vector3(p.x * SCALE, p.y * SCALE, p.z * SCALE);
+  });
+  scene.add(new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints(orbitPts),
+    new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 })
+  ));
+})();
+
+// ═══════════════════════════════════════════
+// TRAJECTORY
+// ═══════════════════════════════════════════
+const trajPts = buildTrajectoryCurve();
+
+// Full predicted path (dashed)
+const fullTrajLine = new THREE.Line(
+  new THREE.BufferGeometry().setFromPoints(trajPts),
+  new THREE.LineDashedMaterial({ color: 0xff6633, transparent: true, opacity: 0.5, dashSize: 0.5, gapSize: 0.3 })
+);
+fullTrajLine.computeLineDistances();
+scene.add(fullTrajLine);
+
+// Traveled path (using Line2 for thick line support)
+const traveledMat = new LineMaterial({
+  color: 0xff6b35,
+  linewidth: 2,
+  transparent: true,
+  opacity: 1.0,
+  resolution: new THREE.Vector2(window.innerWidth, window.innerHeight)
+});
+// Initialize with a minimal line to avoid empty geometry issues
+const initPositions = [0, 0, 0, 0.001, 0, 0];
+const traveledGeo = new LineGeometry();
+traveledGeo.setPositions(initPositions);
+const traveledLine = new Line2(traveledGeo, traveledMat);
+traveledLine.computeLineDistances();
+scene.add(traveledLine);
+
+// Earth-Moon line
+const emLine = new THREE.Line(
+  new THREE.BufferGeometry(),
+  new THREE.LineDashedMaterial({ color: 0xffffff, transparent: true, opacity: 0.08, dashSize: 2, gapSize: 1.5 })
+);
+scene.add(emLine);
+
+// ═══════════════════════════════════════════
+// MANEUVER DETECTION & VISUALIZATION
+// ═══════════════════════════════════════════
+// Maneuver data from Python thrust detection (detect_maneuvers.py)
+// Based on comparing observed acceleration vs expected gravitational acceleration
+// Thrust values in m/s² from detection analysis
+
+// Known maneuver ranges (index ranges in trajectory data)
+// Data: 1284 points at 10-min intervals, starting ~3.4 hours after launch
+const MANEUVERS = [
+  { name: 'Pre-TLI', start: 0, end: 15, peak: 8, thrust: 0.8 },           // Initial adjustments
+  { name: 'TLI', start: 120, end: 140, peak: 130, thrust: 3.1 },          // Trans-Lunar Injection
+  { name: 'MCC', start: 460, end: 475, peak: 468, thrust: 0.3 },          // Mid-course correction
+  { name: 'Lunar Flyby', start: 740, end: 780, peak: 760, thrust: 2.8 },  // Lunar flyby burn
+  { name: 'Return MCC', start: 1100, end: 1115, peak: 1108, thrust: 0.25 }, // Return correction
+  { name: 'Entry', start: 1260, end: 1283, peak: 1275, thrust: 1.5 }      // Entry interface prep
+];
+
+const maxThrust = Math.max(...MANEUVERS.map(m => m.thrust));
+
+// Create engine burn marker texture - cyan/blue color
+function createBurnMarker(intensity) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 64; canvas.height = 64;
+  const ctx = canvas.getContext('2d');
+  
+  // Gradient with cyan/blue tones
+  const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 28);
+  const alpha = 0.6 + intensity * 0.4;
+  grad.addColorStop(0, `rgba(100,220,255,${alpha})`);
+  grad.addColorStop(0.4, `rgba(50,180,255,${alpha * 0.7})`);
+  grad.addColorStop(0.7, `rgba(0,120,200,${alpha * 0.3})`);
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(32, 32, 28, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Add inner bright core - white/cyan
+  const coreGrad = ctx.createRadialGradient(32, 32, 0, 32, 32, 12);
+  coreGrad.addColorStop(0, `rgba(220,250,255,${alpha})`);
+  coreGrad.addColorStop(0.5, `rgba(100,200,255,${alpha * 0.5})`);
+  coreGrad.addColorStop(1, 'rgba(50,150,220,0)');
+  ctx.fillStyle = coreGrad;
+  ctx.beginPath();
+  ctx.arc(32, 32, 12, 0, Math.PI * 2);
+  ctx.fill();
+  
+  return new THREE.CanvasTexture(canvas);
+}
+
+// Create maneuver line segments (bright red/orange)
+const maneuverGroup = new THREE.Group();
+maneuverGroup.visible = false;
+
+// Build maneuver path segments
+// Maneuver line material (shared)
+const maneuverLineMat = new LineMaterial({
+  color: 0x00ccff,
+  linewidth: 3,
+  transparent: true,
+  opacity: 1.0,
+  resolution: new THREE.Vector2(window.innerWidth, window.innerHeight),
+  depthTest: true,
+  depthWrite: false
+});
+
+MANEUVERS.forEach(m => {
+  const segPts = [];
+  for (let j = m.start; j <= Math.min(m.end, NASA_TRAJ.length - 1); j++) {
+    const p = horizonsToThree(NASA_TRAJ[j]);
+    segPts.push(p.x * SCALE, p.y * SCALE, p.z * SCALE);
+  }
+  if (segPts.length > 3) { // Need at least 2 points (6 values)
+    const geo = new LineGeometry();
+    geo.setPositions(segPts);
+    const line = new Line2(geo, maneuverLineMat);
+    line.computeLineDistances();
+    maneuverGroup.add(line);
+  }
+  
+  // Add burn marker at END of maneuver - size based on thrust magnitude
+  const markerIdx = Math.min(m.end, NASA_TRAJ.length - 1);
+  if (markerIdx < NASA_TRAJ.length) {
+    const p = horizonsToThree(NASA_TRAJ[markerIdx]);
+    const intensity = m.thrust / maxThrust;
+    
+    const burnTex = createBurnMarker(intensity);
+    const burnSprite = new THREE.Sprite(new THREE.SpriteMaterial({
+      map: burnTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+    }));
+    burnSprite.position.set(p.x * SCALE, p.y * SCALE, p.z * SCALE);
+    
+    // Scale based on thrust: min 1.5, max 5
+    const baseScale = 1.5 + intensity * 3.5;
+    burnSprite.scale.set(baseScale, baseScale, 1);
+    maneuverGroup.add(burnSprite);
+  }
+});
+
+scene.add(maneuverGroup);
+
+let showManeuvers = false;
+
+// ═══════════════════════════════════════════
+// ORION SPACECRAFT
+// ═══════════════════════════════════════════
+const orionGroup = new THREE.Group();
+let orionMesh = null;
+
+// Load STL model
+const stlLoader = new STLLoader();
+stlLoader.load('orion.stl', (geometry) => {
+  geometry.computeVertexNormals();
+  geometry.center();
+  
+  const material = new THREE.MeshStandardMaterial({ 
+    color: 0xc0c0cc, 
+    roughness: 0.35, 
+    metalness: 0.65,
+    emissive: 0x334455,
+    emissiveIntensity: 0.3
+  });
+  
+  orionMesh = new THREE.Mesh(geometry, material);
+  const s = 0.00018;
+  orionMesh.scale.set(s, s, s);
+  orionMesh.rotation.x = Math.PI;
+  orionGroup.add(orionMesh);
+});
+
+// Beacon sprite (kept for visibility at distance)
+let beaconSprite;
+(() => {
+  const c = document.createElement('canvas');
+  c.width = 128; c.height = 128;
+  const ctx = c.getContext('2d');
+  const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+  grad.addColorStop(0, 'rgba(255,120,50,0.95)');
+  grad.addColorStop(0.2, 'rgba(255,90,30,0.6)');
+  grad.addColorStop(0.5, 'rgba(255,60,20,0.15)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 128, 128);
+  const tex = new THREE.CanvasTexture(c);
+  beaconSprite = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: tex, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false
+  }));
+  beaconSprite.scale.set(2, 2, 1);
+  orionGroup.add(beaconSprite);
+})();
+
+const orionLabel = createLabel('ORION', '#ff8844');
+orionLabel.position.set(0, 0.2, 0);
+orionGroup.add(orionLabel);
+
+scene.add(orionGroup);
+
+// ═══════════════════════════════════════════
+// LIGHTING
+// ═══════════════════════════════════════════
+const SUN_ANGLE = Math.atan2(-0.17, 0.98);
+const sunDir = new THREE.DirectionalLight(0xffffff, 2.5);
+sunDir.position.set(Math.cos(SUN_ANGLE) * 400, 30, Math.sin(SUN_ANGLE) * 400);
+scene.add(sunDir);
+scene.add(new THREE.AmbientLight(0x1a1a2a, 0.5));
+
+// Sun sprite
+(() => {
+  const c = document.createElement('canvas');
+  c.width = 128; c.height = 128;
+  const ctx = c.getContext('2d');
+  const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+  grad.addColorStop(0, 'rgba(255,250,220,0.9)');
+  grad.addColorStop(0.25, 'rgba(255,230,150,0.5)');
+  grad.addColorStop(0.6, 'rgba(255,200,100,0.1)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 128, 128);
+  const tex = new THREE.CanvasTexture(c);
+  const sun = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending }));
+  sun.position.copy(sunDir.position).normalize().multiplyScalar(600);
+  sun.scale.set(50, 50, 1);
+  scene.add(sun);
+})();
+
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+function createLabel(text, color) {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 64;
+  const ctx = c.getContext('2d');
+  ctx.font = '600 28px Space Grotesk, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = color;
+  ctx.fillText(text, 256, 44);
+  const tex = new THREE.CanvasTexture(c);
+  const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.8, depthWrite: false }));
+  sp.scale.set(5, 0.65, 1);
+  return sp;
+}
+
+function formatKm(n) { return Math.round(Math.abs(n)).toLocaleString('en-US'); }
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let cameraMode = 'overview';
+let isPlaying = true;
+let speedMult = 1000;
+let simDay = 0;
+let prevFrameTime = Date.now();
+let targetPos = null;
+let targetLook = null;
+let scrubbing = false;
+
+// ═══════════════════════════════════════════
+// CONTROLS
+// ═══════════════════════════════════════════
+window.setCamera = (mode) => {
+  document.querySelectorAll('.cam-btn:not(#btn-maneuvers)').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  cameraMode = mode;
+  
+  if (mode === 'follow') {
+    const op = orionGroup.position.clone();
+    targetPos = op.clone().add(new THREE.Vector3(2, 2, 3));
+    targetLook = op;
+  } else if (mode === 'earth') {
+    targetPos = new THREE.Vector3(0, eR * 5, eR * 7);
+    targetLook = new THREE.Vector3(0, 0, 0);
+  } else if (mode === 'moon') {
+    const mp = moonGroup.position;
+    targetPos = new THREE.Vector3(mp.x + mR * 5, mp.y + mR * 4, mp.z + mR * 8);
+    targetLook = mp.clone();
+  } else if (mode === 'overview') {
+    const mid = moonGroup.position.clone().multiplyScalar(0.4);
+    targetPos = new THREE.Vector3(mid.x + 80, 50, mid.z + 120);
+    targetLook = new THREE.Vector3(mid.x, -50, mid.z);
+  }
+};
+
+window.togglePlay = () => {
+  isPlaying = !isPlaying;
+  const btn = document.getElementById('play-btn');
+  btn.innerHTML = isPlaying ? '⏸' : '▶';
+  btn.classList.toggle('paused', !isPlaying);
+};
+
+window.skipForward = () => {
+  simDay = Math.min(MISSION_DAYS, simDay + 1/24); // +1 hour
+};
+
+window.skipBackward = () => {
+  simDay = Math.max(0, simDay - 1/24); // -1 hour
+};
+
+window.setSpeed = (spd) => {
+  speedMult = spd;
+  document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+};
+
+window.toggleTelemetry = () => {
+  const panel = document.getElementById('left-panel');
+  const btn = document.getElementById('telemetry-toggle');
+  const isCollapsed = panel.classList.contains('collapsed-mobile');
+  
+  panel.classList.toggle('collapsed-mobile', !isCollapsed);
+  panel.classList.toggle('expanded-mobile', isCollapsed);
+  btn.classList.toggle('active', isCollapsed);
+};
+
+window.toggleManeuvers = () => {
+  showManeuvers = !showManeuvers;
+  maneuverGroup.visible = showManeuvers;
+  document.getElementById('btn-maneuvers').classList.toggle('active', showManeuvers);
+  // Also toggle mobile maneuvers button
+  const mobileBtn = document.getElementById('btn-maneuvers-mobile');
+  if (mobileBtn) mobileBtn.classList.toggle('active', showManeuvers);
+};
+
+window.onTimelineScrub = (val) => {
+  scrubbing = true;
+  // Map slider 0-10000 to TRAJ_START_DAY through MISSION_DAYS
+  simDay = TRAJ_START_DAY + (val / 10000) * (MISSION_DAYS - TRAJ_START_DAY);
+};
+
+document.getElementById('timeline-slider').addEventListener('pointerup', () => { scrubbing = false; });
+document.getElementById('timeline-slider').addEventListener('touchend', () => { scrubbing = false; });
+
+// Raycaster for clicking objects
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+// Prevent context menu on right-click (for pan)
+renderer.domElement.addEventListener('contextmenu', (e) => {
+  e.preventDefault();
+});
+
+// Two-finger pan for mobile (enable touch pan)
+controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.PAN };
+
+// Fade out control hints after 10 seconds
+setTimeout(() => {
+  const hints = document.getElementById('control-hints');
+  if (hints) hints.classList.add('fade-out');
+}, 10000);
+
+// Track dragging to distinguish from clicks
+let isDragging = false;
+let isRightDragging = false;
+let isTwoFingerTouch = false;
+
+renderer.domElement.addEventListener('pointerdown', (e) => { 
+  isDragging = false; 
+  isRightDragging = false;
+});
+renderer.domElement.addEventListener('pointermove', (e) => { 
+  if (e.buttons > 0) isDragging = true;
+  if (e.buttons === 2) isRightDragging = true; // Right mouse button
+});
+
+// Track two-finger touch for mobile pan
+renderer.domElement.addEventListener('touchstart', (e) => {
+  isTwoFingerTouch = e.touches.length >= 2;
+}, { passive: true });
+renderer.domElement.addEventListener('touchend', () => {
+  if (isTwoFingerTouch) {
+    // Exit focus mode when two-finger panning on mobile
+    cameraMode = 'overview';
+    document.querySelectorAll('.cam-btn:not(#btn-maneuvers)').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-overview').classList.add('active');
+    targetPos = null;
+    targetLook = null;
+  }
+  isTwoFingerTouch = false;
+}, { passive: true });
+
+// Reset camera target when user drags, exit focus mode on right-click pan
+renderer.domElement.addEventListener('pointerup', () => {
+  if (isDragging) {
+    targetPos = null;
+    targetLook = null;
+  }
+  if (isRightDragging) {
+    // Exit focus mode when panning (desktop)
+    cameraMode = 'overview';
+    document.querySelectorAll('.cam-btn:not(#btn-maneuvers)').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-overview').classList.add('active');
+  }
+});
+
+renderer.domElement.addEventListener('wheel', () => { targetPos = null; targetLook = null; }, { passive: true });
+
+// Click on objects to focus camera
+renderer.domElement.addEventListener('click', (e) => {
+  if (isDragging) return;
+  
+  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  
+  raycaster.setFromCamera(mouse, camera);
+  
+  // Check Orion first (use a larger sphere for easier clicking)
+  const orionClickSphere = new THREE.Sphere(orionGroup.position, 3);
+  if (raycaster.ray.intersectsSphere(orionClickSphere)) {
+    cameraMode = 'follow';
+    document.querySelectorAll('.cam-btn:not(#btn-maneuvers)').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-follow').classList.add('active');
+    const op = orionGroup.position.clone();
+    targetPos = op.clone().add(new THREE.Vector3(2, 2, 3));
+    targetLook = op;
+    return;
+  }
+  
+  // Check Earth
+  const earthHits = raycaster.intersectObject(earthMesh);
+  if (earthHits.length > 0) {
+    cameraMode = 'earth';
+    document.querySelectorAll('.cam-btn:not(#btn-maneuvers)').forEach(b => b.classList.remove('active'));
+    document.querySelector('.cam-btn:nth-child(2)').classList.add('active');
+    targetPos = new THREE.Vector3(0, eR * 5, eR * 7);
+    targetLook = new THREE.Vector3(0, 0, 0);
+    return;
+  }
+  
+  // Check Moon
+  const moonHits = raycaster.intersectObject(moonMesh);
+  if (moonHits.length > 0) {
+    cameraMode = 'moon';
+    document.querySelectorAll('.cam-btn:not(#btn-maneuvers)').forEach(b => b.classList.remove('active'));
+    document.querySelector('.cam-btn:nth-child(3)').classList.add('active');
+    const mp = moonGroup.position;
+    targetPos = new THREE.Vector3(mp.x + mR * 5, mp.y + mR * 4, mp.z + mR * 8);
+    targetLook = mp.clone();
+    return;
+  }
+});
+
+// ═══════════════════════════════════════════
+// ANIMATION
+// ═══════════════════════════════════════════
+function animate() {
+  requestAnimationFrame(animate);
+  const now = Date.now();
+  const dt = (now - prevFrameTime) / 1000;
+  prevFrameTime = now;
+
+  // Advance simulation
+  if (isPlaying && !scrubbing) {
+    simDay += (dt * speedMult) / 86400;
+    if (simDay > MISSION_DAYS) simDay = MISSION_DAYS;
+  }
+
+  // Moon position
+  const moonKm = getMoonPos(simDay);
+  moonGroup.position.set(moonKm.x * SCALE, moonKm.y * SCALE, moonKm.z * SCALE);
+  moonMesh.lookAt(moonGroup.worldToLocal(new THREE.Vector3(0, 0, 0)));
+  moonMesh.rotateY(Math.PI);
+
+  // Orion position
+  const orionKm = getTrajectoryPos(simDay);
+  const orionSc = new THREE.Vector3(orionKm.x * SCALE, orionKm.y * SCALE, orionKm.z * SCALE);
+  orionGroup.position.copy(orionSc);
+
+  // Orion orientation - point along trajectory direction
+  const nextKm = getTrajectoryPos(Math.min(simDay + 0.005, MISSION_DAYS));
+  const dir = new THREE.Vector3().subVectors(
+    new THREE.Vector3(nextKm.x, nextKm.y, nextKm.z),
+    orionKm
+  ).normalize();
+  orionGroup.lookAt(orionSc.clone().sub(dir.clone().multiplyScalar(SCALE)));
+
+  // Beacon pulse
+  const camDist = camera.position.distanceTo(orionGroup.position);
+  const fade = Math.min(1, camDist / 3);
+  if (beaconSprite) beaconSprite.material.opacity = fade * (0.7 + 0.3 * Math.sin(now * 0.005));
+
+  // Traveled path - includes Earth orbit phase
+  const dataIdx = (simDay - TRAJ_START_DAY) / TRAJ_STEP_DAYS;
+  const trajIdx = Math.max(0, dataIdx * 2); // 2 subdivisions per data point
+  const traveledIdx = Math.min(trajPts.length, Math.max(2, Math.ceil(trajIdx)));
+  const traveledPts = trajPts.slice(0, traveledIdx);
+  const positions = [];
+  traveledPts.forEach(p => positions.push(p.x, p.y, p.z));
+  traveledLine.geometry.dispose();
+  traveledLine.geometry = new LineGeometry();
+  traveledLine.geometry.setPositions(positions);
+  traveledLine.computeLineDistances();
+
+  // Earth-Moon line
+  emLine.geometry.dispose();
+  emLine.geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), moonGroup.position.clone()]);
+  emLine.computeLineDistances();
+
+  // Earth rotation (GMST)
+  const simMs = LAUNCH_TIME + simDay * 86400000;
+  const dJ2000 = (simMs - J2000_MS) / 86400000;
+  const gmstDeg = (280.46061837 + 360.98564736629 * dJ2000) % 360;
+  earthMesh.rotation.y = gmstDeg * Math.PI / 180;
+
+  // Camera
+  if (targetPos) {
+    camera.position.lerp(targetPos, 0.05);
+    controls.target.lerp(targetLook, 0.05);
+    if (camera.position.distanceTo(targetPos) < 0.5) { targetPos = null; targetLook = null; }
+  }
+
+  if (!targetPos) {
+    if (cameraMode === 'follow') {
+      const offset = camera.position.clone().sub(controls.target);
+      controls.target.copy(orionSc);
+      camera.position.copy(orionSc).add(offset);
+    } else if (cameraMode === 'moon') {
+      const offset = camera.position.clone().sub(controls.target);
+      controls.target.copy(moonGroup.position);
+      camera.position.copy(moonGroup.position).add(offset);
     }
-    const monsMoutonLocal = latLonToMoonVec(-84.9, -33.3, mR + 0.03);
+  }
 
-    // Mons Mouton Landing Beacon
-    const beaconGroup = new THREE.Group();
-    beaconGroup.position.copy(monsMoutonLocal);
+  controls.update();
 
-    // Target needle
-    const needleGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.7, 8);
-    needleGeo.translate(0, 0.35, 0);
-    const needleMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
-    const needle = new THREE.Mesh(needleGeo, needleMat);
-    needle.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), monsMoutonLocal.clone().normalize());
-    beaconGroup.add(needle);
+  // Labels face camera
+  earthLabel.lookAt(camera.position);
+  moonLabel.lookAt(camera.position);
+  orionLabel.lookAt(camera.position);
+  
+  // Dynamic Orion label scaling based on camera distance
+  const orionCamDist = camera.position.distanceTo(orionGroup.position);
+  const labelScale = Math.max(0.3, Math.min(1, orionCamDist / 15));
+  orionLabel.scale.set(5 * labelScale, 0.65 * labelScale, 1);
 
-    // Pulsing radar ring
-    const ringGeo = new THREE.RingGeometry(0.12, 0.32, 32);
-    const ringMat = new THREE.MeshBasicMaterial({ color: 0x00d4ff, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
-    const radarRing = new THREE.Mesh(ringGeo, ringMat);
-    radarRing.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), monsMoutonLocal.clone().normalize());
-    beaconGroup.add(radarRing);
+  // ═══ HUD Update ═══
+  const hudMs = simDay * 86400000;
+  
+  // MET
+  const metD = Math.floor(simDay);
+  const metH = Math.floor((hudMs % 86400000) / 3600000);
+  const metM = Math.floor((hudMs % 3600000) / 60000);
+  const metS = Math.floor((hudMs % 60000) / 1000);
+  document.getElementById('met-display').textContent = 
+    `T+${String(metD).padStart(2,'0')}:${String(metH).padStart(2,'0')}:${String(metM).padStart(2,'0')}:${String(metS).padStart(2,'0')}`;
 
-    moonGroup.add(beaconGroup);
+  // Date
+  const missionDate = new Date(LAUNCH_TIME + hudMs);
+  document.getElementById('date-display').textContent = missionDate.toUTCString().slice(0, 22) + ' UTC';
 
-    // ═══════════════════════════════════════════
-    // 6. LINTASAN 3D & WAHANA (TRAJECTORY & LANDER)
-    // ═══════════════════════════════════════════
-    const moonArrivalPos = getMoonOrbitPosition(T_ARRIVAL);
-    const tliPoints = [];
-    const tliSteps = 300;
-    for (let i = 0; i <= tliSteps; i++) {
-      const u = i / tliSteps;
-      const x = THREE.MathUtils.lerp(eR * 1.18, moonArrivalPos.x, u);
-      const z = THREE.MathUtils.lerp(0, moonArrivalPos.z, u) + Math.sin(u * Math.PI) * 45;
-      const y = THREE.MathUtils.lerp(0, moonArrivalPos.y, u) + Math.sin(u * Math.PI) * 16;
-      tliPoints.push(new THREE.Vector3(x, y, z));
-    }
-    const tliSpline = new THREE.CatmullRomCurve3(tliPoints);
+  // Timeline slider - maps TRAJ_START_DAY to MISSION_DAYS onto 0-100%
+  if (!scrubbing) {
+    const timeRange = MISSION_DAYS - TRAJ_START_DAY;
+    const pct = Math.max(0, (simDay - TRAJ_START_DAY) / timeRange) * 100;
+    document.getElementById('timeline-slider').value = Math.min(10000, pct * 100);
+    document.getElementById('timeline-progress').style.width = `${Math.min(100, pct)}%`;
+  }
 
-    // Kurva PDI Pendaratan Mons Mouton
-    const pdiLocalPoints = [];
-    const pdiSteps = 100;
-    const periluneLocal = new THREE.Vector3(0, -mR * 1.5, 2.5);
-    const touchdownLocal = monsMoutonLocal.clone();
-    for (let i = 0; i <= pdiSteps; i++) {
-      const u = i / pdiSteps;
-      const pt = new THREE.Vector3().lerpVectors(periluneLocal, touchdownLocal, u);
-      pt.y += Math.sin((1 - u) * Math.PI * 0.5) * 1.2;
-      pdiLocalPoints.push(pt);
-    }
-    const pdiLocalSpline = new THREE.CatmullRomCurve3(pdiLocalPoints);
+  // Phase markers (based on mission day)
+  // Data starts at day 0.14 (ICPS), TLI at ~day 1.05, flyby at ~day 5.5, data ends ~day 9.05
+  [['pm-orbit',0,1.05],['pm-tli',1.05,1.15],['pm-coast',1.15,5.3],['pm-flyby',5.3,6.3],['pm-return',6.3,MISSION_DAYS],['pm-entry',MISSION_DAYS,MISSION_DAYS+1]].forEach(([id,s,e]) => {
+    document.getElementById(id).classList.toggle('active', simDay >= s && simDay < e);
+  });
 
-    // Garis Lintasan Penuh (Dashed Prediksi)
-    const fullTrajGeo = new THREE.BufferGeometry().setFromPoints(tliPoints);
-    const fullTrajMat = new THREE.LineDashedMaterial({
-      color: 0x00d4ff, transparent: true, opacity: 0.5, dashSize: 2.5, gapSize: 1.5
-    });
-    const fullTrajLine = new THREE.Line(fullTrajGeo, fullTrajMat);
-    fullTrajLine.computeLineDistances();
-    scene.add(fullTrajLine);
+  // Phase text (data ends at ~day 9.05, before re-entry)
+  let phase = 'Data End';
+  if (simDay < 1.05) phase = 'Earth Orbit';
+  else if (simDay < 1.15) phase = 'Translunar Injection';
+  else if (simDay < 5.3) phase = 'Translunar Coast';
+  else if (simDay < 6.3) phase = 'Lunar Flyby';
+  else if (simDay < MISSION_DAYS) phase = 'Return Transit';
+  document.getElementById('phase-text').textContent = phase;
 
-    // Garis PDI Descent Arc di Moon Group
-    const pdiTrajGeo = new THREE.BufferGeometry().setFromPoints(pdiLocalPoints);
-    const pdiTrajMat = new THREE.LineBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.9, linewidth: 2 });
-    const pdiLine = new THREE.Line(pdiTrajGeo, pdiTrajMat);
-    moonGroup.add(pdiLine);
+  // Telemetry
+  const dEarth = Math.max(0, orionKm.length() - EARTH_RADIUS_KM);
+  const dMoon = Math.max(0, orionKm.clone().sub(moonKm).length() - MOON_RADIUS_KM);
+  document.getElementById('dist-earth').textContent = formatKm(dEarth);
+  document.getElementById('dist-moon').textContent = formatKm(dMoon);
 
-    // Wahana Antariksa (Artemis Lander)
-    const landerGroup = new THREE.Group();
-    scene.add(landerGroup);
+  const prevKm = getTrajectoryPos(Math.max(0, simDay - 0.001));
+  const vel = orionKm.clone().sub(prevKm).length() / (0.001 * 86400);
+  document.getElementById('velocity').textContent = vel.toFixed(2);
 
-    // Badan Wahana
-    const bodyGeo = new THREE.CylinderGeometry(0.35, 0.45, 0.6, 8);
-    const bodyMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.25 });
-    landerGroup.add(new THREE.Mesh(bodyGeo, bodyMat));
+  composer.render();
+}
 
-    // Base Gold Foil
-    const foilGeo = new THREE.BoxGeometry(0.65, 0.2, 0.65);
-    const foilMat = new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.9, roughness: 0.35 });
-    const foil = new THREE.Mesh(foilGeo, foilMat);
-    foil.position.y = -0.35;
-    landerGroup.add(foil);
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+window.addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  composer.setSize(innerWidth, innerHeight);
+  traveledMat.resolution.set(innerWidth, innerHeight);
+  maneuverLineMat.resolution.set(innerWidth, innerHeight);
+});
 
-    // Engine Bell
-    const bellGeo = new THREE.ConeGeometry(0.18, 0.3, 12, 1, true);
-    const bellMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.9, roughness: 0.1 });
-    const bell = new THREE.Mesh(bellGeo, bellMat);
-    bell.rotation.x = Math.PI;
-    bell.position.y = -0.52;
-    landerGroup.add(bell);
+// Initialize
+(() => {
+  simDay = TRAJ_START_DAY; // Start at data start (ICPS separation, ~3h24m after launch)
+  const moonKm = getMoonPos(simDay);
+  moonGroup.position.set(moonKm.x * SCALE, moonKm.y * SCALE, moonKm.z * SCALE);
+  const mid = moonGroup.position.clone().multiplyScalar(0.4);
+  camera.position.set(mid.x + 80, 50, mid.z + 120);
+  controls.target.set(mid.x, -50, mid.z);
+  controls.update();
+})();
 
-    // Thruster Burn Flare (Additive Sprite)
-    let burnSprite;
-    (() => {
-      const c = document.createElement('canvas');
-      c.width = 128; c.height = 128;
-      const ctx = c.getContext('2d');
-      const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
-      grad.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-      grad.addColorStop(0.2, 'rgba(0, 212, 255, 0.85)');
-      grad.addColorStop(0.5, 'rgba(0, 150, 255, 0.35)');
-      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 128, 128);
-      const tex = new THREE.CanvasTexture(c);
-      burnSprite = new THREE.Sprite(new THREE.SpriteMaterial({
-        map: tex, transparent: true, blending: THREE.AdditiveBlending
-      }));
-      burnSprite.position.y = -0.9;
-      burnSprite.scale.set(1.4, 1.4, 1);
-      landerGroup.add(burnSprite);
-    })();
 
-    // ═══════════════════════════════════════════
-    // 7. SIMULATION LOGIC & TELEMETRY
-    // ═══════════════════════════════════════════
-    let simProgress = 0; // 0 to 10000
-    let isPlaying = false;
-    let timeMultiplier = 1;
-    let cameraMode = 'overview';
+animate();
+</script>
 
-    const LAUNCH_EPOCH = new Date("2026-11-10T12:00:00Z").getTime();
-    const TOTAL_SECONDS = 96.2 * 3600; // 346,320 detik
-
-    function getSimState(p) {
-      const fraction = p / 10000;
-      const currentSeconds = fraction * TOTAL_SECONDS;
-      const date = new Date(LAUNCH_EPOCH + currentSeconds * 1000);
-
-      let pos = new THREE.Vector3();
-      let dEarthKm = 0;
-      let dMoonKm = 0;
-      let altVal = "0";
-      let altUnit = "KM";
-      let velVal = "0.00";
-      let fuelVal = "1,250.0";
-      let phaseTitle = "";
-      let phaseDesc = "";
-      let isBurn = false;
-
-      // 1. LEO (0 - 1000)
-      if (p < 1000) {
-        const u = p / 1000;
-        const ang = u * Math.PI * 4;
-        const r = eR * 1.18;
-        pos.set(Math.cos(ang) * r, Math.sin(ang * 0.3) * 2, Math.sin(ang) * r);
-        dEarthKm = 185;
-        dMoonKm = 384400 - u * 2000;
-        altVal = "185";
-        altUnit = "KM";
-        velVal = (7.80).toFixed(2);
-        fuelVal = (1250 - u * 150).toFixed(1) + " KG (88.0%)";
-        phaseTitle = "[FASE 1] Peluncuran & Orbit Parkir Bumi (LEO)";
-        phaseDesc = "Wahana stabil pada orbit parkir 185 km pasca pemisahan roket pendorong.";
-        isBurn = (u > 0.85);
-      }
-      // 2. TLI INJECTION (1000 - 1500)
-      else if (p < 1500) {
-        const u = (p - 1000) / 500;
-        pos.copy(tliSpline.getPoint(u * 0.08));
-        dEarthKm = 185 + u * 1800;
-        dMoonKm = 384400 - dEarthKm;
-        altVal = Math.round(dEarthKm).toLocaleString();
-        altUnit = "KM";
-        velVal = THREE.MathUtils.lerp(7.80, 10.95, u).toFixed(2);
-        fuelVal = (1100 - u * 220).toFixed(1) + " KG (70.4%)";
-        phaseTitle = "[FASE 2] Trans-Lunar Injection (TLI)";
-        phaseDesc = "Mesin tahap kedua membakar propelan, mempercepat wahana menuju kecepatan lepas 10.95 km/s.";
-        isBurn = true;
-      }
-      // 3. TRANSLUNAR COAST (1500 - 8800)
-      else if (p < 8800) {
-        const u = (p - 1500) / 7300;
-        const splineU = THREE.MathUtils.lerp(0.08, 0.98, u);
-        pos.copy(tliSpline.getPoint(splineU));
-        dEarthKm = Math.round(THREE.MathUtils.lerp(2000, 380000, u));
-        dMoonKm = Math.max(100, 384400 - dEarthKm);
-        altVal = dEarthKm.toLocaleString();
-        altUnit = "KM";
-        const v = u < 0.75 ? THREE.MathUtils.lerp(10.95, 1.15, u / 0.75) : THREE.MathUtils.lerp(1.15, 2.38, (u - 0.75) / 0.25);
-        velVal = v.toFixed(2);
-        fuelVal = "880.0 KG (70.4%)";
-        phaseTitle = "[FASE 3] Transit Translunar (Cislunar Coast)";
-        phaseDesc = "Melintasi ruang hampa Bumi-Bulan. Gravitasi Bulan mulai menarik wahana di titik L1.";
-        isBurn = false;
-      }
-      // 4. LOI LUNAR ORBIT (8800 - 9600)
-      else if (p < 9600) {
-        const u = (p - 8800) / 800;
-        const ang = u * Math.PI * 4;
-        const orbR = THREE.MathUtils.lerp(mR * 1.8, mR * 1.15, u);
-        const moonPosNow = getMoonOrbitPosition(currentSeconds);
-        pos.set(
-          moonPosNow.x + Math.sin(ang) * orbR * 0.2,
-          moonPosNow.y + Math.cos(ang) * orbR,
-          moonPosNow.z + Math.sin(ang) * orbR
-        );
-        dEarthKm = 384400;
-        const altK = THREE.MathUtils.lerp(100, 15, u);
-        dMoonKm = Math.round(1737 + altK);
-        altVal = altK.toFixed(1);
-        altUnit = "KM";
-        velVal = THREE.MathUtils.lerp(2.38, 1.69, u).toFixed(2);
-        fuelVal = (880 - u * 350).toFixed(1) + " KG (42.4%)";
-        phaseTitle = "[FASE 4] Lunar Orbit Insertion (LOI)";
-        phaseDesc = "Pengereman retro-burn menstabilkan wahana ke orbit polar eliptik perilune 15 km.";
-        isBurn = (u < 0.4);
-      }
-      // 5. PDI MONS MOUTON DESCENT (9600 - 10000)
-      else {
-        const u = Math.min(1.0, (p - 9600) / 400);
-        const moonPosNow = getMoonOrbitPosition(currentSeconds);
-        const relPt = pdiLocalSpline.getPoint(u);
-        pos.copy(moonPosNow).add(relPt);
-        dEarthKm = 384400;
-        const altMeters = Math.max(0, Math.round((1 - u) * (1 - u) * 15000));
-        dMoonKm = 1737 + Math.round(altMeters / 1000);
-        altVal = altMeters.toLocaleString();
-        altUnit = "M";
-        velVal = THREE.MathUtils.lerp(1.69, 0.0008, Math.pow(u, 0.8)).toFixed(2);
-        fuelVal = (530 - u * 130).toFixed(1) + " KG (32.0%)";
-        phaseTitle = u < 1.0 ? "[FASE 5] Powered Descent Initiation (PDI)" : "[SELESAI] TOUCHDOWN MONS MOUTON";
-        phaseDesc = u < 1.0 
-          ? "Deselerasi dorongan mesin roket menuju pendaratan presisi di Mons Mouton Crest (-84.9°S, 33.3°W)."
-          : "Pendaratan sukses dengan kecepatan sentuh 0.8 m/s. Sistem siap beroperasi!";
-        isBurn = (u < 0.98);
-      }
-
-      return {
-        pos, date, dEarthKm, dMoonKm, altVal, altUnit, velVal, fuelVal, phaseTitle, phaseDesc, isBurn, currentSeconds
-      };
-    }
-
-    function formatMET(sec) {
-      const d = Math.floor(sec / 86400);
-      const h = Math.floor((sec % 86400) / 3600);
-      const m = Math.floor((sec % 3600) / 60);
-      const s = Math.floor(sec % 60);
-      const pad = (n) => String(n).padStart(2, '0');
-      return `MET: ${pad(d)}d ${pad(h)}h ${pad(m)}m ${pad(s)}s`;
-    }
-
-    function updateSimulation(p) {
-      simProgress = Math.max(0, Math.min(10000, p));
-      const state = getSimState(simProgress);
-
-      // Update Posisi Fisik Orbit Bulan Mengitari Bumi
-      const moonPosNow = getMoonOrbitPosition(state.currentSeconds);
-      moonGroup.position.copy(moonPosNow);
-      moonMesh.lookAt(moonGroup.worldToLocal(new THREE.Vector3(0, 0, 0)));
-      moonMesh.rotateY(Math.PI);
-
-      // Update Garis Vektor Koneksi Bumi-Bulan
-      emLine.geometry.dispose();
-      emLine.geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), moonPosNow.clone()]);
-      emLine.computeLineDistances();
-
-      // Posisi wahana
-      landerGroup.position.copy(state.pos);
-
-      // Orientasi wahana
-      if (simProgress > 9600) {
-        const upVec = monsMoutonLocal.clone().normalize();
-        landerGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), upVec);
-      } else {
-        const nextState = getSimState(Math.min(10000, simProgress + 15));
-        const dir = nextState.pos.clone().sub(state.pos).normalize();
-        if (dir.length() > 0.001) {
-          landerGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
-        }
-      }
-
-      // Thruster Burn Flare
-      burnSprite.visible = state.isBurn;
-      if (state.isBurn) {
-        const s = 1.2 + Math.random() * 0.4;
-        burnSprite.scale.set(s, s, 1);
-      }
-
-      // Update UI Telemetri
-      document.getElementById('dist-earth').textContent = state.dEarthKm.toLocaleString();
-      document.getElementById('dist-moon').textContent = state.dMoonKm.toLocaleString();
-      document.getElementById('altitude-val').textContent = state.altVal;
-      document.getElementById('altitude-unit').textContent = state.altUnit;
-      document.getElementById('velocity-val').textContent = state.velVal;
-      document.getElementById('fuel-val').textContent = state.fuelVal;
-
-      document.getElementById('phase-title').textContent = state.phaseTitle;
-      document.getElementById('phase-desc').textContent = state.phaseDesc;
-      document.getElementById('date-display').textContent = state.date.toUTCString().slice(0, 22) + ' UTC';
-      document.getElementById('met-display').textContent = formatMET(state.currentSeconds);
-
-      // Update Slider & Progress Bar
-      const pct = (simProgress / 10000) * 100;
-      document.getElementById('timeline-progress').style.width = `${pct}%`;
-      const slider = document.getElementById('timeline-slider');
-      if (document.activeElement !== slider) {
-        slider.value = simProgress;
-      }
-
-      // Phase Marker Active Highlight
-      document.querySelectorAll('.phase-marker').forEach(m => m.classList.remove('active'));
-      if (simProgress < 1000) document.getElementById('pm-leo').classList.add('active');
-      else if (simProgress < 1500) document.getElementById('pm-tli').classList.add('active');
-      else if (simProgress < 8800) document.getElementById('pm-coast').classList.add('active');
-      else if (simProgress < 9600) document.getElementById('pm-loi').classList.add('active');
-      else if (simProgress < 10000) document.getElementById('pm-pdi').classList.add('active');
-      else document.getElementById('pm-touchdown').classList.add('active');
-
-      // Radar Pulse
-      const pulse = 1 + Math.sin(performance.now() * 0.006) * 0.4;
-      radarRing.scale.set(pulse, pulse, 1);
-
-      // Rotasi alami Bumi & Bulan
-      earthMesh.rotation.y += 0.0006;
-      moonMesh.rotation.y += 0.0002;
-    }
-
-    // ═══════════════════════════════════════════
-    // 8. CAMERA PRESETS & LERP
-    // ═══════════════════════════════════════════
-    function setCamera(mode) {
-      cameraMode = mode;
-      document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
-      const btn = document.getElementById(`btn-cam-${mode}`);
-      if (btn) btn.classList.add('active');
-
-      if (mode === 'overview') {
-        const mid = getMoonOrbitPosition(T_ARRIVAL).clone().multiplyScalar(0.45);
-        targetLook.set(mid.x, 0, mid.z);
-        targetSpherical.radius = 420;
-        targetSpherical.theta = 0.85;
-        targetSpherical.phi = 1.15;
-      } else if (mode === 'earth') {
-        targetLook.set(0, 0, 0);
-        targetSpherical.radius = 75;
-        targetSpherical.theta = 0.6;
-        targetSpherical.phi = 1.2;
-      } else if (mode === 'moon') {
-        targetLook.copy(moonGroup.position);
-        targetSpherical.radius = 28;
-        targetSpherical.theta = 0.8;
-        targetSpherical.phi = 1.2;
-      } else if (mode === 'lander') {
-        targetLook.copy(landerGroup.position);
-        targetSpherical.radius = 12;
-      } else if (mode === 'mons') {
-        const mp = moonGroup.position.clone().add(monsMoutonLocal);
-        targetLook.copy(mp);
-        targetSpherical.radius = 6;
-        targetSpherical.phi = 1.35;
-      }
-    }
-    window.setCamera = setCamera;
-
-    // ═══════════════════════════════════════════
-    // 9. CONTROLS & TIMELINE LISTENERS
-    // ═══════════════════════════════════════════
-    const slider = document.getElementById('timeline-slider');
-    slider.addEventListener('input', (e) => {
-      updateSimulation(parseFloat(e.target.value));
-    });
-
-    function togglePlay() {
-      if (simProgress >= 10000) {
-        simProgress = 0;
-      }
-      isPlaying = !isPlaying;
-      const btn = document.getElementById('btn-play');
-      if (btn) {
-        btn.innerHTML = isPlaying ? "&#10074;&#10074;" : "&#9658;";
-        btn.style.color = isPlaying ? "#00d4ff" : "#ffffff";
-        btn.style.borderColor = isPlaying ? "#00d4ff" : "rgba(255, 255, 255, 0.3)";
-        btn.title = isPlaying ? "Jeda Simulasi (Spasi)" : "Putar Simulasi (Spasi)";
-      }
-    }
-    window.togglePlay = togglePlay;
-
-    // Pasang Event Listener Langsung ke Tombol Play/Pause
-    const playBtn = document.getElementById('btn-play');
-    if (playBtn) {
-      playBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        togglePlay();
-      });
-    }
-
-    // Tombol Pintas Keyboard Spasi (Spacebar)
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'Space') {
-        e.preventDefault();
-        togglePlay();
-      }
-    });
-
-    function setSpeed(spd) {
-      timeMultiplier = spd;
-      document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
-      const btn = document.getElementById(`spd-${spd}`);
-      if (btn) btn.classList.add('active');
-    }
-    window.setSpeed = setSpeed;
-
-    function jumpTo(val) {
-      updateSimulation(val);
-      if (val === 0) setCamera('earth');
-      else if (val === 1000) setCamera('earth');
-      else if (val === 4500) setCamera('overview');
-      else if (val === 8800) setCamera('moon');
-      else if (val >= 9600) setCamera('mons');
-    }
-    window.jumpTo = jumpTo;
-
-    // ═══════════════════════════════════════════
-    // 10. RENDER LOOP
-    // ═══════════════════════════════════════════
-    let lastTime = performance.now();
-    function animate(time) {
-      requestAnimationFrame(animate);
-
-      const delta = (time - lastTime) / 1000;
-      lastTime = time;
-
-      if (isPlaying) {
-        const advanceRate = (10000 / TOTAL_SECONDS) * 35 * timeMultiplier;
-        simProgress += advanceRate * delta;
-        if (simProgress >= 10000) {
-          simProgress = 10000;
-          isPlaying = false;
-          const btn = document.getElementById('btn-play');
-          if (btn) {
-            btn.innerHTML = "&#9658;";
-            btn.style.color = "#ffffff";
-            btn.style.borderColor = "rgba(255, 255, 255, 0.3)";
-          }
-        }
-        updateSimulation(simProgress);
-      }
-
-      // Smooth Camera Damping (Inersia halus)
-      camSpherical.radius += (targetSpherical.radius - camSpherical.radius) * 0.08;
-      camSpherical.theta += (targetSpherical.theta - camSpherical.theta) * 0.08;
-      camSpherical.phi += (targetSpherical.phi - camSpherical.phi) * 0.08;
-
-      if (cameraMode === 'moon') {
-        targetLook.copy(moonGroup.position);
-      } else if (cameraMode === 'mons') {
-        const mp = moonGroup.position.clone().add(monsMoutonLocal);
-        targetLook.copy(mp);
-      } else if (cameraMode === 'lander') {
-        targetLook.copy(landerGroup.position);
-      }
-
-      camTarget.lerp(targetLook, 0.08);
-
-      const cx = camTarget.x + camSpherical.radius * Math.sin(camSpherical.phi) * Math.sin(camSpherical.theta);
-      const cy = camTarget.y + camSpherical.radius * Math.cos(camSpherical.phi);
-      const cz = camTarget.z + camSpherical.radius * Math.sin(camSpherical.phi) * Math.cos(camSpherical.theta);
-
-      camera.position.set(cx, cy, cz);
-      camera.lookAt(camTarget);
-
-      renderer.render(scene, camera);
-    }
-
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    // Inisialisasi awal
-    updateSimulation(0);
-    requestAnimationFrame(animate);
-  </script>
 </body>
 </html>
