@@ -6,7 +6,7 @@
   <title>XASUAI — Sistem Navigasi Lokasi Pendaratan di Bulan</title>
   <link rel="icon" type="image/png" href="/logo.png">
   <script src="/three.min.js"></script>
-  <link rel="stylesheet" href="/css/style.css?v=3">
+  <link rel="stylesheet" href="/css/style.css?v=4">
 </head>
 <body>
 
@@ -43,66 +43,55 @@
   <!-- ===================================================================== -->
   <!-- LAYAR 0: BERANDA / SISTEM OPERASI KENDALI MISI (FLIGHT DYNAMICS) -->
   <!-- ===================================================================== -->
-  <main id="view-home" class="bento-container" style="display: grid;">
-    <div class="bento-card bento-full" style="background: var(--bg-surface); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); color: var(--text-primary); padding: 18px 28px; border-radius: var(--radius-lg); min-height: calc(100vh - 130px); display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
+    <main id="view-home" style="display: block; position: relative;">
+    
+    <!-- Floating Side Slide Indicators (Pills / Dots) -->
+    <div class="slide-floating-dots" id="homeSlideDots">
+      <button class="slide-dot active" onclick="slideHomeTo(1)" title="Pengantar Misi &amp; Model 3D"></button>
+      <button class="slide-dot" onclick="slideHomeTo(2)" title="Tantangan Utama Pendaratan"></button>
+      <button class="slide-dot" onclick="slideHomeTo(3)" title="Alur Kerja 3 Tahap Penyelesaian"></button>
+    </div>
+
+    <!-- Scroll-Snap Slider Container (Natural Scroll & Snap) -->
+    <div class="home-slides-container" id="homeSlidesContainer">
 
       <!-- =================================================================== -->
-      <!-- ONBOARDING LANGKAH 1: PENGANTAR SISTEM & MODEL 3D BULAN -->
+      <!-- SLIDE 1: PENGANTAR SISTEM & MODEL 3D BULAN -->
       <!-- =================================================================== -->
-      <div id="onboarding-step-1" class="onboarding-step-view" style="display: flex;">
-        <!-- Konten Utama -->
-        <div class="onboarding-inner-center" style="max-width: 960px;">
-          <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(37,99,235,0.08); color: var(--artemis-blue); padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-bottom: 8px;">
-            <span>LANGKAH 1 DARI 3 &bull; PENGANTAR SISTEM</span>
-          </div>
-          <h1 style="font-size: 25px; font-weight: 900; color: var(--text-primary); margin: 0 0 8px; letter-spacing: -0.5px;">
+      <section id="home-slide-1" class="home-slide-section">
+        <div style="max-width: 960px; margin: auto 0; text-align: center; width: 100%;">
+          <h1 style="font-size: 26px; font-weight: 900; color: var(--text-primary); margin: 0 0 10px; letter-spacing: -0.5px;">
             XASUAI — Sistem Navigasi Lokasi Pendaratan di Bulan
           </h1>
-          <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; max-width: 860px; margin: 0 auto 12px;">
+          <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.6; max-width: 860px; margin: 0 auto 16px;">
             XASUAI adalah sistem yang membantu menentukan lokasi dan waktu pendaratan terbaik bagi wahana Artemis di <strong>Mons Mouton, Kutub Selatan Bulan</strong>. Sistem ini menganalisis kondisi lingkungan, bentuk permukaan Bulan, serta pergerakan wahana untuk memastikan pendaratan berlangsung aman dan terkendali.
           </p>
 
-          <!-- Pure Cinematic 3D Moon Canvas (Transparent, Floating, Interactive) -->
-          <div style="background: transparent; border: none; margin: 0 auto 6px; overflow: visible; position: relative; height: 320px; cursor: pointer; filter: drop-shadow(0 20px 28px rgba(15, 23, 42, 0.22));" id="homeMoonContainer" onclick="goToOnboarding(2)" title="Klik Bulan untuk Membuka Tantangan Pendaratan"></div>
+          <!-- Pure Cinematic 3D Moon Canvas -->
+          <div style="background: transparent; border: none; margin: 0 auto 8px; overflow: visible; position: relative; height: 320px; cursor: pointer; filter: drop-shadow(0 20px 28px rgba(15, 23, 42, 0.22));" id="homeMoonContainer" onclick="slideHomeTo(2)" title="Klik Bulan untuk Eksplorasi Tantangan"></div>
 
           <!-- Teks Simpel Petunjuk -->
-          <p id="homeMoonCtaPill" onclick="goToOnboarding(2)" style="font-size: 13px; color: var(--text-muted); margin: 0 auto; cursor: pointer; transition: color 0.2s ease; user-select: none; font-weight: 600;" onmouseover="this.style.color='var(--artemis-blue)';" onmouseout="this.style.color='var(--text-muted)';">
+          <p id="homeMoonCtaPill" onclick="slideHomeTo(2)" style="font-size: 13px; color: var(--text-muted); margin: 0 auto; cursor: pointer; transition: color 0.2s ease; user-select: none; font-weight: 600;" onmouseover="this.style.color='var(--artemis-blue)';" onmouseout="this.style.color='var(--text-muted)';">
             Klik Bulan untuk Melanjutkan &darr;
           </p>
         </div>
 
-        <!-- Onboarding Navigation Bar -->
-        <div class="onboarding-nav-bar">
-          <div style="font-size: 12px; font-weight: 700; color: var(--text-muted);">
-            Langkah 1 / 3
-          </div>
-          <div style="display: flex; gap: 8px;">
-            <button class="onboarding-indicator-dot active" onclick="goToOnboarding(1)" title="Langkah 1: Pengantar Misi">1. Pengantar</button>
-            <button class="onboarding-indicator-dot" onclick="goToOnboarding(2)" title="Langkah 2: Tantangan Utama">2. Tantangan</button>
-            <button class="onboarding-indicator-dot" onclick="goToOnboarding(3)" title="Langkah 3: Alur Solusi">3. Alur Kerja</button>
-          </div>
-          <div>
-            <button class="btn-onboarding-next" onclick="goToOnboarding(2)">
-              <span>Lanjut ke Tantangan</span>
-              <span>&rarr;</span>
-            </button>
-          </div>
+        <!-- Subtle Floating Slide Down Hint -->
+        <div onclick="slideHomeTo(2)" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text-muted); margin-top: auto; padding-top: 10px; transition: color 0.2s;" onmouseover="this.style.color='var(--artemis-blue)';" onmouseout="this.style.color='var(--text-muted)';" title="Gulir atau Klik untuk ke Tantangan">
+          <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase;">Gulir ke Bawah</span>
+          <span style="font-size: 15px; animation: bounceSlow 1.8s infinite;">&darr;</span>
         </div>
-      </div>
+      </section>
 
       <!-- =================================================================== -->
-      <!-- ONBOARDING LANGKAH 2: TANTANGAN UTAMA PENDARATAN (3 MASALAH) -->
+      <!-- SLIDE 2: TANTANGAN UTAMA PENDARATAN DI KUTUB SELATAN BULAN -->
       <!-- =================================================================== -->
-      <div id="onboarding-step-2" class="onboarding-step-view" style="display: none; opacity: 0;">
-        <!-- Konten Utama (Full di Tengah Layar) -->
-        <div class="onboarding-inner-center" style="max-width: 1140px;">
-          <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(220,38,38,0.08); color: #b91c1c; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-bottom: 8px;">
-            <span>LANGKAH 2 DARI 3 &bull; IDENTIFIKASI TANTANGAN</span>
-          </div>
+      <section id="home-slide-2" class="home-slide-section">
+        <div style="max-width: 1140px; margin: auto 0; text-align: center; width: 100%;">
           <h2 style="font-size: 24px; font-weight: 900; color: var(--text-primary); margin: 0 0 6px; letter-spacing: -0.5px;">
             Tantangan Utama Pendaratan di Kutub Selatan Bulan
           </h2>
-          <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0 auto 18px; max-width: 760px;">
+          <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0 auto 20px; max-width: 760px;">
             Ada tiga masalah utama yang harus diatasi sebelum wahana dapat mendarat dengan aman di Mons Mouton.
           </p>
 
@@ -132,7 +121,7 @@
                   Solusi 1 — Rekomendasi Waktu Pendaratan
                 </div>
                 <div style="font-size: 11.5px; line-height: 1.45; color: var(--text-secondary); margin: 0;">
-                  Sistem menganalisis pergerakan Matahari & Bumi untuk mencari jendela waktu saat lokasi mendapat cukup cahaya dan jalur komunikasi langsung bebas rintangan.
+                  Sistem menganalisis pergerakan Matahari &amp; Bumi untuk mencari jendela waktu saat lokasi mendapat cukup cahaya dan jalur komunikasi langsung bebas rintangan.
                 </div>
               </div>
             </div>
@@ -158,10 +147,10 @@
               </div>
               <div style="background: #ffffff; border: 1px solid #fef3c7; border-radius: 6px; padding: 10px; margin-top: 8px;">
                 <div style="font-size: 11px; font-weight: 800; color: #b45309; margin-bottom: 3px;">
-                  Solusi 2 — Visualisasi & Analisis Topografi
+                  Solusi 2 — Visualisasi &amp; Analisis Topografi
                 </div>
                 <div style="font-size: 11.5px; line-height: 1.45; color: var(--text-secondary); margin: 0;">
-                  Sistem memetakan kontur 2D/3D & profil horizon Mons Mouton untuk mengukur batas kelerengan aman serta memverifikasi elevasi tebing penghalang sinyal.
+                  Sistem memetakan kontur 2D/3D &amp; profil horizon Mons Mouton untuk mengukur batas kelerengan aman serta memverifikasi elevasi tebing penghalang sinyal.
                 </div>
               </div>
             </div>
@@ -174,7 +163,7 @@
                   <span style="font-size: 11px; font-weight: 700; color: #1e40af;">Dinamika Wahana</span>
                 </div>
                 <div style="font-size: 13px; font-weight: 800; color: #1d4ed8; margin-bottom: 8px; line-height: 1.35;">
-                  Kecepatan Wahana & Risiko Kecelakaan
+                  Kecepatan Wahana &amp; Risiko Kecelakaan
                 </div>
                 <div style="margin-bottom: 10px;">
                   <div style="font-size: 10.5px; font-weight: 800; color: #1e40af; text-transform: uppercase; margin-bottom: 3px;">
@@ -187,7 +176,7 @@
               </div>
               <div style="background: #ffffff; border: 1px solid #dbeafe; border-radius: 6px; padding: 10px; margin-top: 8px;">
                 <div style="font-size: 11px; font-weight: 800; color: #1d4ed8; margin-bottom: 3px;">
-                  Solusi 3 — Simulasi Penerbangan & Pendaratan
+                  Solusi 3 — Simulasi Penerbangan &amp; Pendaratan
                 </div>
                 <div style="font-size: 11.5px; line-height: 1.45; color: var(--text-secondary); margin: 0;">
                   Sistem menyimulasikan panduan penerbangan 6-DOF, modulasi dorongan pendorong, dan konsumsi propelan untuk menjamin pendaratan vertikal yang mulus.
@@ -197,37 +186,18 @@
           </div>
         </div>
 
-        <!-- Onboarding Navigation Bar -->
-        <div class="onboarding-nav-bar">
-          <div>
-            <button class="btn-onboarding-prev" onclick="goToOnboarding(1)">
-              <span>&larr;</span>
-              <span>Kembali ke Pengantar</span>
-            </button>
-          </div>
-          <div style="display: flex; gap: 8px;">
-            <button class="onboarding-indicator-dot" onclick="goToOnboarding(1)" title="Langkah 1: Pengantar Misi">1. Pengantar</button>
-            <button class="onboarding-indicator-dot active" onclick="goToOnboarding(2)" title="Langkah 2: Tantangan Utama">2. Tantangan</button>
-            <button class="onboarding-indicator-dot" onclick="goToOnboarding(3)" title="Langkah 3: Alur Solusi">3. Alur Kerja</button>
-          </div>
-          <div>
-            <button class="btn-onboarding-next" onclick="goToOnboarding(3)">
-              <span>Lanjut ke Alur Kerja</span>
-              <span>&rarr;</span>
-            </button>
-          </div>
+        <!-- Subtle Floating Slide Down Hint to Slide 3 -->
+        <div onclick="slideHomeTo(3)" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text-muted); margin-top: auto; padding-top: 10px; transition: color 0.2s;" onmouseover="this.style.color='var(--artemis-blue)';" onmouseout="this.style.color='var(--text-muted)';" title="Gulir atau Klik untuk ke Alur Kerja">
+          <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase;">Lihat Alur Kerja Solusi</span>
+          <span style="font-size: 15px; animation: bounceSlow 1.8s infinite;">&darr;</span>
         </div>
-      </div>
+      </section>
 
       <!-- =================================================================== -->
-      <!-- ONBOARDING LANGKAH 3: ALUR KERJA XASUAI (3 TAHAP AKSI) -->
+      <!-- SLIDE 3: ALUR KERJA XASUAI (3 TAHAP AKSI) -->
       <!-- =================================================================== -->
-      <div id="onboarding-step-3" class="onboarding-step-view" style="display: none; opacity: 0;">
-        <!-- Konten Utama (Full di Tengah Layar) -->
-        <div class="onboarding-inner-center" style="max-width: 1140px;">
-          <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(37,99,235,0.08); color: var(--artemis-blue); padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-bottom: 8px;">
-            <span>LANGKAH 3 DARI 3 &bull; ALUR PENYELESAIAN TERPADU</span>
-          </div>
+      <section id="home-slide-3" class="home-slide-section">
+        <div style="max-width: 1140px; margin: auto 0; text-align: center; width: 100%;">
           <h2 style="font-size: 24px; font-weight: 900; color: var(--text-primary); margin: 0 0 6px; letter-spacing: -0.5px;">
             Alur Kerja XASUAI — 3 Tahap Penyelesaian
           </h2>
@@ -254,7 +224,7 @@
           </div>
 
           <!-- 3 Interactive Cards (Actionable Buttons) -->
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: left;">
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: left; width: 100%;">
             <!-- Tahap 1: Rekomendasi (Merah/Coral) -->
             <div class="interactive-card" onclick="switchView('rekomendasi'); playAvionicBeep(640, 'sine');" style="background: #fffafa; border: 1px solid #fecaca; border-top: 4px solid #b91c1c; border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); cursor: pointer;" title="Klik untuk membuka Tahap 1: Mesin Rekomendasi">
               <div>
@@ -294,7 +264,7 @@
                   Memeriksa Kondisi Permukaan
                 </h3>
                 <div style="font-size: 11.5px; font-weight: 700; color: #b45309; margin-bottom: 8px;">
-                  Visualisasi Topografi (2D, 3D & Horizon)
+                  Visualisasi Topografi (2D, 3D &amp; Horizon)
                 </div>
                 <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.55; margin: 0 0 10px;">
                   Sistem menampilkan model permukaan Mons Mouton dalam tampilan peta kontur 2D interaktif, medan 3D dinamis, dan mask horizon elevasi tebing.
@@ -341,31 +311,16 @@
           </div>
         </div>
 
-        <!-- Onboarding Navigation Bar -->
-        <div class="onboarding-nav-bar">
-          <div>
-            <button class="btn-onboarding-prev" onclick="goToOnboarding(2)">
-              <span>&larr;</span>
-              <span>Kembali ke Tantangan</span>
-            </button>
-          </div>
-          <div style="display: flex; gap: 8px;">
-            <button class="onboarding-indicator-dot" onclick="goToOnboarding(1)" title="Langkah 1: Pengantar Misi">1. Pengantar</button>
-            <button class="onboarding-indicator-dot" onclick="goToOnboarding(2)" title="Langkah 2: Tantangan Utama">2. Tantangan</button>
-            <button class="onboarding-indicator-dot active" onclick="goToOnboarding(3)" title="Langkah 3: Alur Solusi">3. Alur Kerja</button>
-          </div>
-          <div>
-            <button class="btn-onboarding-next" onclick="switchView('rekomendasi'); playAvionicBeep(640, 'sine');">
-              <span>Mulai dari Tahap 1</span>
-              <span>&rarr;</span>
-            </button>
-          </div>
+        <!-- Subtle Floating Slide Up Hint to Top -->
+        <div onclick="slideHomeTo(1)" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; color: var(--text-muted); margin-top: auto; padding-top: 10px; transition: color 0.2s;" onmouseover="this.style.color='var(--artemis-blue)';" onmouseout="this.style.color='var(--text-muted)';" title="Kembali ke Awal">
+          <span style="font-size: 15px; animation: bounceSlow 1.8s infinite;">&uarr;</span>
+          <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.3px; text-transform: uppercase;">Kembali ke Atas</span>
         </div>
-      </div>
+      </section>
 
     </div>
   </main>
-  <!-- ===================================================================== -->
+<!-- ===================================================================== -->
   <!-- LAYAR 1: REKOMENDASI TANGGAL & POSISI OPTIMAL (MCDA) -->
   <!-- ===================================================================== -->
   <main id="view-rekomendasi" class="bento-container" style="display: none;">
@@ -839,6 +794,6 @@
   </div>
 
   <!-- JAVASCRIPT SYSTEM ENGINE -->
-  <script src="/js/app.js?v=3"></script>
+  <script src="/js/app.js?v=4"></script>
 </body>
 </html>

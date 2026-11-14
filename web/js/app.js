@@ -180,63 +180,65 @@
       homeMoonInitialized = true;
     }
 
-    let currentOnboardingStep = 1;
+        let currentHomeSlide = 1;
 
-    function goToOnboarding(step) {
-      if (step < 1 || step > 3) return;
-      currentOnboardingStep = step;
-      playAvionicBeep(560 + (step * 70), 'sine');
+    function slideHomeTo(slideIndex) {
+      if (slideIndex < 1 || slideIndex > 3) return;
+      currentHomeSlide = slideIndex;
+      playAvionicBeep(560 + (slideIndex * 70), 'sine');
 
-      for (let i = 1; i <= 3; i++) {
-        const el = document.getElementById("onboarding-step-" + i);
-        if (!el) continue;
-        if (i === step) {
-          el.style.display = "flex";
-          setTimeout(() => {
-            el.style.opacity = "1";
-            el.style.transform = "translateY(0)";
-          }, 20);
-        } else {
-          el.style.opacity = "0";
-          el.style.transform = "translateY(6px)";
-          el.style.display = "none";
-        }
+      const target = document.getElementById("home-slide-" + slideIndex);
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+      updateHomeSlideDots(slideIndex);
+    }
 
-      // Update active indicator buttons across all steps
-      document.querySelectorAll(".onboarding-indicator-dot").forEach((dot, idx) => {
-        const dotStep = (idx % 3) + 1;
-        if (dotStep === step) {
+    function updateHomeSlideDots(activeIdx) {
+      const dots = document.querySelectorAll("#homeSlideDots .slide-dot");
+      dots.forEach((dot, idx) => {
+        if (idx + 1 === activeIdx) {
           dot.classList.add("active");
         } else {
           dot.classList.remove("active");
         }
       });
+    }
 
-      // Resize 3D Moon if returning to step 1
-      if (step === 1 && homeMoonRenderer && homeMoonCamera) {
-        const container = document.getElementById("homeMoonContainer");
-        if (container) {
-          const nw = container.clientWidth || 900;
-          const nh = container.clientHeight || 320;
-          homeMoonCamera.aspect = nw / nh;
-          homeMoonCamera.updateProjectionMatrix();
-          homeMoonRenderer.setSize(nw, nh);
-        }
-      }
+    function initHomeSlideObserver() {
+      const container = document.getElementById("homeSlidesContainer");
+      if (!container) return;
 
-      // Smooth scroll to top of view-home container
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      const homeView = document.getElementById("view-home");
-      if (homeView) homeView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const slides = [1, 2, 3].map(i => document.getElementById("home-slide-" + i)).filter(Boolean);
+      if (!slides.length) return;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const id = entry.target.id;
+            const match = id.match(/home-slide-(\d+)/);
+            if (match) {
+              const activeSlide = parseInt(match[1]);
+              currentHomeSlide = activeSlide;
+              updateHomeSlideDots(activeSlide);
+            }
+          }
+        });
+      }, { root: container, threshold: 0.5 });
+
+      slides.forEach(slide => observer.observe(slide));
     }
 
     function revealHomeChallenges() {
-      goToOnboarding(2);
+      slideHomeTo(2);
     }
 
     function scrollToWorkflow() {
-      goToOnboarding(3);
+      slideHomeTo(3);
+    }
+
+    function goToOnboarding(step) {
+      slideHomeTo(step);
     }
 
     function toggleHomeGlobeRotation() {
@@ -844,8 +846,11 @@
       if (btnVis) btnVis.classList.remove("active");
       if (btnSim) btnSim.classList.remove("active");
 
+      const dots = document.getElementById("homeSlideDots");
+      if (dots) dots.style.display = (viewName === 'home' ? 'flex' : 'none');
+
       if (viewName === 'home') {
-        if (homeView) homeView.style.display = "grid";
+        if (homeView) homeView.style.display = "block";
         if (btnHome) btnHome.classList.add("active");
         try { history.pushState(null, '', '/'); } catch(e){}
         if (!homeMoonInitialized) {
@@ -854,7 +859,7 @@
           const container = document.getElementById("homeMoonContainer");
           if (container) {
             const nw = container.clientWidth || 900;
-            const nh = container.clientHeight || 330;
+            const nh = container.clientHeight || 320;
             homeMoonCamera.aspect = nw / nh;
             homeMoonCamera.updateProjectionMatrix();
             homeMoonRenderer.setSize(nw, nh);
