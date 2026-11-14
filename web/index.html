@@ -1300,72 +1300,107 @@
     </div>
   </header>
 
-  <!-- VIEW 0: SYSTEM GUIDE & ONBOARDING (PANDUAN & ALUR SISTEM) -->
-    <!-- ===================================================================== -->
-  <!-- LAYAR 0: BERANDA / PENJELASAN RINGKAS MISI -->
+  <!-- ===================================================================== -->
+  <!-- LAYAR 0: BERANDA / SISTEM OPERASI KENDALI MISI (FLIGHT DYNAMICS) -->
   <!-- ===================================================================== -->
   <main id="view-home" class="bento-container" style="display: grid;">
-    <div class="bento-card bento-full" style="background: linear-gradient(135deg, #090d16 0%, #0f172a 100%); border: 1px solid rgba(56, 189, 248, 0.25); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); color: #f8fafc; padding: 28px;">
-      <div style="max-width: 960px; margin: 0 auto; text-align: center;">
-        <span class="step-badge" style="background: var(--artemis-blue); color: #ffffff; padding: 4px 14px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">NASA SPACE APPS CHALLENGE 2026</span>
-        <h1 style="font-size: 26px; font-weight: 900; color: #ffffff; margin: 12px 0 8px; letter-spacing: -0.5px;">
+    <div class="bento-card bento-full" style="background: linear-gradient(135deg, #070b14 0%, #0d1527 50%, #0a1120 100%); border: 1px solid rgba(56, 189, 248, 0.25); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6); color: #f8fafc; padding: 28px 32px;">
+      <div style="max-width: 1040px; margin: 0 auto; text-align: center;">
+        
+        <!-- Header Status & Telemetri Real-Time -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 14px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="step-badge" style="background: rgba(14, 116, 144, 0.35); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.8px;">
+              ARTEMIS LUNAR OPERATIONS SUITE // FLIGHT DYNAMICS CONSOLE // ACTIVE
+            </span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <div class="api-status-chip" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; font-size: 11px; font-weight: 700;">
+              <span class="dot-online"></span> NASA JPL HORIZONS: ONLINE
+            </div>
+            <div class="mission-status-pill" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399; font-size: 11px; font-weight: 800;">
+              SYSTEM STATUS: READY (FLIGHT OPS GO)
+            </div>
+          </div>
+        </div>
+
+        <h1 style="font-size: 28px; font-weight: 900; color: #ffffff; margin: 0 0 10px; letter-spacing: -0.5px;">
           XASUAI — Mons Mouton Lunar Landing Navigator
         </h1>
-        <p style="font-size: 14px; color: #cbd5e1; line-height: 1.6; margin-bottom: 24px;">
-          Sistem otomasi navigasi lokasi pendaratan presisi dan simulator trajektori 6-DOF Artemis di dataran tinggi <strong>Mons Mouton, Kutub Selatan Bulan (-84.9°S, 33.3°W)</strong>.
+        <p style="font-size: 14px; color: #94a3b8; line-height: 1.6; max-width: 860px; margin: 0 auto 28px;">
+          Sistem otomasi navigasi lokasi pendaratan presisi dan solver trajektori penerbangan 6-DOF Artemis di dataran tinggi <strong>Mons Mouton, Kutub Selatan Bulan (-84.9°S, 33.3°W)</strong>.
         </p>
 
-        <!-- 3 Tantangan Kritis Kutub Selatan -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; text-align: left; margin-bottom: 24px;">
-          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-md); padding: 14px;">
-            <div style="font-size: 11px; font-weight: 800; color: #f87171; letter-spacing: 0.5px; margin-bottom: 4px;">[TANTANGAN 1] KEGELAPAN ABADI</div>
-            <p style="font-size: 12px; line-height: 1.5; color: #cbd5e1; margin: 0;">
-              Sudut surya sangat rendah (≤ 2.5°) menyebabkan suhu anjlok hingga <strong>-240°C</strong> yang membekukan baterai dan mematikan suplai daya panel surya.
-            </p>
+        <!-- 3 Peringatan Bahaya Operasional Kritis (Critical Mission Hazards) -->
+        <div style="text-align: left; margin-bottom: 28px;">
+          <div style="font-size: 11px; font-weight: 800; color: #f87171; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;">
+            CRITICAL MISSION HAZARDS // LUNAR SOUTH POLE ENVIRONMENT
           </div>
-          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-md); padding: 14px;">
-            <div style="font-size: 11px; font-weight: 800; color: #fbbf24; letter-spacing: 0.5px; margin-bottom: 4px;">[TANTANGAN 2] TEBING & JURANG CURAM</div>
-            <p style="font-size: 12px; line-height: 1.5; color: #cbd5e1; margin: 0;">
-              Dikelilingi kawah ekstrem ribuan meter. Batas aman struktural Artemis HLS mewajibkan <strong>kemiringan lereng &lt; 10°</strong> guna mencegah bahaya pendarat terbalik (rollover).
-            </p>
-          </div>
-          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-md); padding: 14px;">
-            <div style="font-size: 11px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; margin-bottom: 4px;">[TANTANGAN 3] HILANGNYA SINYAL BUMI</div>
-            <p style="font-size: 12px; line-height: 1.5; color: #cbd5e1; margin: 0;">
-              Bumi tampak melayang rendah di cakrawala. Bibir kawah yang tinggi dapat memblokir transmisi Direct-To-Earth (DTE) dan memutus telemetri kendali.
-            </p>
-          </div>
-        </div>
-
-        <!-- 3 Solusi Alur Kerja Efektif -->
-        <h3 style="font-size: 15px; font-weight: 800; color: #ffffff; margin-bottom: 12px;">3 Langkah Solusi Terpadu XASUAI:</h3>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; text-align: left; margin-bottom: 24px;">
-          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(14, 116, 144, 0.4); border-radius: var(--radius-md); padding: 16px;">
-            <span class="step-badge" style="background: var(--artemis-blue); color: #ffffff; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;">LANGKAH 1</span>
-            <h4 style="font-size: 13px; font-weight: 800; color: #ffffff; margin: 8px 0 4px;">1. Rekomendasi Optimal</h4>
-            <p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
-              Algoritma MCDA memindai 336 jam data JPL Horizons & LOLA DEM untuk menentukan tanggal, jam, dan lokasi teraman.
-            </p>
-          </div>
-          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: var(--radius-md); padding: 16px;">
-            <span class="step-badge" style="background: var(--emerald-safe); color: #ffffff; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;">LANGKAH 2</span>
-            <h4 style="font-size: 13px; font-weight: 800; color: #ffffff; margin: 8px 0 4px;">2. Visualisasi Topografi</h4>
-            <p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
-              Panggung LOLA DEM 2D (zoom 1x-5x, pan) & Globe 3D Three.js serta radar polar rintangan kawah 360°.
-            </p>
-          </div>
-          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(2, 132, 199, 0.4); border-radius: var(--radius-md); padding: 16px;">
-            <span class="step-badge" style="background: #0284c7; color: #ffffff; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;">LANGKAH 3</span>
-            <h4 style="font-size: 13px; font-weight: 800; color: #ffffff; margin: 8px 0 4px;">3. Simulasi Penerbangan 3D</h4>
-            <p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
-              Simulator WebGL Three.js dari peluncuran Bumi, TLI, orbit polar, hingga pendaratan lunak vertikal di Mons Mouton.
-            </p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: var(--radius-md); padding: 16px;">
+              <div style="font-size: 12px; font-weight: 800; color: #f87171; letter-spacing: 0.5px; margin-bottom: 6px;">
+                HAZARD 01 — KEGELAPAN ABADI (PERMANENT SHADOWS)
+              </div>
+              <p style="font-size: 12px; line-height: 1.6; color: #cbd5e1; margin: 0;">
+                Sudut datang surya sangat rendah (&le; 2.5°), menyebabkan suhu kriogenik ekstrem (<strong>-240°C</strong>) yang membekukan sel baterai kimiawi, melumpuhkan propelan, dan memutus total suplai daya panel surya (0% blackout).
+              </p>
+            </div>
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: var(--radius-md); padding: 16px;">
+              <div style="font-size: 12px; font-weight: 800; color: #fbbf24; letter-spacing: 0.5px; margin-bottom: 6px;">
+                HAZARD 02 — TEBING CURAM &amp; MEDAN EKSTREM
+              </div>
+              <p style="font-size: 12px; line-height: 1.6; color: #cbd5e1; margin: 0;">
+                Kawah jurang terjal ribuan meter di sekitar Mons Mouton. Ambang batas struktural pendarat Artemis HLS terkunci ketat pada <strong>kemiringan lereng &lt; 10°</strong> guna mencegah risiko fatal wahana terbalik (rollover catastrophic failure).
+              </p>
+            </div>
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: var(--radius-md); padding: 16px;">
+              <div style="font-size: 12px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; margin-bottom: 6px;">
+                HAZARD 03 — PEMUTUSAN SINYAL BUMI (BLACKOUT DTE)
+              </div>
+              <p style="font-size: 12px; line-height: 1.6; color: #cbd5e1; margin: 0;">
+                Posisi Bumi yang menggantung rendah di cakrawala mudah terhalang oleh tingginya dinding kawah, yang dapat memutus jalur transmisi langsung (Direct-To-Earth) dan komunikasi telemetri kendali seketika.
+              </p>
+            </div>
           </div>
         </div>
 
-        <button class="btn-finder-hero" onclick="switchView('rekomendasi')" style="font-size: 14px; padding: 14px 36px; box-shadow: 0 4px 20px rgba(14, 116, 144, 0.4);">
-          Mulai: Langkah 1 - Rekomendasi Tanggal & Posisi Optimal &rarr;
-        </button>
+        <!-- 3 Tahapan Alur Kerja Operasional (Mission Flow) -->
+        <div style="text-align: left; margin-bottom: 32px;">
+          <div style="font-size: 11px; font-weight: 800; color: #38bdf8; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 12px;">
+            OPERATIONAL MISSION FLOW // 3-PHASE EXECUTION
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px;">
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(14, 116, 144, 0.4); border-radius: var(--radius-md); padding: 18px;">
+              <span class="step-badge" style="background: var(--artemis-blue); color: #ffffff; padding: 2px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 1</span>
+              <h4 style="font-size: 14px; font-weight: 800; color: #ffffff; margin: 10px 0 6px;">Rekomendasi (MCDA Engine)</h4>
+              <p style="font-size: 12px; color: #94a3b8; line-height: 1.6; margin: 0;">
+                Solver multi-kriteria memindai 336 jam efemeris JPL Horizons &amp; model LOLA DEM untuk menentukan jendela peluncuran dan pendaratan teraman.
+              </p>
+            </div>
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: var(--radius-md); padding: 18px;">
+              <span class="step-badge" style="background: var(--emerald-safe); color: #ffffff; padding: 2px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 2</span>
+              <h4 style="font-size: 14px; font-weight: 800; color: #ffffff; margin: 10px 0 6px;">Visualisasi Topografi (2D/3D &amp; Horizon)</h4>
+              <p style="font-size: 12px; color: #94a3b8; line-height: 1.6; margin: 0;">
+                Evaluasi kontur tanah LOLA 2D (zoom/pan mikroskopik), Globe 3D Three.js, dan verifikasi radar cakrawala 360° bebas rintangan kawah.
+              </p>
+            </div>
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(2, 132, 199, 0.4); border-radius: var(--radius-md); padding: 18px;">
+              <span class="step-badge" style="background: #0284c7; color: #ffffff; padding: 2px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 3</span>
+              <h4 style="font-size: 14px; font-weight: 800; color: #ffffff; margin: 10px 0 6px;">Simulasi Penerbangan (6-DOF Flight Dynamics)</h4>
+              <p style="font-size: 12px; color: #94a3b8; line-height: 1.6; margin: 0;">
+                Validasi penerbangan dari peluncuran Bumi, orbit polar, Powered Descent, hingga touchdown vertikal (Vz = 0.80 m/s) di puncak Mons Mouton.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tombol Tindakan Utama (Hero CTA) -->
+        <div style="display: flex; justify-content: center;">
+          <button class="btn-finder-hero" onclick="switchView('rekomendasi')" style="font-size: 14px; font-weight: 800; padding: 16px 42px; letter-spacing: 0.5px; box-shadow: 0 4px 24px rgba(14, 116, 144, 0.5); border-radius: var(--radius-sm);">
+            MASUK KE SISTEM REKOMENDASI PENDARATAN &rarr;
+          </button>
+        </div>
+
       </div>
     </div>
   </main>
