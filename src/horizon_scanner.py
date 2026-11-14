@@ -67,3 +67,4 @@ def calculate_line_of_sight_clearance(
     clearance = elevation_deg - rim_elev
     is_clear = clearance > 0.0 and elevation_deg > 0.0
     return is_clear, round(clearance, 2)
+

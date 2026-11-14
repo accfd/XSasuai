@@ -85,3 +85,4 @@ def calculate_mcda_score(
         "is_feasible": total_score >= 0.30,
         "recommendation": rec
     }
+

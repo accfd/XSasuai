@@ -218,8 +218,19 @@ class LaunchSimHandler(BaseApiHandler):
             self.write_json({"status": "ERROR", "message": str(e)}, 500)
 
 
+class MainIndexHandler(tornado.web.RequestHandler):
+    """Menyajikan halaman antarmuka utama dengan penonaktifan cache."""
+    def get(self, *args):
+        self.set_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        self.set_header("Pragma", "no-cache")
+        self.set_header("Expires", "0")
+        web_dir = os.path.dirname(os.path.abspath(__file__))
+        with open(os.path.join(web_dir, "index.html"), "r", encoding="utf-8") as f:
+            self.write(f.read())
+
+
 class NoCacheStaticFileHandler(tornado.web.StaticFileHandler):
-    """Menonaktifkan cache browser untuk menjamin perubahan index.html langsung muncul."""
+    """Menonaktifkan cache browser untuk menjamin perubahan file statis langsung muncul."""
     def set_extra_headers(self, path):
         self.set_header("Cache-Control", "no-cache, no-store, must-revalidate")
         self.set_header("Pragma", "no-cache")
@@ -230,6 +241,10 @@ def make_app():
     web_dir = os.path.dirname(os.path.abspath(__file__))
     data_dir = os.path.join(BASE_DIR, "data")
     return tornado.web.Application([
+        (r"/", MainIndexHandler),
+        (r"/rekomendasi", MainIndexHandler),
+        (r"/visualisasi", MainIndexHandler),
+        (r"/simulasi", MainIndexHandler),
         (r"/api/state", StateHandler),
         (r"/api/sites", SitesHandler),
         (r"/api/select_site", SelectSiteHandler),

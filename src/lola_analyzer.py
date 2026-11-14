@@ -68,3 +68,4 @@ def calculate_slope(dem: np.ndarray, res_m: float = 250.0) -> np.ndarray:
 def is_slope_safe(slope_deg: float) -> bool:
     """Mengecek batasan keamanan pendaratan Artemis HLS (Hard Gate: Slope < 10 derajat)."""
     return slope_deg < c.MAX_LANDING_SLOPE_DEG
+

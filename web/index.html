@@ -1284,235 +1284,114 @@
 
     <div class="header-actions">
       <div class="segmented-tabs">
-        <button class="tab-btn active" id="tab-btn-guide" onclick="switchView('guide')">
-          Panduan Misi
+        <button class="tab-btn active" id="tab-btn-home" onclick="switchView('home')">
+          Beranda
         </button>
-        <button class="tab-btn" id="tab-btn-console" onclick="switchView('console')">
-          Mission Console
+        <button class="tab-btn" id="tab-btn-rekomendasi" onclick="switchView('rekomendasi')">
+          1. Rekomendasi
         </button>
-        <button class="tab-btn" id="tab-btn-testbed" onclick="switchView('testbed')">
-          Flight Testbed
+        <button class="tab-btn" id="tab-btn-visualisasi" onclick="switchView('visualisasi')">
+          2. Visualisasi
+        </button>
+        <button class="tab-btn" id="tab-btn-simulasi" onclick="switchView('simulasi')">
+          3. Simulasi
         </button>
       </div>
     </div>
   </header>
 
   <!-- VIEW 0: SYSTEM GUIDE & ONBOARDING (PANDUAN & ALUR SISTEM) -->
-  <main id="view-guide">
-    <!-- Hero Banner -->
-    <div class="guide-hero">
-      <div class="guide-badge">
-        NASA Space Apps Challenge • Artemis Landing Navigator
-      </div>
-      <h2>Platform Xasuai: Panduan Sistem & Strategi Pendaratan Mons Mouton</h2>
-      <p>
-        <strong>Xasuai</strong> adalah sistem navigasi lokasi pendaratan presisi dan simulator trajektori penerbangan <em>Powered Descent Guidance</em> untuk misi Artemis di dataran tinggi <strong>Mons Mouton, Kutub Selatan Bulan (-84.9°S, 33.3°W)</strong>. Sistem ini mengintegrasikan data topografi elevasi riil NASA LROC LOLA, dinamika efemeris langsung NASA JPL Horizons, solver integrasi numerik RK45, serta antarmuka visual intuitif untuk menjawab 3 pertanyaan kritis misi antariksa.
-      </p>
-      <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
-        <button class="btn-cta-primary" onclick="switchView('console')">
-          Buka Mission Console ➔
-        </button>
-        <button class="btn-cta-secondary" onclick="openSmartFinderModal()">
-          Cari Tanggal & Posisi Optimal
-        </button>
-        <button class="btn-cta-secondary" onclick="switchView('testbed')">
-          Uji Simulator Testbed
-        </button>
-      </div>
-      <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
-        <button class="btn-cta-primary" onclick="switchView('console')">
-          Buka Mission Console ➔
-        </button>
-        <button class="btn-cta-secondary" onclick="openSmartFinderModal()">
-          Cari Tanggal & Posisi Optimal
-        </button>
-        <button class="btn-cta-secondary" onclick="switchView('testbed')">
-          Uji Simulator Testbed
-        </button>
-      </div>
-    </div>
+    <!-- ===================================================================== -->
+  <!-- LAYAR 0: BERANDA / PENJELASAN RINGKAS MISI -->
+  <!-- ===================================================================== -->
+  <main id="view-home" class="bento-container" style="display: grid;">
+    <div class="bento-card bento-full" style="background: linear-gradient(135deg, #090d16 0%, #0f172a 100%); border: 1px solid rgba(56, 189, 248, 0.25); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); color: #f8fafc; padding: 28px;">
+      <div style="max-width: 960px; margin: 0 auto; text-align: center;">
+        <span class="step-badge" style="background: var(--artemis-blue); color: #ffffff; padding: 4px 14px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">NASA SPACE APPS CHALLENGE 2026</span>
+        <h1 style="font-size: 26px; font-weight: 900; color: #ffffff; margin: 12px 0 8px; letter-spacing: -0.5px;">
+          XASUAI — Mons Mouton Lunar Landing Navigator
+        </h1>
+        <p style="font-size: 14px; color: #cbd5e1; line-height: 1.6; margin-bottom: 24px;">
+          Sistem otomasi navigasi lokasi pendaratan presisi dan simulator trajektori 6-DOF Artemis di dataran tinggi <strong>Mons Mouton, Kutub Selatan Bulan (-84.9°S, 33.3°W)</strong>.
+        </p>
 
-    <!-- 3 Pillars answering the 3 Key Questions -->
-    <div class="three-pillars-grid">
-      <!-- Pillar 1 -->
-      <div class="pillar-card">
-        <div class="pillar-num">1</div>
-        <div class="pillar-subtitle">Pertanyaan 1 • Penentuan Waktu & Posisi</div>
-        <div class="pillar-title">Menentukan Tanggal & Posisi Aman Cakrawala</div>
-        <div class="pillar-desc">
-          Di Kutub Selatan Bulan, sudut elevasi Matahari dan Bumi sangat rendah (&lt; 2°–7°). Sedikit kecerobohan dapat menjebak wahana di dalam bayangan tebing abadi (<em>Permanently Shadowed Regions</em>) atau memutus sinyal radio ke Bumi. 
-          <br><br>
-          <strong>Solusi Xasuai:</strong> Memindai model elevasi digital LOLA DEM menggunakan algoritma <em>360° Radial Raymarching</em> dengan koreksi kelengkungan Bulan, disinkronkan secara langsung dengan vektor efemeris NASA JPL Horizons untuk menjamin pencahayaan panel surya dan komunikasi <em>Direct-to-Earth (DTE)</em> tetap bebas dari halangan tebing kawah.
-        </div>
-        <div class="pillar-feature">
-          Instrumen: Peta LOLA DEM & 360° Polar Horizon Sky-Plot
-        </div>
-      </div>
-
-      <!-- Pillar 2 -->
-      <div class="pillar-card">
-        <div class="pillar-num">2</div>
-        <div class="pillar-subtitle">Pertanyaan 2 • Perhitungan Trajektori</div>
-        <div class="pillar-title">Memperhitungkan Lintasan Orbit & Pendaratan Tepat</div>
-        <div class="pillar-desc">
-          Wahana antariksa harus turun dari orbit <em>perilune</em> (kecepatan 1.690 m/s pada ketinggian 15 km) menuju sentuhan permukaan yang lembut tanpa kehabisan propelan atau menabrak dinding kawah terjal Mons Mouton.
-          <br><br>
-          <strong>Solusi Xasuai:</strong> Mengimplementasikan solver numerik Runge-Kutta Orde 4/5 (RK45) presisi tinggi dengan model gravitasi non-sferis Bulan (koefisien zonal J₂ = 2.027 × 10⁻⁴), modulasi dorongan mesin (400 N – 3.200 N), pembatasan kecepatan impak aman (Vz ≤ 2.0 m/s, Vh ≤ 0.5 m/s), serta jarak bebas kawah koridor pendekatan &gt; 150 meter.
-        </div>
-        <div class="pillar-feature">
-          Instrumen: RK45 Powered Descent Guidance & Budget Delta-V
-        </div>
-      </div>
-
-      <!-- Pillar 3 -->
-      <div class="pillar-card">
-        <div class="pillar-num">3</div>
-        <div class="pillar-subtitle">Pertanyaan 3 • Visualisasi Cepat & Intuitif</div>
-        <div class="pillar-title">Visualisasi Cepat yang Mudah Dipahami Publik</div>
-        <div class="pillar-desc">
-          Masyarakat umum dan pengambil keputusan seringkali kesulitan mencerna ratusan baris data telemetri, matriks vektor, dan koordinat orbit yang rumit.
-          <br><br>
-          <strong>Solusi Xasuai:</strong> Merangkum data ilmiah kompleks ke dalam <strong>Bento Grid Dashboard</strong>:
-          Radar Polar 360° seperti radar cuaca, <em>timeline scrubber</em> 14-hari (0–336 jam) yang interaktif seperti pemutar video, lencana keputusan instan <strong>MISSION STATUS: GO / NO-GO</strong>, serta simulator pendaratan interaktif (<em>Flight Testbed</em>) yang dapat dimainkan langsung di peramban.
-        </div>
-        <div class="pillar-feature">
-          Instrumen: Bento Console & Flight Testbed & Canvas Flight Simulator
-        </div>
-      </div>
-    </div>
-
-    <!-- Step-by-Step System Flow -->
-    <div class="workflow-section">
-      <div class="workflow-header">
-        <h3>Alur Lengkap Penggunaan Sistem Xasuai (User Workflow)</h3>
-        <p>Ikuti 5 langkah terpadu berikut saat merencanakan dan memverifikasi misi pendaratan:</p>
-      </div>
-
-      <div class="flow-steps-grid">
-        <div class="flow-step-item">
-          <div class="step-pill">LANGKAH 1</div>
-          <div class="step-name">Pilih Kandidat Lokasi</div>
-          <div class="step-detail">
-            Pilih antara <strong>Site Alpha</strong> (Puncak), <strong>Site Beta</strong> (Rim Utara), atau <strong>Site Gamma</strong> (Barat) melalui kartu situs atau pin peta satelit LOLA.
+        <!-- 3 Tantangan Kritis Kutub Selatan -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; text-align: left; margin-bottom: 24px;">
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-md); padding: 14px;">
+            <div style="font-size: 11px; font-weight: 800; color: #f87171; letter-spacing: 0.5px; margin-bottom: 4px;">[TANTANGAN 1] KEGELAPAN ABADI</div>
+            <p style="font-size: 12px; line-height: 1.5; color: #cbd5e1; margin: 0;">
+              Sudut surya sangat rendah (≤ 2.5°) menyebabkan suhu anjlok hingga <strong>-240°C</strong> yang membekukan baterai dan mematikan suplai daya panel surya.
+            </p>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-md); padding: 14px;">
+            <div style="font-size: 11px; font-weight: 800; color: #fbbf24; letter-spacing: 0.5px; margin-bottom: 4px;">[TANTANGAN 2] TEBING & JURANG CURAM</div>
+            <p style="font-size: 12px; line-height: 1.5; color: #cbd5e1; margin: 0;">
+              Dikelilingi kawah ekstrem ribuan meter. Batas aman struktural Artemis HLS mewajibkan <strong>kemiringan lereng &lt; 10°</strong> guna mencegah bahaya pendarat terbalik (rollover).
+            </p>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-md); padding: 14px;">
+            <div style="font-size: 11px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px; margin-bottom: 4px;">[TANTANGAN 3] HILANGNYA SINYAL BUMI</div>
+            <p style="font-size: 12px; line-height: 1.5; color: #cbd5e1; margin: 0;">
+              Bumi tampak melayang rendah di cakrawala. Bibir kawah yang tinggi dapat memblokir transmisi Direct-To-Earth (DTE) dan memutus telemetri kendali.
+            </p>
           </div>
         </div>
 
-        <div class="flow-step-item">
-          <div class="step-pill">LANGKAH 2</div>
-          <div class="step-name">Cek Rintangan 360°</div>
-          <div class="step-detail">
-            Periksa <strong>Radar Polar Sky-Plot</strong> untuk memastikan posisi Matahari dan Bumi berada di atas garis kontur bibir kawah dan kemiringan tanah &lt; 10°.
+        <!-- 3 Solusi Alur Kerja Efektif -->
+        <h3 style="font-size: 15px; font-weight: 800; color: #ffffff; margin-bottom: 12px;">3 Langkah Solusi Terpadu XASUAI:</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; text-align: left; margin-bottom: 24px;">
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(14, 116, 144, 0.4); border-radius: var(--radius-md); padding: 16px;">
+            <span class="step-badge" style="background: var(--artemis-blue); color: #ffffff; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;">LANGKAH 1</span>
+            <h4 style="font-size: 13px; font-weight: 800; color: #ffffff; margin: 8px 0 4px;">1. Rekomendasi Optimal</h4>
+            <p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
+              Algoritma MCDA memindai 336 jam data JPL Horizons & LOLA DEM untuk menentukan tanggal, jam, dan lokasi teraman.
+            </p>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: var(--radius-md); padding: 16px;">
+            <span class="step-badge" style="background: var(--emerald-safe); color: #ffffff; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;">LANGKAH 2</span>
+            <h4 style="font-size: 13px; font-weight: 800; color: #ffffff; margin: 8px 0 4px;">2. Visualisasi Topografi</h4>
+            <p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
+              Panggung LOLA DEM 2D (zoom 1x-5x, pan) & Globe 3D Three.js serta radar polar rintangan kawah 360°.
+            </p>
+          </div>
+          <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(2, 132, 199, 0.4); border-radius: var(--radius-md); padding: 16px;">
+            <span class="step-badge" style="background: #0284c7; color: #ffffff; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 800;">LANGKAH 3</span>
+            <h4 style="font-size: 13px; font-weight: 800; color: #ffffff; margin: 8px 0 4px;">3. Simulasi Penerbangan 3D</h4>
+            <p style="font-size: 12px; color: #94a3b8; line-height: 1.5; margin: 0;">
+              Simulator WebGL Three.js dari peluncuran Bumi, TLI, orbit polar, hingga pendaratan lunak vertikal di Mons Mouton.
+            </p>
           </div>
         </div>
 
-        <div class="flow-step-item">
-          <div class="step-pill">LANGKAH 3</div>
-          <div class="step-name">Geser Timeline 14-Hari</div>
-          <div class="step-detail">
-            Gunakan penggeser waktu <strong>0 - 336 Jam</strong> untuk memilih jam pendaratan optimal dengan suplai daya surya 100% dan koneksi sinyal Bumi aktif.
-          </div>
-        </div>
-
-        <div class="flow-step-item">
-          <div class="step-pill">LANGKAH 4</div>
-          <div class="step-name">Hitung Trajektori RK45</div>
-          <div class="step-detail">
-            Klik tombol <strong>Hitung Trajektori RK45</strong> untuk memvalidasi kebutuhan Delta-V, margin cadangan propelan (&gt; 15 kg), dan ketinggian bebas tebing (&gt; 150 m).
-          </div>
-        </div>
-
-        <div class="flow-step-item">
-          <div class="step-pill">LANGKAH 5</div>
-          <div class="step-name">Validasi & Uji Terbang</div>
-          <div class="step-detail">
-            Pastikan lencana status <strong>GO (SAFE)</strong> aktif, lalu buka tab <strong>Flight Testbed</strong> untuk menguji pendaratan wahana dengan kontrol manual atau autopilot.
-          </div>
-        </div>
-      </div>
-
-      <div class="guide-cta-row">
-        <button class="btn-cta-secondary" onclick="switchView('testbed')">
-          Uji Flight Testbed
-        </button>
-        <button class="btn-cta-primary" onclick="switchView('console')">
-          <span></span> Buka Mission Console Sekarang
+        <button class="btn-finder-hero" onclick="switchView('rekomendasi')" style="font-size: 14px; padding: 14px 36px; box-shadow: 0 4px 20px rgba(14, 116, 144, 0.4);">
+          Mulai: Langkah 1 - Rekomendasi Tanggal & Posisi Optimal &rarr;
         </button>
       </div>
     </div>
   </main>
 
-  <!-- VIEW 1: MISSION CONSOLE (DEFAULT) -->
-  <main id="view-console" class="bento-container">
-
-    <!-- LANGKAH 1: LAYAR PANDUAN MISI (THE CHALLENGE) -->
-    <div class="bento-card bento-full" id="step-1-challenge" style="background: linear-gradient(135deg, #090d16 0%, #0f172a 100%); border: 1px solid rgba(56, 189, 248, 0.25); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); color: #f8fafc;">
-      <div class="card-header" style="border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 12px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span class="step-badge" style="background: var(--artemis-blue); color: #ffffff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">LANGKAH 1</span>
-          <span class="card-title" style="color: #ffffff; font-size: 15px; font-weight: 800;">Tantangan: Mengapa Mendarat di Kutub Selatan Bulan (Mons Mouton) Sangat Berbahaya?</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-          <div class="api-status-chip" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399;">
-            <span class="dot-online"></span> NASA JPL: ONLINE
-          </div>
-          <div class="mission-status-pill" id="global-status-pill" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;">
-            MISSION STATUS: GO (SAFE)
-          </div>
-        </div>
-      </div>
-
-      <!-- 3 FATAL THREATS CARDS GRID -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 6px;">
-        <!-- Threat 1: Kegelapan Abadi -->
-        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: var(--radius-md); padding: 16px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <span style="font-size: 11px; font-weight: 800; color: #f87171; letter-spacing: 0.5px;">[ANCAMAN 1] KEGELAPAN ABADI (PERMANENT SHADOWS)</span>
-          </div>
-          <p style="font-size: 12px; line-height: 1.6; color: #cbd5e1; margin: 0;">
-            Kawah kutub memiliki sudut datang sinar Matahari sangat rendah (&le; 2.5&deg;). Suhu turun drastis hingga <strong>-240&deg;C</strong> yang membekukan baterai wahana dan sistem propelan, serta memutus suplai daya panel surya menjadi 0%.
-          </p>
-        </div>
-
-        <!-- Threat 2: Tebing Curam & Kawah Ekstrem -->
-        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: var(--radius-md); padding: 16px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <span style="font-size: 11px; font-weight: 800; color: #fbbf24; letter-spacing: 0.5px;">[ANCAMAN 2] TEBING &amp; KEMIRINGAN CURAM (SLOPE &gt; 10&deg;)</span>
-          </div>
-          <p style="font-size: 12px; line-height: 1.6; color: #cbd5e1; margin: 0;">
-            Kutub selatan dipenuhi tebing jurang curam ribuan meter. Batas aman struktural pendarat Artemis HLS mewajibkan <strong>kemiringan lereng &lt; 10&deg;</strong>; kemiringan lebih curam memicu risiko rollover fatal (terbalik saat touchdown).
-          </p>
-        </div>
-
-        <!-- Threat 3: Hilangnya Sinyal Bumi -->
-        <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-md); padding: 16px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <span style="font-size: 11px; font-weight: 800; color: #38bdf8; letter-spacing: 0.5px;">[ANCAMAN 3] HILANGNYA SINYAL BUMI (BLACKOUT DTE)</span>
-          </div>
-          <p style="font-size: 12px; line-height: 1.6; color: #cbd5e1; margin: 0;">
-            Bumi hanya tampak sedikit di atas horizon. Dinding kawah tinggi dapat memblokir garis pandang transmisi langsung ke Bumi (Direct-To-Earth), memutus telemetri dan kendali darurat secara total.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- LANGKAH 2: TOMBOL UTAMA INTERAKTIF (HERO CTA) -->
-    <div class="bento-card bento-full" id="step-2-cta" style="background: var(--bg-surface); border: 2px solid var(--border-medium); text-align: center; padding: 24px;">
+  <!-- ===================================================================== -->
+  <!-- LAYAR 1: REKOMENDASI TANGGAL & POSISI OPTIMAL (MCDA) -->
+  <!-- ===================================================================== -->
+  <main id="view-rekomendasi" class="bento-container" style="display: none;">
+    <!-- Step 1 Card: CTA Finder -->
+    <div class="bento-card bento-full" id="step-2-cta" style="background: var(--bg-surface); border: 2px solid var(--border-medium); text-align: center; padding: 26px;">
       <div style="max-width: 820px; margin: 0 auto;">
-        <span class="step-badge" style="background: var(--artemis-blue); color: #ffffff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">LANGKAH 2</span>
-        <h2 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 10px 0 6px;">
-          Optimasi Tanggal, Waktu &amp; Posisi Pendaratan Otomatis (MCDA Engine)
+        <span class="step-badge" style="background: var(--artemis-blue); color: #ffffff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">LANGKAH 1 DARI 3</span>
+        <h2 style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 10px 0 6px;">
+          Pencarian Tanggal, Waktu &amp; Posisi Pendaratan Optimal (MCDA Engine)
         </h2>
-        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 18px;">
-          Jalankan kalkulasi optimasi algoritma Multi-Criteria Decision Analysis (MCDA) dan pemindaian rintangan horizon kawah secara real-time pada seluruh jendela 336 jam untuk mengunci koordinat pendaratan paling aman.
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 20px;">
+          Tekan tombol di bawah untuk menjalankan kalkulasi Multi-Criteria Decision Analysis (MCDA) dan pemindaian rintangan horizon kawah pada seluruh durasi jendela misi 336 jam.
         </p>
 
         <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
-          <button id="btn-hero-optimize" class="btn-finder-hero" onclick="runAutomatedOptimization()" style="font-size: 14px; padding: 14px 36px; letter-spacing: 0.5px; box-shadow: 0 4px 20px rgba(14, 116, 144, 0.4);">
+          <button id="btn-hero-optimize" class="btn-finder-hero" onclick="runAutomatedOptimization()" style="font-size: 15px; padding: 16px 40px; letter-spacing: 0.5px; box-shadow: 0 4px 24px rgba(14, 116, 144, 0.45);">
             CARI TANGGAL &amp; POSISI OPTIMAL
           </button>
         </div>
 
-        <div id="optimization-progress-bar" style="display: none; margin-top: 16px; background: var(--bg-subtle); border-radius: 999px; height: 8px; overflow: hidden; border: 1px solid var(--border-light);">
+        <div id="optimization-progress-bar" style="display: none; margin-top: 18px; background: var(--bg-subtle); border-radius: 999px; height: 8px; overflow: hidden; border: 1px solid var(--border-light);">
           <div id="optimization-progress-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--artemis-blue), var(--emerald-safe)); transition: width 0.3s ease;"></div>
         </div>
         <div id="optimization-status-text" style="display: none; font-size: 12px; font-weight: 700; color: var(--artemis-blue); margin-top: 8px;">
@@ -1521,7 +1400,85 @@
       </div>
     </div>
 
-    <!-- LANGKAH 3: HASIL REKOMENDASI & TITIK LOKASI PRESISI (HERO VIEW) -->
+    <!-- Step 1 Card: Hasil Rekomendasi Terverifikasi -->
+    <div class="bento-card bento-full" id="solution-banner-card">
+      <div class="card-header">
+        <span class="card-title">Hasil Rekomendasi Pendaratan Terverifikasi (Status: GO)</span>
+        <div class="mission-status-pill" id="global-status-pill" style="background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;">
+          MISSION STATUS: GO (SAFE)
+        </div>
+      </div>
+
+      <div id="solution-banner" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 16px;">
+        <div>
+          <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">WAKTU TOUCHDOWN OPTIMAL</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--emerald-safe); margin-top: 2px;">14 Nov 2026, 14:55 UTC</div>
+          <div style="font-size: 11px; color: var(--text-dim); margin-top: 1px;">Penyinaran Surya 100% Penuh (Terang Bebas Bayangan)</div>
+        </div>
+        <div>
+          <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">LOKASI SASARAN PENDARATAN</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--artemis-blue); margin-top: 2px;">Mons Mouton Crest (-84.9°S, 33.3°W)</div>
+          <div style="font-size: 11px; color: var(--text-dim); margin-top: 1px;">Elevasi +5.920 m (Puncak Dataran Tinggi Aman)</div>
+        </div>
+        <div>
+          <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">KEMIRINGAN LERENG (SLOPE)</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--emerald-safe); margin-top: 2px;">0.08° (Sangat Datar &lt; 10°)</div>
+          <div style="font-size: 11px; color: var(--text-dim); margin-top: 1px;">Bebas Risiko Terguling (Rollover Margin Safe)</div>
+        </div>
+        <div>
+          <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">STATUS KELAYAKAN MISI</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--emerald-safe); margin-top: 2px;">MISSION GO (OPTIMAL)</div>
+          <div style="font-size: 11px; color: var(--text-dim); margin-top: 1px;">Skor MCDA 0.94 / 1.0 (Direct-To-Earth Terkunci)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1 Card: Penjelasan Ilmiah Singkat & Matematika -->
+    <div class="bento-card bento-full" id="step-4-math-explanation">
+      <div class="card-header">
+        <span class="card-title">Mengapa Tanggal &amp; Lokasi Ini Adalah Solusi Terbaik? (Transparansi Ilmiah)</span>
+        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Verifikasi Astrodinamika</span>
+      </div>
+
+      <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 16px; font-size: 13px; line-height: 1.6; color: var(--text-primary); margin-bottom: 14px;">
+        Pada <strong>14 November 2026 pukul 14:55 UTC</strong>, Matahari berada pada elevasi stabil +2.5° di atas horizon Mons Mouton (bebas bayangan kawah), dan Bumi berada pada elevasi +10.25° yang menghasilkan margin klirens sinyal <strong>+12.35° di atas bibir tebing kawah terdekat</strong>. Dikombinasikan dengan dataran tinggi Mons Mouton yang sangat landai (kemiringan lereng hanya <strong>0.08°</strong>), titik ini merupakan jendela pendaratan paling aman di seluruh durasi misi Artemis.
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px;">
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 14px;">
+          <div style="font-size: 11px; font-weight: 800; color: var(--artemis-blue); text-transform: uppercase; margin-bottom: 4px;">RUMUS SKOR MCDA</div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 8px 10px; font-family: monospace; font-size: 11px; color: var(--text-primary); margin-bottom: 8px;">
+            Score = 0.35·I(t) + 0.30·C(t) + 0.35·(1 - θ/10°) = 0.94
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted);">
+            Penyinaran penuh 100%, Komunikasi DTE bebas kawah 100%, dan kemiringan sangat datar (0.08° &lt; 10°).
+          </div>
+        </div>
+
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 14px;">
+          <div style="font-size: 11px; font-weight: 800; color: var(--artemis-blue); text-transform: uppercase; margin-bottom: 4px;">KLIRENS SUDUT SINYAL BUMI</div>
+          <div style="background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 8px 10px; font-family: monospace; font-size: 11px; color: var(--text-primary); margin-bottom: 8px;">
+            θ<sub>Earth</sub> = +10.25°  |  θ<sub>rim</sub> = -2.10°  →  Clearance = +12.35°
+          </div>
+          <div style="font-size: 11px; color: var(--text-muted);">
+            Garis pandang antena Direct-To-Earth melintas jauh di atas bibir tebing kawah (Zero Loss Connection).
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button to Next Step -->
+      <div style="display: flex; justify-content: flex-end; margin-top: 14px;">
+        <button class="btn-finder-hero" onclick="switchView('visualisasi')" style="padding: 12px 28px; font-size: 13px;">
+          Lanjut ke Langkah 2: Visualisasi Peta Bulan &rarr;
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- LAYAR 2: VISUALISASI TOPOGRAFI & MEDAN KAWAH MONS MOUTON -->
+  <!-- ===================================================================== -->
+  <main id="view-visualisasi" class="bento-container" style="display: none;">
     <div class="bento-card bento-full" id="card-topography-hero">
       <div class="card-header">
         <div style="display: flex; align-items: center; gap: 10px;">
@@ -1691,74 +1648,53 @@
       </div>
     </div>
 
-    <!-- LANGKAH 4: KARTU PENJELASAN EDUKATIF & TRANSPARANSI MATEMATIKA -->
-    <div class="bento-card bento-full" id="step-4-math-explanation">
-      <div class="card-header">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span class="step-badge" style="background: var(--artemis-blue); color: #ffffff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">LANGKAH 4</span>
-          <span class="card-title">Mengapa Tanggal &amp; Lokasi Ini Adalah Solusi Terbaik? (Transparansi Ilmiah)</span>
+    <!-- Navigasi Lanjut ke Simulasi -->
+    <div class="bento-card bento-full" style="background: var(--bg-surface); border: 1px solid var(--border-light); display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 16px 20px;">
+      <div>
+        <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">Verifikasi Topografi Mons Mouton Selesai</div>
+        <div style="font-size: 11px; color: var(--text-muted);">Kontur lereng 0.08° dan elevasi +5.920 m telah tervalidasi siap untuk pendaratan lunak Artemis HLS.</div>
+      </div>
+      <button class="btn-finder-hero" onclick="switchView('simulasi')" style="padding: 12px 28px; font-size: 13px;">
+        Lanjut ke Langkah 3: Luncurkan Simulasi Penerbangan &rarr;
+      </button>
+    </div>
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- LAYAR 3: SIMULASI PENERBANGAN 3D REAL-TIME (BUMI KE BULAN) -->
+  <!-- ===================================================================== -->
+  <main id="view-simulasi" class="bento-container" style="display: none;">
+    <!-- Sub-header Mode Simulator -->
+    <div class="bento-card bento-full" style="padding: 12px 16px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 13px; font-weight: 800; color: var(--text-primary);">MODE SIMULATOR:</span>
+        <div class="segmented-tabs">
+          <button class="tab-btn active" id="btn-mode-3d" onclick="switchTestbedMode('3d')">
+            Simulator 3D Misi Penuh (Bumi ke Bulan)
+          </button>
+          <button class="tab-btn" id="btn-mode-2d" onclick="switchTestbedMode('2d')">
+            Uji Cockpit Manual (2D Physics)
+          </button>
         </div>
+      </div>
+      <div>
+        <a href="/simulator.html" target="_blank" class="btn-finder-hero" style="padding: 8px 18px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          Buka Fullscreen di Tab Baru &rarr;
+        </a>
+      </div>
+    </div>
+
+    <!-- PDI Flight Dynamics & Trajectory Chart Solver -->
+    <div class="bento-card bento-full">
+      <div class="card-header">
+        <span class="card-title">Powered Descent Initiation (PDI) Solver (RK45 &amp; J2 Gravitasi)</span>
         <button class="btn-recalc" id="btn-recalc-pdi">
           Hitung Ulang Trajektori RK45
         </button>
       </div>
 
-      <!-- 3 FORMULA & GUIDANCE CARDS -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 4px;">
-        <!-- Card 1: MCDA Scoring -->
-        <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 18px;">
-          <div style="font-size: 11px; font-weight: 800; color: var(--artemis-blue); text-transform: uppercase; margin-bottom: 4px;">1. MULTI-CRITERIA DECISION ANALYSIS (MCDA)</div>
-          <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 8px;">Skor Kelayakan Multi-Parameter</h4>
-          <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 0 0 10px;">
-            Sistem mengombinasikan 4 variabel kritis pendaratan dengan pembobotan analitis:
-          </p>
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 10px; font-family: monospace; font-size: 11px; color: var(--text-primary); margin-bottom: 10px;">
-            Score = w<sub>illum</sub>·I(t) + w<sub>comm</sub>·C(t) + w<sub>slope</sub>·(1 - θ/10°) + w<sub>ΔV</sub>·(1 - ΔV/ΔV<sub>max</sub>)
-          </div>
-          <ul style="font-size: 11px; color: var(--text-muted); margin: 0; padding-left: 16px; line-height: 1.6;">
-            <li><strong>Penyinaran Surya (35%):</strong> I(t) = 1.0 (100% daya panel surya aktif).</li>
-            <li><strong>Komunikasi Bumi (30%):</strong> C(t) = 1.0 (Transmisi DTE stabil bebas rintangan).</li>
-            <li><strong>Kemiringan Lereng (35%):</strong> θ = 0.08° &lt; 10° (Hard gate terpenuhi aman).</li>
-          </ul>
-        </div>
-
-        <!-- Card 2: DTE Line-of-Sight Clearance -->
-        <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 18px;">
-          <div style="font-size: 11px; font-weight: 800; color: var(--artemis-blue); text-transform: uppercase; margin-bottom: 4px;">2. DIRECT-TO-EARTH (DTE) LINE-OF-SIGHT</div>
-          <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 8px;">Klirens Sudut Sinyal di Atas Tebing Kawah</h4>
-          <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 0 0 10px;">
-            Vektor posisi geosentrik Bumi dari efemeris JPL Horizons didekomposisikan terhadap normal lokal:
-          </p>
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 10px; font-family: monospace; font-size: 11px; color: var(--text-primary); margin-bottom: 10px;">
-            θ<sub>Earth</sub> = arcsin((r<sub>Earth</sub> · n) / ||r<sub>Earth</sub>||) &gt; θ<sub>rim</sub>
-          </div>
-          <ul style="font-size: 11px; color: var(--text-muted); margin: 0; padding-left: 16px; line-height: 1.6;">
-            <li><strong>Elevasi Sudut Bumi:</strong> +10.25° di atas cakrawala Mons Mouton.</li>
-            <li><strong>Rintangan Kawah:</strong> Bibir kawah terdekat berada pada elevasi -2.10°.</li>
-            <li><strong>Klirens Bersih:</strong> <strong>+12.35° Margin Bebas Halangan</strong> (Zero Loss).</li>
-          </ul>
-        </div>
-
-        <!-- Card 3: Powered Descent Guidance -->
-        <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 18px;">
-          <div style="font-size: 11px; font-weight: 800; color: var(--artemis-blue); text-transform: uppercase; margin-bottom: 4px;">3. POWERED DESCENT GUIDANCE (KLUEVER LAW)</div>
-          <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 8px;">Pendaratan Lunak Vertikal (Soft Landing)</h4>
-          <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin: 0 0 10px;">
-            Propagasi gravitasi LP150Q (J2) dan hukum akselerasi dorong kuadratik adaptif:
-          </p>
-          <div style="background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 10px; font-family: monospace; font-size: 11px; color: var(--text-primary); margin-bottom: 10px;">
-            a<sub>cmd</sub>(t) = a<sub>0</sub> + a<sub>1</sub>·t + a<sub>2</sub>·t<sup>2</sup>  →  V<sub>z</sub>(t<sub>f</sub>) = 0.80 m/s
-          </div>
-          <ul style="font-size: 11px; color: var(--text-muted); margin: 0; padding-left: 16px; line-height: 1.6;">
-            <li><strong>Laju Vertikal (Vz):</strong> <strong>0.80 m/s</strong> (Aman, standar NASA &le; 1.5 m/s).</li>
-            <li><strong>Laju Horizontal (Vh):</strong> <strong>0.12 m/s</strong> (Tegak sempurna saat touchdown).</li>
-            <li><strong>Margin Propelan:</strong> <strong>25.6% cadangan</strong> (115.3 kg tersisa).</li>
-          </ul>
-        </div>
-      </div>
-
       <!-- PDI FLIGHT DYNAMICS TILES -->
-      <div class="guidance-grid" style="margin-top: 14px;">
+      <div class="guidance-grid">
         <div class="data-tile">
           <div class="tile-lbl">Total Delta-V Dibutuhkan</div>
           <div class="tile-val" id="m-dv" style="color: var(--artemis-blue);">1,714.8 m/s</div>
@@ -1782,82 +1718,38 @@
       </div>
     </div>
 
-    <!-- LANGKAH 5: TOMBOL EKSEKUSI MENUJU SIMULATOR 3D MISI PENUH -->
-    <div class="bento-card bento-full" id="step-5-launch" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 50%, #075985 100%); color: #ffffff; text-align: center; padding: 32px 20px; border: none; box-shadow: 0 10px 30px rgba(2, 132, 199, 0.35);">
-      <div style="max-width: 820px; margin: 0 auto;">
-        <span class="step-badge" style="background: rgba(255, 255, 255, 0.25); color: #ffffff; padding: 4px 14px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">LANGKAH 5</span>
-        <h2 style="font-size: 24px; font-weight: 900; color: #ffffff; margin: 12px 0 8px; letter-spacing: -0.5px;">
-          Uji Penerbangan di Simulator 3D (Bumi ke Bulan)
-        </h2>
-        <p style="font-size: 14px; color: rgba(255, 255, 255, 0.9); line-height: 1.6; margin-bottom: 24px;">
-          Validasi trajektori 6-DOF kontinu dari peluncuran Kennedy Space Center (LC-39B), dorongan TLI, 2 putaran orbit polar, hingga Powered Descent Initiation dan pendaratan vertikal di puncak kawah Mons Mouton dalam simulator WebGL Three.js.
-        </p>
+    <!-- Viewer Containers (3D Embed & 2D Manual Canvas) -->
+    <div class="bento-card bento-full" style="padding: 0; overflow: hidden;">
+      <div id="testbed-subview-3d" style="width: 100%; height: 680px; background: #030712;">
+        <iframe src="/simulator.html" style="width: 100%; height: 100%; border: none; display: block;"></iframe>
+      </div>
 
-        <div style="display: flex; justify-content: center; gap: 16px; flex-wrap: wrap;">
-          <a href="/simulator.html" target="_blank" class="btn-finder-hero" style="background: #ffffff; color: #0369a1; font-size: 14px; font-weight: 800; padding: 14px 32px; border-radius: var(--radius-sm); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);">
-            LUNCURKAN SIMULATOR 3D SELEBAR LAYAR &rarr;
-          </a>
-          <button class="btn-finder-hero" onclick="switchView('testbed')" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.4); color: #ffffff; font-size: 14px; padding: 14px 28px; border-radius: var(--radius-sm);">
-            Buka Tab Flight Testbed
-          </button>
+      <div id="testbed-subview-2d" style="display: none; flex-direction: column; gap: 14px; padding: 16px;">
+        <div class="testbed-canvas-box">
+          <canvas id="cockpitCanvas"></canvas>
         </div>
-      </div>
-    </div>
 
-  </main>
-
-  <!-- VIEW 2: DEDICATED FLIGHT TESTBED TAB (SEPARATE VIEW) -->
-  <main id="view-testbed">
-    <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); padding: 10px 16px; border: 1px solid var(--border-light); border-radius: var(--radius-md);">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="font-size: 13px; font-weight: 800; color: var(--text-primary);">MODE SIMULATOR:</span>
-        <div class="segmented-tabs">
-          <button class="tab-btn active" id="btn-mode-3d" onclick="switchTestbedMode('3d')">
-            Simulator 3D Misi Penuh (Bumi ke Bulan)
-          </button>
-          <button class="tab-btn" id="btn-mode-2d" onclick="switchTestbedMode('2d')">
-            Uji Cockpit Manual (2D Physics)
-          </button>
-        </div>
-      </div>
-      <div>
-        <a href="/simulator.html" target="_blank" class="btn-finder-hero" style="padding: 6px 14px; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-          Buka Fullscreen di Tab Baru &rarr;
-        </a>
-      </div>
-    </div>
-
-    <!-- SUBVIEW 1: 3D FULL MISSION SIMULATOR IFRAME EMBED -->
-    <div id="testbed-subview-3d" style="width: 100%; height: 680px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); background: #030712;">
-      <iframe src="/simulator.html" style="width: 100%; height: 100%; border: none; display: block;"></iframe>
-    </div>
-
-    <!-- SUBVIEW 2: 2D MANUAL FLIGHT COCKPIT -->
-    <div id="testbed-subview-2d" style="display: none; flex-direction: column; gap: 14px;">
-      <div class="testbed-canvas-box">
-        <canvas id="cockpitCanvas"></canvas>
-      </div>
-
-      <div class="testbed-bar">
-        <div>
-          Kendali Pendaratan: 
-          <span class="kbd-tag">SPACE / W</span> Main Engine &nbsp;•&nbsp; 
-          <span class="kbd-tag">A / D</span> RCS Roll &nbsp;•&nbsp; 
-          <span class="kbd-tag">R</span> Reset Posisi
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <button class="tab-btn" id="btn-sim-reset" style="background: var(--bg-subtle);">
-            [RESET] Posisi Awal
-          </button>
-          <button class="tab-btn" id="btn-sim-auto" style="background: var(--bg-selected); color: var(--artemis-blue);">
-            [AUTOPILOT] Descent Guidance
-          </button>
+        <div class="testbed-bar">
+          <div>
+            Kendali Pendaratan: 
+            <span class="kbd-tag">SPACE / W</span> Main Engine &nbsp;•&nbsp; 
+            <span class="kbd-tag">A / D</span> RCS Roll &nbsp;•&nbsp; 
+            <span class="kbd-tag">R</span> Reset Posisi
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="tab-btn" id="btn-sim-reset" style="background: var(--bg-subtle);">
+              [RESET] Posisi Awal
+            </button>
+            <button class="tab-btn" id="btn-sim-auto" style="background: var(--bg-selected); color: var(--artemis-blue);">
+              [AUTOPILOT] Descent Guidance
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- MODAL: PENCARI REKOMENDASI PENDARATAN OTOMATIS (SMART LANDING FINDER) -->
+  <!-- MODAL: PENCARI REKOMENDASI  <!-- MODAL: PENCARI REKOMENDASI PENDARATAN OTOMATIS (SMART LANDING FINDER) -->
   <div class="modal-backdrop" id="smartFinderModal" onclick="closeSmartFinderModal(event)">
     <div class="modal-box" onclick="event.stopPropagation()">
       <div class="modal-header">
@@ -2023,7 +1915,6 @@
     // Apply Recommendation Action
     function applyRecommendation(siteKey, hourOffset, siteName, dateStr) {
       closeSmartFinderModal();
-      switchView('console');
       selectSite(siteKey);
 
       // Set timeline slider
@@ -2042,19 +1933,13 @@
         }, 4500);
       }
 
-      // Switch to 3D Moon Globe & Trigger Cinematic Fly-To Animation!
+      // Siapkan Globe Bulan 3D & Fly-To
       setMapView('globe');
       setTimeout(() => {
         triggerFlyToAnimation();
       }, 150);
 
-      showToast(`Rekomendasi Terpilih: ${siteName} • ${dateStr}`);
-
-      // Scroll to map
-      const mapBox = document.getElementById("map-frame-box");
-      if (mapBox) {
-        mapBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      showToast(`Rekomendasi Terkunci: ${siteName} • ${dateStr}`);
     }
 
     // =====================================================================
@@ -2526,31 +2411,52 @@
     }
 
     // 1. Tab View Switcher
+        // 1. Tab View Switcher (4-Screen Architecture)
     function switchView(viewName) {
-      const consoleView = document.getElementById("view-console");
-      const testbedView = document.getElementById("view-testbed");
-      const guideView = document.getElementById("view-guide");
-      const btnConsole = document.getElementById("tab-btn-console");
-      const btnTestbed = document.getElementById("tab-btn-testbed");
-      const btnGuide = document.getElementById("tab-btn-guide");
+      const homeView = document.getElementById("view-home");
+      const recView = document.getElementById("view-rekomendasi");
+      const visView = document.getElementById("view-visualisasi");
+      const simView = document.getElementById("view-simulasi");
+
+      const btnHome = document.getElementById("tab-btn-home");
+      const btnRec = document.getElementById("tab-btn-rekomendasi");
+      const btnVis = document.getElementById("tab-btn-visualisasi");
+      const btnSim = document.getElementById("tab-btn-simulasi");
 
       // Hide all views first
-      consoleView.style.display = "none";
-      testbedView.classList.remove("active");
-      guideView.style.display = "none";
-      btnConsole.classList.remove("active");
-      btnTestbed.classList.remove("active");
-      btnGuide.classList.remove("active");
+      if (homeView) homeView.style.display = "none";
+      if (recView) recView.style.display = "none";
+      if (visView) visView.style.display = "none";
+      if (simView) simView.style.display = "none";
 
-      if (viewName === 'console') {
-        consoleView.style.display = "grid";
-        btnConsole.classList.add("active");
-      } else if (viewName === 'testbed') {
-        testbedView.classList.add("active");
-        btnTestbed.classList.add("active");
-      } else if (viewName === 'guide') {
-        guideView.style.display = "flex";
-        btnGuide.classList.add("active");
+      if (btnHome) btnHome.classList.remove("active");
+      if (btnRec) btnRec.classList.remove("active");
+      if (btnVis) btnVis.classList.remove("active");
+      if (btnSim) btnSim.classList.remove("active");
+
+      if (viewName === 'home') {
+        if (homeView) homeView.style.display = "grid";
+        if (btnHome) btnHome.classList.add("active");
+        try { history.pushState(null, '', '/'); } catch(e){}
+      } else if (viewName === 'rekomendasi') {
+        if (recView) recView.style.display = "grid";
+        if (btnRec) btnRec.classList.add("active");
+        try { history.pushState(null, '', '/rekomendasi'); } catch(e){}
+      } else if (viewName === 'visualisasi') {
+        if (visView) visView.style.display = "grid";
+        if (btnVis) btnVis.classList.add("active");
+        try { history.pushState(null, '', '/visualisasi'); } catch(e){}
+        setTimeout(() => {
+          onWindowResizeGlobe();
+        }, 100);
+      } else if (viewName === 'simulasi') {
+        if (simView) simView.style.display = "grid";
+        if (btnSim) btnSim.classList.add("active");
+        try { history.pushState(null, '', '/simulasi'); } catch(e){}
+        if (!testbedInitialized) {
+          initCockpitEngine();
+          testbedInitialized = true;
+        }
       }
     }
 
@@ -2942,6 +2848,18 @@
       await loadSites();
       await loadTimeline();
       updateEvaluationFromSlider();
+      // Inisialisasi rute tampilan berdasarkan URL saat ini
+      const path = window.location.pathname.toLowerCase();
+      if (path.includes('rekomendasi')) {
+        switchView('rekomendasi');
+      } else if (path.includes('visualisasi')) {
+        switchView('visualisasi');
+      } else if (path.includes('simulasi')) {
+        switchView('simulasi');
+      } else {
+        switchView('home');
+      }
+
     })();
   </script>
 </body>

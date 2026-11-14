@@ -45,3 +45,4 @@ def get_position_safe(body: str, site_key: str, dt: datetime, day_val: float) ->
     if body == "SUN":
         return 45.0, 2.5, "FALLBACK_ANALYTIC"
     return 15.0, 10.25, "FALLBACK_ANALYTIC"
+
