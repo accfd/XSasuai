@@ -1416,54 +1416,13 @@
           XASUAI adalah sistem yang membantu menentukan lokasi dan waktu pendaratan terbaik bagi wahana Artemis di <strong>Mons Mouton, Kutub Selatan Bulan</strong>. Sistem ini menganalisis kondisi lingkungan, bentuk permukaan Bulan, serta pergerakan wahana untuk memastikan pendaratan berlangsung aman dan terkendali.
         </p>
 
-        <!-- INTERACTIVE 3D MOON EXPLORER WIDGET -->
-        <div style="background: #030712; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-md); margin: 0 auto 36px; overflow: hidden; position: relative; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45); text-align: left;">
-          
-          <!-- Top HUD Bar -->
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; background: rgba(15, 23, 42, 0.85); border-bottom: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap; gap: 10px; z-index: 10; position: relative;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <span class="step-badge" style="background: rgba(37, 99, 235, 0.3); border: 1px solid rgba(56, 189, 248, 0.5); color: #38bdf8; font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: var(--radius-pill);">
-                3D ORBITAL EXPLORER
-              </span>
-              <span style="font-size: 11px; font-weight: 700; color: #f8fafc; letter-spacing: 0.3px;">
-                Eksplorasi Interaktif Mons Mouton (-84.9° LS, 33.3° BB)
-              </span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <button class="btn-hud" onclick="toggleHomeGlobeRotation()" id="btn-home-rotate" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: #f8fafc; font-size: 11px; padding: 4px 10px; border-radius: 6px; cursor: pointer;">
-                ⟳ Putar Otomatis
-              </button>
-              <button class="btn-hud" onclick="focusHomeMonsMouton()" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: #f8fafc; font-size: 11px; padding: 4px 10px; border-radius: 6px; cursor: pointer;">
-                🎯 Kunci Mons Mouton
-              </button>
-              <button class="btn-hud" onclick="switchView('visualisasi'); playAvionicBeep(720, 'sine');" style="background: var(--artemis-blue); border: none; color: #ffffff; font-size: 11px; font-weight: 800; padding: 5px 14px; border-radius: 6px; cursor: pointer;">
-                Buka Peta Topografi Penuh (Tahap 2) &rarr;
-              </button>
-            </div>
+        <!-- PURE CINEMATIC 3D MOON -->
+        <div style="background: radial-gradient(circle at center, #0f1d38 0%, #030712 100%); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: var(--radius-md); margin: 0 auto 36px; overflow: hidden; position: relative; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45); height: 320px; cursor: grab;" id="homeMoonContainer">
+          <!-- Loading indicator -->
+          <div id="homeMoonLoading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #38bdf8; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; z-index: 5;">
+            <div class="spinner" style="width: 18px; height: 18px; border: 2px solid rgba(56, 189, 248, 0.2); border-top-color: #38bdf8; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+            Memuat Model 3D Bulan...
           </div>
-
-          <!-- 3D Canvas Container -->
-          <div id="homeMoonContainer" style="width: 100%; height: 320px; position: relative; cursor: grab; background: radial-gradient(circle at center, #0f1d38 0%, #030712 100%);">
-            <!-- Loading indicator -->
-            <div id="homeMoonLoading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #38bdf8; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; z-index: 5;">
-              <div class="spinner" style="width: 18px; height: 18px; border: 2px solid rgba(56, 189, 248, 0.2); border-top-color: #38bdf8; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
-              Memuat Model 3D Bulan &amp; Penanda Sasaran...
-            </div>
-          </div>
-
-          <!-- Bottom Telemetry HUD Bar -->
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; background: rgba(15, 23, 42, 0.9); border-top: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap; gap: 10px; font-size: 11px;">
-            <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; color: #cbd5e1;">
-              <div><span style="color: #94a3b8;">SASARAN:</span> <strong style="color: #facc15;">MONS MOUTON CREST</strong></div>
-              <div><span style="color: #94a3b8;">KOORDINAT:</span> <strong style="color: #38bdf8;">-84.9° LS, 33.3° BB</strong></div>
-              <div><span style="color: #94a3b8;">ELEVASI:</span> <strong style="color: #34d399;">+5.920 m</strong></div>
-              <div><span style="color: #94a3b8;">KEMIRINGAN:</span> <strong style="color: #34d399;">0.08° (AMAT DATAR)</strong></div>
-            </div>
-            <div style="color: #94a3b8; font-style: italic; font-size: 10.5px;">
-              💡 Tips: Klik &amp; geser mouse untuk memutar Bulan 3D
-            </div>
-          </div>
-
         </div>
 
         <!-- Bagian 1: Tiga Masalah Utama -->
@@ -2262,11 +2221,11 @@
       const w = container.clientWidth || 900;
       const h = container.clientHeight || 320;
 
-      // 1. Scene & Camera (Tilted so South Pole is prominently visible)
+      // 1. Scene & Camera (Centered perspective)
       homeMoonScene = new THREE.Scene();
-      homeMoonCamera = new THREE.PerspectiveCamera(40, w / h, 0.1, 1000);
-      homeMoonCamera.position.set(0, -14, 22);
-      homeMoonCamera.lookAt(0, -1, 0);
+      homeMoonCamera = new THREE.PerspectiveCamera(38, w / h, 0.1, 1000);
+      homeMoonCamera.position.set(0, 0, 24);
+      homeMoonCamera.lookAt(0, 0, 0);
 
       // 2. WebGL Renderer
       homeMoonRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -2292,7 +2251,7 @@
       const starMat = new THREE.PointsMaterial({ color: 0x93c5fd, size: 1.2, transparent: true, opacity: 0.75 });
       homeMoonScene.add(new THREE.Points(starGeo, starMat));
 
-      // 5. Lunar Sphere with NASA Texture
+      // 5. Lunar Sphere with NASA Texture (Pure Spinning Moon)
       const moonGeo = new THREE.SphereGeometry(7.5, 64, 64);
       const textureLoader = new THREE.TextureLoader();
       const moonTexture = textureLoader.load('/data/moon_1024.jpg', () => {
@@ -2307,47 +2266,7 @@
       homeMoonMesh = new THREE.Mesh(moonGeo, moonMat);
       homeMoonScene.add(homeMoonMesh);
 
-      // 6. South Pole Latitude Rings (-70°, -80°, -85°)
-      const gridMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.35 });
-      [-70, -80, -85].forEach(lat => {
-        const r = 7.52 * Math.cos(lat * Math.PI / 180);
-        const y = 7.52 * Math.sin(lat * Math.PI / 180);
-        const circleGeo = new THREE.BufferGeometry();
-        const pts = [];
-        for (let i = 0; i <= 64; i++) {
-          const a = (i / 64) * Math.PI * 2;
-          pts.push(r * Math.cos(a), y, r * Math.sin(a));
-        }
-        circleGeo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-        homeMoonMesh.add(new THREE.Line(circleGeo, gridMat));
-      });
-
-      // 7. Target Beacon at Mons Mouton (-84.9°S, 33.3°W)
-      homeBeaconGroup = new THREE.Group();
-      const pinGeo = new THREE.CylinderGeometry(0.06, 0.06, 1.2, 8);
-      const pinMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
-      const pinMesh = new THREE.Mesh(pinGeo, pinMat);
-      pinMesh.position.y = 0.6;
-      homeBeaconGroup.add(pinMesh);
-
-      const ringGeo = new THREE.RingGeometry(0.2, 0.45, 24);
-      const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide });
-      const ringMesh = new THREE.Mesh(ringGeo, ringMat);
-      ringMesh.rotation.x = Math.PI / 2;
-      homeBeaconGroup.add(ringMesh);
-
-      // Convert coordinate: -84.9° Lat, -33.3° Lon
-      const phi = (90 - (-84.9)) * (Math.PI / 180);
-      const theta = (-33.3 + 180) * (Math.PI / 180);
-      const bx = -7.55 * Math.sin(phi) * Math.cos(theta);
-      const by = 7.55 * Math.cos(phi);
-      const bz = 7.55 * Math.sin(phi) * Math.sin(theta);
-      const pos = new THREE.Vector3(bx, by, bz);
-      homeBeaconGroup.position.copy(pos);
-      homeBeaconGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), pos.clone().normalize());
-      homeMoonMesh.add(homeBeaconGroup);
-
-      // 8. Mouse & Touch Drag Controls
+      // 6. Mouse & Touch Drag Controls
       let isDragging = false;
       let prevX = 0, prevY = 0;
 
@@ -2397,17 +2316,11 @@
         isDragging = false;
       });
 
-      // 9. Animation Loop with Beacon Ring Pulsing
-      let ringPulse = 0;
+      // 7. Animation Loop (Smooth continuous rotation)
       function animateHomeMoon() {
         requestAnimationFrame(animateHomeMoon);
         if (homeMoonRotating && homeMoonMesh && !isDragging) {
           homeMoonMesh.rotation.y += 0.0022;
-        }
-        ringPulse += 0.04;
-        if (ringMesh) {
-          const s = 1.0 + Math.sin(ringPulse) * 0.35;
-          ringMesh.scale.set(s, s, s);
         }
         if (homeMoonRenderer && homeMoonScene && homeMoonCamera) {
           homeMoonRenderer.render(homeMoonScene, homeMoonCamera);
