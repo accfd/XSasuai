@@ -1389,7 +1389,8 @@
 
 .home-slide-section,
 .rekomendasi-slide-section,
-.visualisasi-slide-section {
+.visualisasi-slide-section,
+.simulasi-slide-section {
   width: 100%;
   min-height: calc(100vh - 90px);
   height: calc(100vh - 90px);
