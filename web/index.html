@@ -892,10 +892,128 @@
   </main>
 
   <!-- ===================================================================== -->
-  <!-- LAYAR 3: SIMULASI PENERBANGAN 3D REAL-TIME (BUMI KE BULAN & HLS) -->
+  <!-- LAYAR 3: MISSION LAUNCH DECK — SIMULASI PENERBANGAN 3D (BUMI KE BULAN & HLS) -->
   <!-- ===================================================================== -->
-  <main id="view-simulasi" style="display: none; width: 100%; height: calc(100vh - 105px); min-height: 600px; position: relative; margin: 0; padding: 0; overflow: hidden; border-radius: var(--radius-md); border: 1px solid var(--border-medium); box-shadow: 0 10px 30px rgba(0,0,0,0.25); background: #0a0a0f;">
-    <iframe id="sim-iframe-3d" src="/simulator.html?v=30" style="width: 100%; height: 100%; border: none; display: block;" title="Simulator 3D Misi Penuh (Bumi ke Bulan & HLS)"></iframe>
+  <main id="view-simulasi" style="display: none; width: 100%; height: calc(100vh - 105px); min-height: 600px; position: relative; margin: 0; padding: 0; overflow: hidden;">
+    <div style="max-width: 1240px; width: 100%; height: 100%; margin: 0 auto; background: #ffffff; border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 18px 24px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; overflow: hidden;">
+      
+      <!-- Top Bar: Breadcrumb, Phase Title & Verification Badge -->
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid var(--border-light);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button onclick="switchView('visualisasi')" style="background: none; border: none; color: var(--text-muted); font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px;" onmouseover="this.style.color='var(--artemis-blue)'" onmouseout="this.style.color='var(--text-muted)'">
+            <span>&larr;</span>
+            <span>Kembali ke Visualisasi (Tahap 2)</span>
+          </button>
+          <span style="color: var(--border-medium);">|</span>
+          <span style="font-size: 11px; font-weight: 800; color: var(--artemis-blue); text-transform: uppercase; letter-spacing: 0.6px;">
+            TAHAP 3 — SIMULASI DINAMIKA PENERBANGAN 6-DOF
+          </span>
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; font-size: 10.5px; font-weight: 800; padding: 3px 12px; border-radius: 999px; display: flex; align-items: center; gap: 6px;">
+          <span style="width: 7px; height: 7px; background: #10b981; border-radius: 50%;"></span>
+          DATA VALID: NASA JPL HORIZONS DE441 + LP150Q GRAVITY
+        </div>
+      </div>
+
+      <!-- Section Title & Subtitle -->
+      <div style="margin-top: 4px; margin-bottom: 4px;">
+        <h2 style="font-size: 19px; font-weight: 800; color: var(--text-primary); margin: 0 0 3px;">
+          Pusat Peluncuran Simulator Penerbangan 3D Real-Time
+        </h2>
+        <p style="font-size: 12px; color: var(--text-secondary); margin: 0; line-height: 1.45;">
+          Uji lintasan astrodinamika terintegrasi dari peluncuran Bumi (KSC LC-39B), injeksi TLI, transfer translunar 384.400 km, pendekatan orbit polar Bulan, hingga pendaratan vertikal wahana SpaceX Starship HLS di puncak Mons Mouton Crest (-84,9°S, 33,3°W).
+        </p>
+      </div>
+
+      <!-- 4 Telemetry Highlights Grid (Consistent Card System) -->
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+        <!-- Card 1: Wahana & Peluncur -->
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #0284c7; border-radius: var(--radius-sm); padding: 10px 14px; box-shadow: var(--shadow-sm);">
+          <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">WAHANA MISI</div>
+          <div style="font-size: 13.5px; font-weight: 800; color: #0369a1; margin-top: 2px;">SpaceX Starship HLS</div>
+          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 3px; line-height: 1.35;">
+            Propulsi 6-DOF &amp; panduan pengereman Apollo PDI.
+          </div>
+        </div>
+
+        <!-- Card 2: Target Pendaratan -->
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #10b981; border-radius: var(--radius-sm); padding: 10px 14px; box-shadow: var(--shadow-sm);">
+          <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">TARGET PENDARATAN</div>
+          <div style="font-size: 13.5px; font-weight: 800; color: #047857; margin-top: 2px;">Mons Mouton Crest</div>
+          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 3px; line-height: 1.35;">
+            -84,9°S, 33,3°W | Elevasi +5.920 m (Kemiringan 0,08°).
+          </div>
+        </div>
+
+        <!-- Card 3: Durasi Trajektori -->
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #f59e0b; border-radius: var(--radius-sm); padding: 10px 14px; box-shadow: var(--shadow-sm);">
+          <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">DURASI MISI</div>
+          <div style="font-size: 13.5px; font-weight: 800; color: #b45309; margin-top: 2px;">4,53 Hari (108,7 Jam)</div>
+          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 3px; line-height: 1.35;">
+            Transfer translunar mulus 384.400 km (Hermite Spline).
+          </div>
+        </div>
+
+        <!-- Card 4: Status Keselamatan -->
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #8b5cf6; border-radius: var(--radius-sm); padding: 10px 14px; box-shadow: var(--shadow-sm);">
+          <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">STATUS KESELAMATAN</div>
+          <div style="font-size: 13.5px; font-weight: 800; color: #6d28d9; margin-top: 2px;">VERIFIKASI GO (AMAN)</div>
+          <div style="font-size: 11px; color: var(--text-secondary); margin-top: 3px; line-height: 1.35;">
+            Touchdown V_z 0,80 m/s (Batas toleransi NASA &le; 2,0 m/s).
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Launch Deck Action Card (Aerospace Dark Glassmorphism) -->
+      <div style="background: radial-gradient(circle at 50% 30%, #0d1e3d 0%, #030712 100%); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: var(--radius-md); padding: 26px 24px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; box-shadow: 0 8px 32px rgba(2, 132, 199, 0.18);">
+        
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 12px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px;">
+            ✦ SIMULATOR 3D MISI PENUH BERBASIS WEBGL &amp; THREE.JS ✦
+          </span>
+        </div>
+
+        <!-- Big Launch CTA Button -->
+        <a href="/simulator.html" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 12px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; font-size: 16px; font-weight: 800; padding: 14px 38px; border-radius: 12px; text-decoration: none; box-shadow: 0 6px 24px rgba(2, 132, 199, 0.5); transition: all 0.2s ease; border: 1px solid rgba(255, 255, 255, 0.25);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 32px rgba(2, 132, 199, 0.7)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 6px 24px rgba(2, 132, 199, 0.5)';">
+          <span style="font-size: 20px;">🚀</span>
+          <span>LUNCURKAN SIMULATOR 3D MISI PENUH (TAB BARU)</span>
+          <span style="font-size: 18px;">&nearr;</span>
+        </a>
+
+        <!-- Feature Badges Row -->
+        <div style="display: flex; gap: 20px; align-items: center; flex-wrap: wrap; justify-content: center; margin-top: 2px;">
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #94a3b8;">
+            <span style="color: #38bdf8; font-size: 14px;">⚡</span>
+            <span><strong>Akselerasi 60 FPS Standalone</strong> tanpa beban iframe</span>
+          </div>
+          <span style="color: #334155;">•</span>
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #94a3b8;">
+            <span style="color: #10b981; font-size: 14px;">🕹️</span>
+            <span><strong>Kontrol Kamera 3D Multi-Sudut</strong> (Orion, Mons LZ, Earth, Moon)</span>
+          </div>
+          <span style="color: #334155;">•</span>
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #94a3b8;">
+            <span style="color: #facc15; font-size: 14px;">📊</span>
+            <span><strong>Telemetri Kokpit Real-Time</strong> (Bahan Bakar, G-Force, Ketinggian, Kecepatan)</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Navigation Footer -->
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 8px; border-top: 1px solid var(--border-light);">
+        <button onclick="switchView('visualisasi')" style="background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;" onmouseover="this.style.color='var(--artemis-blue)'" onmouseout="this.style.color='var(--text-muted)'">
+          <span>&larr;</span>
+          <span>Kembali ke Visualisasi Topografi 3D</span>
+        </button>
+
+        <button onclick="switchView('home')" style="background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px;" onmouseover="this.style.color='var(--artemis-blue)'" onmouseout="this.style.color='var(--text-muted)'">
+          <span>Kembali ke Beranda Utama</span>
+          <span>&uarr;</span>
+        </button>
+      </div>
+
+    </div>
   </main>
 
   <!-- MODAL: PENCARI REKOMENDASI  <!-- MODAL: PENCARI REKOMENDASI PENDARATAN OTOMATIS (SMART LANDING FINDER) -->
