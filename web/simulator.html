@@ -685,7 +685,7 @@ body:active { cursor: grabbing; }
         <span class="phase-text" id="phase-text">Translunar Coast</span>
       </div>
       <div class="met-display" id="met-display">T+00:00:00:00</div>
-      <div class="date-display" id="date-display">Apr 2, 2026 · 12:00 UTC</div>
+      <div class="date-display" id="date-display">Nov 10, 2026 · 12:00 UTC</div>
     </div>
     
     <!-- Playback Controls -->
@@ -754,7 +754,7 @@ import { MISSION_SUMMARY, MISSION_TRAJECTORY_POINTS, getMissionPointByDay } from
 const EARTH_RADIUS_KM = 6371;
 const MOON_RADIUS_KM = 1737;
 const SCALE = 1 / 4000;
-const LAUNCH_TIME = Date.UTC(2026, 3, 1, 22, 35, 0);
+const LAUNCH_TIME = Date.UTC(2026, 10, 10, 12, 0, 0); // 2026-Nov-10 12:00:00 UTC (NASA Horizons Epoch)
 // ═══════════════════════════════════════════
 // UNIFIED ARTEMIS III MISSION TIMELINE
 // 1. Earth Launch at KSC (Day 0.0, 0 km)
@@ -1661,7 +1661,7 @@ function animate() {
     orionGroup.position.copy(orionSc);
 
     // Orientation: Points along forward velocity vector, orients vertically at touchdown
-    const isPDIPhase = mPoint.phase && (mPoint.phase.includes("BRAKING") || mPoint.phase.includes("APPROACH") || mPoint.phase.includes("TOUCHDOWN"));
+    const isPDIPhase = mPoint.phase && (mPoint.phase.includes("BRAKING") || mPoint.phase.includes("APPROACH") || mPoint.phase.includes("TOUCHDOWN") || mPoint.phase.includes("TERMINAL") || mPoint.phase.includes("POWERED DESCENT"));
     
     if (isPDIPhase) {
       // During powered descent and touchdown: align with lunar surface normal at Mons Mouton

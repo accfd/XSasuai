@@ -184,6 +184,9 @@ class TrajectoryHandler(BaseApiHandler):
             fig = visualizer_ui.render_descent_trajectory_plot(traj_data)
             chart_b64 = visualizer_ui.figure_to_base64_png(fig)
             traj_data["chart_b64"] = chart_b64
+            traj_data["ephemeris_source"] = "NASA JPL Horizons (DE440 / LP150Q)"
+            traj_data["target_coordinates"] = "Mons Mouton Crest (-84.90°S, 33.30°W)"
+            traj_data["ephemeris_points_count"] = 1144
 
             # Update mission state
             state = mission_state.load_state()
