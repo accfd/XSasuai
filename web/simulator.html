@@ -4,22 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Xesuai — Artemis III Lunar Mission Simulator</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+  <script src="three.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: #06080e;
+      background: #04060b;
       color: #ffffff;
-      font-family: 'Space Grotesk', -apple-system, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Space Grotesk", sans-serif;
       overflow: hidden;
-      cursor: grab;
       user-select: none;
     }
-    body:active { cursor: grabbing; }
 
     #canvas-container {
       width: 100vw;
@@ -36,32 +31,32 @@
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 20;
+      z-index: 25;
       text-align: center;
       pointer-events: none;
     }
 
     .logo-text {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: 5px;
       text-transform: uppercase;
-      color: rgba(56, 189, 248, 0.7);
+      color: #38bdf8;
       margin-bottom: 4px;
     }
 
     .mission-title {
       font-size: 26px;
-      font-weight: 700;
+      font-weight: 800;
       letter-spacing: 2px;
       color: #ffffff;
-      text-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+      text-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
     }
 
     .date-display {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: "JetBrains Mono", "Courier New", monospace;
       font-size: 13px;
-      color: rgba(255, 255, 255, 0.65);
+      color: rgba(255, 255, 255, 0.7);
       margin-top: 4px;
       letter-spacing: 1px;
     }
@@ -69,11 +64,11 @@
     .nav-back-link {
       pointer-events: auto;
       display: inline-block;
-      margin-top: 8px;
+      margin-top: 6px;
       font-size: 11px;
       font-weight: 600;
-      letter-spacing: 2px;
-      color: rgba(255, 255, 255, 0.4);
+      letter-spacing: 1.5px;
+      color: rgba(255, 255, 255, 0.45);
       text-decoration: none;
       text-transform: uppercase;
       transition: color 0.2s;
@@ -88,38 +83,35 @@
       top: 50%;
       left: 24px;
       transform: translateY(-50%);
-      z-index: 20;
+      z-index: 25;
       display: flex;
       flex-direction: column;
       gap: 10px;
+      pointer-events: auto;
     }
 
     .stat-card {
-      background: linear-gradient(135deg, rgba(0, 20, 40, 0.75), rgba(0, 10, 20, 0.55));
-      border: 1px solid rgba(0, 180, 255, 0.18);
+      background: linear-gradient(135deg, rgba(0, 20, 40, 0.8), rgba(0, 10, 20, 0.65));
+      border: 1px solid rgba(0, 180, 255, 0.25);
       border-radius: 12px;
       padding: 12px 18px;
       min-width: 170px;
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      transition: border-color 0.2s;
-    }
-    .stat-card:hover {
-      border-color: rgba(0, 212, 255, 0.4);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     }
 
     .stat-label {
       font-size: 9px;
-      font-weight: 600;
+      font-weight: 700;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: rgba(255, 255, 255, 0.45);
+      color: rgba(255, 255, 255, 0.5);
       margin-bottom: 4px;
     }
 
     .stat-value {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: "JetBrains Mono", "Courier New", monospace;
       font-size: 19px;
       font-weight: 700;
       color: #ffffff;
@@ -127,18 +119,18 @@
     }
     .stat-value.highlight {
       color: #00d4ff;
-      text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+      text-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
     }
     .stat-value.gold {
       color: #facc15;
-      text-shadow: 0 0 10px rgba(250, 204, 21, 0.5);
+      text-shadow: 0 0 10px rgba(250, 204, 21, 0.6);
     }
 
     .stat-unit {
       font-size: 11px;
-      font-weight: 500;
-      color: rgba(255, 255, 255, 0.4);
-      margin-left: 2px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.45);
+      margin-left: 3px;
     }
 
     /* RIGHT PANEL - CAMERA CONTROLS */
@@ -147,43 +139,43 @@
       top: 50%;
       right: 24px;
       transform: translateY(-50%);
-      z-index: 20;
+      z-index: 25;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      pointer-events: auto;
     }
 
     .cam-btn {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 10px;
       padding: 11px 18px;
-      color: rgba(255, 255, 255, 0.65);
-      font-family: 'Space Grotesk', sans-serif;
+      color: rgba(255, 255, 255, 0.7);
       font-size: 12px;
       font-weight: 600;
       letter-spacing: 0.5px;
       cursor: pointer;
       transition: all 0.2s ease;
-      min-width: 150px;
+      min-width: 155px;
       text-align: center;
       backdrop-filter: blur(12px);
     }
     .cam-btn:hover {
-      background: rgba(255, 255, 255, 0.09);
-      border-color: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.3);
       color: #ffffff;
     }
     .cam-btn.active {
-      background: linear-gradient(135deg, rgba(0, 180, 255, 0.22), rgba(0, 120, 200, 0.12));
-      border-color: rgba(0, 180, 255, 0.5);
+      background: linear-gradient(135deg, rgba(0, 180, 255, 0.25), rgba(0, 120, 200, 0.15));
+      border-color: rgba(0, 180, 255, 0.6);
       color: #00d4ff;
-      box-shadow: 0 0 15px rgba(0, 180, 255, 0.2);
+      box-shadow: 0 0 15px rgba(0, 180, 255, 0.3);
     }
 
     .cam-divider {
       height: 1px;
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.1);
       margin: 4px 0;
     }
 
@@ -195,12 +187,11 @@
       right: 0;
       z-index: 30;
       padding: 24px 40px 24px;
-      background: linear-gradient(to top, rgba(6, 8, 14, 0.95) 0%, rgba(6, 8, 14, 0.6) 70%, transparent 100%);
+      background: linear-gradient(to top, rgba(4, 6, 11, 0.98) 0%, rgba(4, 6, 11, 0.7) 70%, transparent 100%);
       pointer-events: auto;
     }
 
     .bottom-inner {
-      pointer-events: auto;
       max-width: 1100px;
       margin: 0 auto;
       display: flex;
@@ -217,7 +208,7 @@
       position: relative;
       width: 100%;
       height: 6px;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.12);
       border-radius: 3px;
       cursor: pointer;
     }
@@ -230,7 +221,7 @@
       background: linear-gradient(90deg, #00d4ff, #facc15);
       border-radius: 3px;
       pointer-events: none;
-      box-shadow: 0 0 12px rgba(0, 212, 255, 0.5);
+      box-shadow: 0 0 12px rgba(0, 212, 255, 0.6);
     }
 
     .timeline-slider {
@@ -249,12 +240,12 @@
     .timeline-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
       border-radius: 50%;
       background: #ffffff;
       cursor: pointer;
-      box-shadow: 0 0 12px rgba(255, 255, 255, 0.8), 0 0 20px rgba(0, 212, 255, 0.8);
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.9), 0 0 20px rgba(0, 212, 255, 0.9);
       border: 2px solid #00d4ff;
       transition: transform 0.1s ease;
     }
@@ -273,7 +264,7 @@
       position: absolute;
       font-size: 10px;
       font-weight: 500;
-      color: rgba(255, 255, 255, 0.35);
+      color: rgba(255, 255, 255, 0.4);
       cursor: pointer;
       transform: translateX(-50%);
       transition: color 0.2s;
@@ -283,7 +274,7 @@
       font-weight: 700;
     }
     .phase-marker.active {
-      text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+      text-shadow: 0 0 8px rgba(0, 212, 255, 0.7);
     }
 
     /* PLAYBACK ROW */
@@ -297,12 +288,12 @@
     .playback-left {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
     .play-btn {
-      width: 48px;
-      height: 48px;
+      width: 46px;
+      height: 46px;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.1);
       border: 1.5px solid rgba(255, 255, 255, 0.3);
@@ -314,7 +305,6 @@
       font-size: 16px;
       font-weight: 800;
       transition: all 0.2s ease;
-      pointer-events: auto !important;
       position: relative;
       z-index: 35;
     }
@@ -330,13 +320,13 @@
 
     .phase-display {
       font-size: 14px;
-      font-weight: 600;
+      font-weight: 700;
       color: #ffffff;
       letter-spacing: 0.5px;
     }
     .phase-subtext {
       font-size: 11px;
-      color: rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 0.5);
       margin-top: 2px;
     }
 
@@ -349,17 +339,17 @@
     .speed-selector {
       display: flex;
       gap: 4px;
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.05);
       padding: 3px;
       border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .speed-btn {
       background: transparent;
       border: none;
-      color: rgba(255, 255, 255, 0.45);
-      font-family: 'JetBrains Mono', monospace;
+      color: rgba(255, 255, 255, 0.5);
+      font-family: "JetBrains Mono", "Courier New", monospace;
       font-size: 11px;
       font-weight: 600;
       padding: 5px 9px;
@@ -371,20 +361,20 @@
       color: #ffffff;
     }
     .speed-btn.active {
-      background: rgba(0, 212, 255, 0.2);
+      background: rgba(0, 212, 255, 0.25);
       color: #00d4ff;
       font-weight: 700;
     }
 
     .met-badge {
-      font-family: 'JetBrains Mono', monospace;
+      font-family: "JetBrains Mono", "Courier New", monospace;
       font-size: 13px;
       font-weight: 700;
       color: #ffffff;
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.08);
       padding: 8px 14px;
       border-radius: 8px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.15);
     }
 
     /* CONTROL HINTS OVERLAY */
@@ -393,7 +383,7 @@
       bottom: 115px;
       right: 28px;
       font-size: 11px;
-      color: rgba(255, 255, 255, 0.35);
+      color: rgba(255, 255, 255, 0.4);
       letter-spacing: 0.5px;
       pointer-events: none;
       z-index: 10;
@@ -409,26 +399,17 @@
       #bottom-panel { padding: 16px 20px; }
     }
   </style>
-
-  <!-- THREE.JS IMPORT MAP (FAJRUL ARCHITECTURE) -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-    }
-  }
-  </script>
 </head>
 <body>
 
+  <!-- 3D WEBGL CANVAS -->
   <div id="canvas-container"></div>
 
   <!-- HEADER -->
   <div id="header">
     <div class="logo-text">NASA ARTEMIS III &bull; LUNAR LANDING NAVIGATOR</div>
     <div class="mission-title">XESUAI MISSION SIMULATOR</div>
-    <div class="date-display" id="date-display">Sat, 14 Nov 2026 12:00:00 UTC</div>
+    <div class="date-display" id="date-display">Tue, 10 Nov 2026 12:00:00 UTC</div>
     <a href="/" class="nav-back-link">&larr; KEMBALI KE MISSION CONSOLE</a>
   </div>
 
@@ -436,23 +417,23 @@
   <div id="left-panel">
     <div class="stat-card">
       <div class="stat-label">JARAK DARI BUMI</div>
-      <div class="stat-value"><span id="dist-earth">384,120</span><span class="stat-unit">KM</span></div>
+      <div class="stat-value"><span id="dist-earth">185</span><span class="stat-unit">KM</span></div>
     </div>
     <div class="stat-card">
       <div class="stat-label">JARAK DARI BULAN</div>
-      <div class="stat-value"><span id="dist-moon">15</span><span class="stat-unit">KM</span></div>
+      <div class="stat-value"><span id="dist-moon">384,400</span><span class="stat-unit">KM</span></div>
     </div>
     <div class="stat-card">
       <div class="stat-label">KETINGGIAN TARGET</div>
-      <div class="stat-value gold"><span id="altitude-val">15,000</span><span class="stat-unit" id="altitude-unit">M</span></div>
+      <div class="stat-value gold"><span id="altitude-val">185</span><span class="stat-unit" id="altitude-unit">KM</span></div>
     </div>
     <div class="stat-card">
       <div class="stat-label">KECEPATAN WAHANA</div>
-      <div class="stat-value highlight"><span id="velocity-val">1.69</span><span class="stat-unit">KM/S</span></div>
+      <div class="stat-value highlight"><span id="velocity-val">7.80</span><span class="stat-unit">KM/S</span></div>
     </div>
     <div class="stat-card">
       <div class="stat-label">SISA PROPELAN</div>
-      <div class="stat-value"><span id="fuel-val">482.0</span><span class="stat-unit">KG (38.6%)</span></div>
+      <div class="stat-value"><span id="fuel-val">1,250.0</span><span class="stat-unit">KG (100%)</span></div>
     </div>
   </div>
 
@@ -468,7 +449,7 @@
 
   <!-- CONTROL HINTS -->
   <div class="control-hints">
-    Rotasi: Drag Kiri &bull; Zoom: Scroll &bull; Geser: Drag Kanan
+    Rotasi: Drag Kiri &bull; Zoom: Scroll &bull; Geser: Drag Kanan &bull; Spasi: Play/Pause
   </div>
 
   <!-- BOTTOM PANEL -->
@@ -512,57 +493,78 @@
     </div>
   </div>
 
-  <!-- THREE.JS HIGH FIDELITY SIMULATION ENGINE -->
-  <script type="module">
-    import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-
+  <!-- THREE.JS HIGH FIDELITY SIMULATION SCRIPT (100% OFFLINE & RESILIENT) -->
+  <script>
     // ═══════════════════════════════════════════
-    // 1. SETUP ENGINE & POST-PROCESSING
+    // 1. SETUP THREE.JS ENGINE & LIGHTWEIGHT CONTROLLER
     // ═══════════════════════════════════════════
     const container = document.getElementById('canvas-container');
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x04060b);
 
-    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 12000);
     camera.position.set(160, 140, 360);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: "high-performance" });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    if (renderer.toneMapping !== undefined) {
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.25;
+    }
     container.appendChild(renderer.domElement);
 
-    // OrbitControls dengan damping halus (Fajrul style)
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.06;
-    controls.minDistance = 2;
-    controls.maxDistance = 1500;
-    controls.target.set(120, 0, 30);
+    // Orbit Controls dengan Damping Halus (Persis Fajrul OrbitControls)
+    let isMouseDown = false;
+    let mouseButton = 0;
+    let prevMouseX = 0;
+    let prevMouseY = 0;
+    let camSpherical = { radius: 420, theta: 0.85, phi: 1.15 };
+    let targetSpherical = { radius: 420, theta: 0.85, phi: 1.15 };
+    let camTarget = new THREE.Vector3(120, 0, 30);
+    let targetLook = new THREE.Vector3(120, 0, 30);
 
-    // Post-Processing UnrealBloomPass untuk pendaran cahaya realistis
-    const composer = new EffectComposer(renderer);
-    composer.addPass(new RenderPass(scene, camera));
-    const bloomPass = new UnrealBloomPass(
-      new THREE.Vector2(window.innerWidth, window.innerHeight),
-      0.45, // strength
-      0.35, // radius
-      0.82  // threshold
-    );
-    composer.addPass(bloomPass);
+    window.addEventListener('mousedown', (e) => {
+      if (e.target.closest('#left-panel, #right-panel, #bottom-panel, #header')) return;
+      isMouseDown = true;
+      mouseButton = e.button;
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
+    });
+
+    window.addEventListener('mouseup', () => { isMouseDown = false; });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isMouseDown) return;
+      const dx = e.clientX - prevMouseX;
+      const dy = e.clientY - prevMouseY;
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
+
+      if (mouseButton === 0) {
+        // Rotasi
+        targetSpherical.theta -= dx * 0.005;
+        targetSpherical.phi = Math.max(0.08, Math.min(Math.PI - 0.08, targetSpherical.phi - dy * 0.005));
+      } else if (mouseButton === 2) {
+        // Pan
+        targetLook.x -= dx * 0.25;
+        targetLook.y += dy * 0.25;
+      }
+    });
+
+    window.addEventListener('wheel', (e) => {
+      targetSpherical.radius = Math.max(6, Math.min(2500, targetSpherical.radius + e.deltaY * 0.45));
+    }, { passive: true });
+
+    window.addEventListener('contextmenu', (e) => { e.preventDefault(); });
 
     // ═══════════════════════════════════════════
     // 2. LIGHTING & REALISTIC SUN
     // ═══════════════════════════════════════════
-    const ambientLight = new THREE.AmbientLight(0x162238, 0.7);
+    const ambientLight = new THREE.AmbientLight(0x162238, 0.8);
     scene.add(ambientLight);
 
-    const sunDir = new THREE.DirectionalLight(0xffffff, 2.6);
+    const sunDir = new THREE.DirectionalLight(0xffffff, 2.8);
     sunDir.position.set(500, 150, 400);
     scene.add(sunDir);
 
@@ -573,8 +575,8 @@
       const ctx = c.getContext('2d');
       const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
       grad.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-      grad.addColorStop(0.2, 'rgba(255, 240, 200, 0.8)');
-      grad.addColorStop(0.5, 'rgba(255, 180, 80, 0.25)');
+      grad.addColorStop(0.2, 'rgba(255, 240, 200, 0.85)');
+      grad.addColorStop(0.5, 'rgba(255, 180, 80, 0.3)');
       grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 128, 128);
@@ -602,7 +604,6 @@
         pos[i*3+1] = r * Math.sin(ph) * Math.sin(th);
         pos[i*3+2] = r * Math.cos(ph);
 
-        // Sedikit variasi warna bintang (putih, biru muda, kuning tipis)
         const tone = Math.random();
         if (tone > 0.8) {
           col[i*3] = 0.7; col[i*3+1] = 0.85; col[i*3+2] = 1.0;
@@ -616,12 +617,12 @@
       g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
       g.setAttribute('color', new THREE.BufferAttribute(col, 3));
       scene.add(new THREE.Points(g, new THREE.PointsMaterial({
-        size: 1.4, vertexColors: true, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending
+        size: 1.5, vertexColors: true, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending
       })));
     })();
 
     // ═══════════════════════════════════════════
-    // 4. PLANET BUMI (REALISTIC SHADER + NASA BLUE MARBLE)
+    // 4. PLANET BUMI (ATMOSPHERIC SHADER + NASA TEXTURE)
     // ═══════════════════════════════════════════
     const textureLoader = new THREE.TextureLoader();
     const earthGroup = new THREE.Group();
@@ -629,13 +630,12 @@
     scene.add(earthGroup);
 
     const eR = 18;
-    const earthGeo = new THREE.SphereGeometry(eR, 96, 64);
+    const earthGeo = new THREE.SphereGeometry(eR, 80, 60);
     const earthMat = new THREE.MeshStandardMaterial({
       roughness: 0.75,
       metalness: 0.1,
       color: 0xffffff
     });
-    // Muat tekstur NASA Blue Marble lokal
     textureLoader.load('/data/earth_blue_marble.jpg', (tex) => {
       earthMat.map = tex;
       earthMat.needsUpdate = true;
@@ -643,15 +643,15 @@
     const earthMesh = new THREE.Mesh(earthGeo, earthMat);
     earthGroup.add(earthMesh);
 
-    // Atmospheric Rayleigh Scattering Rim Shader (Fajrul Atmospheric Glow)
-    const atmosGeo = new THREE.SphereGeometry(eR * 1.04, 64, 48);
+    // Atmospheric Rayleigh Scattering Rim Shader
+    const atmosGeo = new THREE.SphereGeometry(eR * 1.04, 60, 40);
     const atmosMat = new THREE.ShaderMaterial({
       transparent: true,
       side: THREE.FrontSide,
       depthWrite: false,
       uniforms: {
         glowColor: { value: new THREE.Color(0x00aaff) },
-        coeff: { value: 0.45 },
+        coeff: { value: 0.5 },
         power: { value: 3.2 }
       },
       vertexShader: `
@@ -687,21 +687,19 @@
         pts.push(new THREE.Vector3(Math.cos(th) * r, Math.sin(th * 0.3) * 2, Math.sin(th) * r));
       }
       const g = new THREE.BufferGeometry().setFromPoints(pts);
-      const m = new THREE.LineBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.35 });
+      const m = new THREE.LineBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.4 });
       earthGroup.add(new THREE.Line(g, m));
     })();
 
     // ═══════════════════════════════════════════
     // 5. BULAN (ORBIT DINAMIS MENGITARI BUMI + NASA LOLA TEXTURE)
     // ═══════════════════════════════════════════
-    // Orbit Bulan mengitari Bumi (periode 27.32 hari = 2,360,591 detik).
-    // Selama 4 hari misi (96 jam), Bulan bergerak menempuh busur ~52.7 derajat!
     const MOON_ORBIT_RADIUS = 260;
     const LUNAR_PERIOD_SECONDS = 27.32166 * 86400;
     const LUNAR_OMEGA = (2 * Math.PI) / LUNAR_PERIOD_SECONDS;
-    const LUNAR_INCLINATION = 5.14 * (Math.PI / 180); // Kemiringan bidang orbit Bulan 5.14°
-    const T_ARRIVAL = 345600; // Detik saat tiba di Bulan (96 Jam)
-    const THETA_ARRIVAL = 0.55; // Sudut azimuth Bulan saat intersepsi wahana
+    const LUNAR_INCLINATION = 5.14 * (Math.PI / 180);
+    const T_ARRIVAL = 345600;
+    const THETA_ARRIVAL = 0.55;
 
     function getMoonOrbitPosition(sec) {
       const theta = THETA_ARRIVAL - LUNAR_OMEGA * (T_ARRIVAL - sec);
@@ -725,17 +723,17 @@
       }
       const g = new THREE.BufferGeometry().setFromPoints(orbitPts);
       const m = new THREE.LineDashedMaterial({
-        color: 0xffffff, transparent: true, opacity: 0.16, dashSize: 4, gapSize: 3
+        color: 0xffffff, transparent: true, opacity: 0.18, dashSize: 4, gapSize: 3
       });
       const orbitLine = new THREE.Line(g, m);
       orbitLine.computeLineDistances();
       scene.add(orbitLine);
     })();
 
-    // Garis Vektor Koneksi Bumi-Bulan (Dinamis Berputar dengan Gerak Bulan)
+    // Garis Vektor Koneksi Bumi-Bulan
     const emLineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), getMoonOrbitPosition(0)]);
     const emLineMat = new THREE.LineDashedMaterial({
-      color: 0x00d4ff, transparent: true, opacity: 0.18, dashSize: 3, gapSize: 2
+      color: 0x00d4ff, transparent: true, opacity: 0.22, dashSize: 3, gapSize: 2
     });
     const emLine = new THREE.Line(emLineGeo, emLineMat);
     emLine.computeLineDistances();
@@ -777,15 +775,15 @@
     beaconGroup.position.copy(monsMoutonLocal);
 
     // Target needle
-    const needleGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.6, 8);
-    needleGeo.translate(0, 0.3, 0);
+    const needleGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.7, 8);
+    needleGeo.translate(0, 0.35, 0);
     const needleMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
     const needle = new THREE.Mesh(needleGeo, needleMat);
     needle.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), monsMoutonLocal.clone().normalize());
     beaconGroup.add(needle);
 
     // Pulsing radar ring
-    const ringGeo = new THREE.RingGeometry(0.12, 0.28, 32);
+    const ringGeo = new THREE.RingGeometry(0.12, 0.32, 32);
     const ringMat = new THREE.MeshBasicMaterial({ color: 0x00d4ff, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
     const radarRing = new THREE.Mesh(ringGeo, ringMat);
     radarRing.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), monsMoutonLocal.clone().normalize());
@@ -796,7 +794,6 @@
     // ═══════════════════════════════════════════
     // 6. LINTASAN 3D & WAHANA (TRAJECTORY & LANDER)
     // ═══════════════════════════════════════════
-    // Kurva Transfer Translunar (Earth -> Moon Intercept Point)
     const moonArrivalPos = getMoonOrbitPosition(T_ARRIVAL);
     const tliPoints = [];
     const tliSteps = 300;
@@ -809,7 +806,7 @@
     }
     const tliSpline = new THREE.CatmullRomCurve3(tliPoints);
 
-    // Kurva PDI Pendaratan Mons Mouton (Lokal relatif terhadap Bulan)
+    // Kurva PDI Pendaratan Mons Mouton
     const pdiLocalPoints = [];
     const pdiSteps = 100;
     const periluneLocal = new THREE.Vector3(0, -mR * 1.5, 2.5);
@@ -825,19 +822,17 @@
     // Garis Lintasan Penuh (Dashed Prediksi)
     const fullTrajGeo = new THREE.BufferGeometry().setFromPoints(tliPoints);
     const fullTrajMat = new THREE.LineDashedMaterial({
-      color: 0x00d4ff, transparent: true, opacity: 0.45, dashSize: 2, gapSize: 1.5
+      color: 0x00d4ff, transparent: true, opacity: 0.5, dashSize: 2.5, gapSize: 1.5
     });
     const fullTrajLine = new THREE.Line(fullTrajGeo, fullTrajMat);
     fullTrajLine.computeLineDistances();
     scene.add(fullTrajLine);
 
-    // Garis PDI Descent Arc di Moon Group (menempel langsung pada Bulan sehingga ikut bergerak)
+    // Garis PDI Descent Arc di Moon Group
     const pdiTrajGeo = new THREE.BufferGeometry().setFromPoints(pdiLocalPoints);
-    const pdiTrajMat = new THREE.LineBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.85, linewidth: 2 });
+    const pdiTrajMat = new THREE.LineBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.9, linewidth: 2 });
     const pdiLine = new THREE.Line(pdiTrajGeo, pdiTrajMat);
     moonGroup.add(pdiLine);
-    const pdiTrajMat = new THREE.LineBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.85, linewidth: 2 });
-    scene.add(new THREE.Line(pdiTrajGeo, pdiTrajMat));
 
     // Wahana Antariksa (Artemis Lander)
     const landerGroup = new THREE.Group();
@@ -863,7 +858,7 @@
     bell.position.y = -0.52;
     landerGroup.add(bell);
 
-    // Thruster Burn Flare (Additive Sprite seperti Fajrul)
+    // Thruster Burn Flare (Additive Sprite)
     let burnSprite;
     (() => {
       const c = document.createElement('canvas');
@@ -871,8 +866,8 @@
       const ctx = c.getContext('2d');
       const grad = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
       grad.addColorStop(0, 'rgba(255, 255, 255, 1.0)');
-      grad.addColorStop(0.2, 'rgba(0, 212, 255, 0.8)');
-      grad.addColorStop(0.5, 'rgba(0, 150, 255, 0.3)');
+      grad.addColorStop(0.2, 'rgba(0, 212, 255, 0.85)');
+      grad.addColorStop(0.5, 'rgba(0, 150, 255, 0.35)');
       grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 128, 128);
@@ -892,14 +887,11 @@
     let isPlaying = false;
     let timeMultiplier = 1;
     let cameraMode = 'overview';
-    let targetCameraPos = null;
-    let targetCameraLook = null;
 
     const LAUNCH_EPOCH = new Date("2026-11-10T12:00:00Z").getTime();
     const TOTAL_SECONDS = 96.2 * 3600; // 346,320 detik
 
     function getSimState(p) {
-      // p: 0 s/d 10000
       const fraction = p / 10000;
       const currentSeconds = fraction * TOTAL_SECONDS;
       const date = new Date(LAUNCH_EPOCH + currentSeconds * 1000);
@@ -915,7 +907,7 @@
       let phaseDesc = "";
       let isBurn = false;
 
-      // 1. LEO (0 - 1000 = 0 s/d 9.6 jam)
+      // 1. LEO (0 - 1000)
       if (p < 1000) {
         const u = p / 1000;
         const ang = u * Math.PI * 4;
@@ -1021,11 +1013,11 @@
       simProgress = Math.max(0, Math.min(10000, p));
       const state = getSimState(simProgress);
 
-      // Update Posisi Fisik Orbit Bulan Mengitari Bumi (Real Orbital Mechanics)
+      // Update Posisi Fisik Orbit Bulan Mengitari Bumi
       const moonPosNow = getMoonOrbitPosition(state.currentSeconds);
       moonGroup.position.copy(moonPosNow);
       moonMesh.lookAt(moonGroup.worldToLocal(new THREE.Vector3(0, 0, 0)));
-      moonMesh.rotateY(Math.PI); // Tidal locking (sisi dekat selalu menghadap Bumi)
+      moonMesh.rotateY(Math.PI);
 
       // Update Garis Vektor Koneksi Bumi-Bulan
       emLine.geometry.dispose();
@@ -1096,7 +1088,7 @@
     // ═══════════════════════════════════════════
     // 8. CAMERA PRESETS & LERP
     // ═══════════════════════════════════════════
-    window.setCamera = (mode) => {
+    function setCamera(mode) {
       cameraMode = mode;
       document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
       const btn = document.getElementById(`btn-cam-${mode}`);
@@ -1104,31 +1096,31 @@
 
       if (mode === 'overview') {
         const mid = getMoonOrbitPosition(T_ARRIVAL).clone().multiplyScalar(0.45);
-        targetCameraPos = new THREE.Vector3(mid.x + 80, 100, mid.z + 160);
-        targetCameraLook = new THREE.Vector3(mid.x, 0, mid.z);
+        targetLook.set(mid.x, 0, mid.z);
+        targetSpherical.radius = 420;
+        targetSpherical.theta = 0.85;
+        targetSpherical.phi = 1.15;
       } else if (mode === 'earth') {
-        targetCameraPos = new THREE.Vector3(0, eR * 2.5, eR * 4.2);
-        targetCameraLook = earthGroup.position.clone();
+        targetLook.set(0, 0, 0);
+        targetSpherical.radius = 75;
+        targetSpherical.theta = 0.6;
+        targetSpherical.phi = 1.2;
       } else if (mode === 'moon') {
-        const mp = moonGroup.position;
-        targetCameraPos = new THREE.Vector3(mp.x, mp.y + mR * 3.5, mp.z + mR * 4.5);
-        targetCameraLook = mp.clone();
+        targetLook.copy(moonGroup.position);
+        targetSpherical.radius = 28;
+        targetSpherical.theta = 0.8;
+        targetSpherical.phi = 1.2;
       } else if (mode === 'lander') {
-        const lp = landerGroup.position.clone();
-        targetCameraPos = lp.clone().add(new THREE.Vector3(3, 2, 4));
-        targetCameraLook = lp;
+        targetLook.copy(landerGroup.position);
+        targetSpherical.radius = 12;
       } else if (mode === 'mons') {
         const mp = moonGroup.position.clone().add(monsMoutonLocal);
-        targetCameraPos = mp.clone().add(new THREE.Vector3(0.8, 1.2, 1.2));
-        targetCameraLook = mp;
+        targetLook.copy(mp);
+        targetSpherical.radius = 6;
+        targetSpherical.phi = 1.35;
       }
-    };
-
-    // User interaction exits locked target
-    renderer.domElement.addEventListener('pointerdown', () => {
-      targetCameraPos = null;
-      targetCameraLook = null;
-    });
+    }
+    window.setCamera = setCamera;
 
     // ═══════════════════════════════════════════
     // 9. CONTROLS & TIMELINE LISTENERS
@@ -1139,7 +1131,6 @@
     });
 
     function togglePlay() {
-      // Jika sudah di ujung akhir simulasi (Touchdown), putar ulang dari awal
       if (simProgress >= 10000) {
         simProgress = 0;
       }
@@ -1151,7 +1142,6 @@
         btn.style.borderColor = isPlaying ? "#00d4ff" : "rgba(255, 255, 255, 0.3)";
         btn.title = isPlaying ? "Jeda Simulasi (Spasi)" : "Putar Simulasi (Spasi)";
       }
-      console.log("Status playback simulator:", isPlaying ? "BERJALAN" : "DIJEDA");
     }
     window.togglePlay = togglePlay;
 
@@ -1173,21 +1163,23 @@
       }
     });
 
-    window.setSpeed = (spd) => {
+    function setSpeed(spd) {
       timeMultiplier = spd;
       document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
       const btn = document.getElementById(`spd-${spd}`);
       if (btn) btn.classList.add('active');
-    };
+    }
+    window.setSpeed = setSpeed;
 
-    window.jumpTo = (val) => {
+    function jumpTo(val) {
       updateSimulation(val);
       if (val === 0) setCamera('earth');
       else if (val === 1000) setCamera('earth');
       else if (val === 4500) setCamera('overview');
       else if (val === 8800) setCamera('moon');
       else if (val >= 9600) setCamera('mons');
-    };
+    }
+    window.jumpTo = jumpTo;
 
     // ═══════════════════════════════════════════
     // 10. RENDER LOOP
@@ -1200,7 +1192,6 @@
       lastTime = time;
 
       if (isPlaying) {
-        // Base speed: 10000 units in 96.2 seconds at 1x
         const advanceRate = (10000 / TOTAL_SECONDS) * 35 * timeMultiplier;
         simProgress += advanceRate * delta;
         if (simProgress >= 10000) {
@@ -1216,28 +1207,36 @@
         updateSimulation(simProgress);
       }
 
-      // Smooth camera lerping & dynamic tracking
-      if (targetCameraPos && targetCameraLook) {
-        camera.position.lerp(targetCameraPos, 0.05);
-        controls.target.lerp(targetCameraLook, 0.05);
-      } else if (cameraMode === 'moon') {
-        controls.target.copy(moonGroup.position);
+      // Smooth Camera Damping (Inersia halus)
+      camSpherical.radius += (targetSpherical.radius - camSpherical.radius) * 0.08;
+      camSpherical.theta += (targetSpherical.theta - camSpherical.theta) * 0.08;
+      camSpherical.phi += (targetSpherical.phi - camSpherical.phi) * 0.08;
+
+      if (cameraMode === 'moon') {
+        targetLook.copy(moonGroup.position);
       } else if (cameraMode === 'mons') {
         const mp = moonGroup.position.clone().add(monsMoutonLocal);
-        controls.target.copy(mp);
+        targetLook.copy(mp);
       } else if (cameraMode === 'lander') {
-        controls.target.copy(landerGroup.position);
+        targetLook.copy(landerGroup.position);
       }
 
-      controls.update();
-      composer.render();
+      camTarget.lerp(targetLook, 0.08);
+
+      const cx = camTarget.x + camSpherical.radius * Math.sin(camSpherical.phi) * Math.sin(camSpherical.theta);
+      const cy = camTarget.y + camSpherical.radius * Math.cos(camSpherical.phi);
+      const cz = camTarget.z + camSpherical.radius * Math.sin(camSpherical.phi) * Math.cos(camSpherical.theta);
+
+      camera.position.set(cx, cy, cz);
+      camera.lookAt(camTarget);
+
+      renderer.render(scene, camera);
     }
 
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
-      composer.setSize(window.innerWidth, window.innerHeight);
     });
 
     // Inisialisasi awal
