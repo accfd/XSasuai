@@ -153,10 +153,18 @@
               </div>
             </div>
           </div>
+
+          <!-- Tombol Lanjut ke Alur Kerja 3 Tahap -->
+          <div style="text-align: center; margin-top: 28px;">
+            <button onclick="scrollToWorkflow()" style="display: inline-flex; align-items: center; gap: 8px; background: var(--bg-surface); border: 1.5px solid var(--border-subtle); color: var(--text-primary); padding: 10px 24px; border-radius: 999px; font-size: 13.5px; font-weight: 700; cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow-sm);" onmouseover="this.style.borderColor='var(--artemis-blue)'; this.style.color='var(--artemis-blue)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='var(--border-subtle)'; this.style.color='var(--text-primary)'; this.style.transform='translateY(0)';">
+              <span>Lanjut ke Alur Kerja 3 Tahap Penyelesaian</span>
+              <span style="font-size: 14px;">&darr;</span>
+            </button>
+          </div>
         </div>
 
         <!-- Bagian 2: Tiga Tahap Alur Kerja -->
-        <div style="text-align: left; margin-bottom: 40px;">
+        <div id="section-workflow" style="text-align: left; margin-bottom: 40px; padding-top: 24px;">
           <div style="margin-bottom: 24px; text-align: center;">
             <h2 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0 0 6px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
               <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--artemis-blue);"></span>
@@ -168,18 +176,18 @@
 
             <!-- Alur 3 Tahap: Rekomendasi -> Visualisasi -> Simulasi -->
             <div style="display: inline-flex; align-items: center; justify-content: center; gap: 12px; background: var(--bg-surface); padding: 8px 20px; border-radius: var(--radius-pill); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); flex-wrap: wrap;">
-              <span style="font-size: 12px; font-weight: 800; color: var(--artemis-blue); display: inline-flex; align-items: center; gap: 6px;">
-                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--artemis-blue);"></span>
+              <span style="font-size: 12px; font-weight: 800; color: #b91c1c; display: inline-flex; align-items: center; gap: 6px;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #b91c1c;"></span>
                 Rekomendasi
               </span>
-              <span style="color: var(--artemis-blue); font-size: 15px; font-weight: 900;">&rarr;</span>
-              <span style="font-size: 12px; font-weight: 800; color: var(--emerald-safe); display: inline-flex; align-items: center; gap: 6px;">
-                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--emerald-safe);"></span>
+              <span style="color: #b91c1c; font-size: 15px; font-weight: 900;">&rarr;</span>
+              <span style="font-size: 12px; font-weight: 800; color: #b45309; display: inline-flex; align-items: center; gap: 6px;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #b45309;"></span>
                 Visualisasi
               </span>
-              <span style="color: var(--emerald-safe); font-size: 15px; font-weight: 900;">&rarr;</span>
-              <span style="font-size: 12px; font-weight: 800; color: #0284c7; display: inline-flex; align-items: center; gap: 6px;">
-                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #0284c7;"></span>
+              <span style="color: #b45309; font-size: 15px; font-weight: 900;">&rarr;</span>
+              <span style="font-size: 12px; font-weight: 800; color: #1d4ed8; display: inline-flex; align-items: center; gap: 6px;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #1d4ed8;"></span>
                 Simulasi
               </span>
             </div>
@@ -187,17 +195,17 @@
 
           <!-- 3 Cards dengan Panah Penghubung -->
           <div class="workflow-cards-wrapper">
-            <!-- Tahap 1: Rekomendasi -->
-            <div class="workflow-card-item interactive-card" onclick="switchView('rekomendasi'); playAvionicBeep(640, 'sine');" style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid var(--artemis-blue); border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);" title="Klik untuk membuka Langkah 1: Rekomendasi">
+            <!-- Tahap 1: Rekomendasi (Matching Masalah 1: Merah/Coral) -->
+            <div class="workflow-card-item interactive-card" onclick="switchView('rekomendasi'); playAvionicBeep(640, 'sine');" style="background: #fffafa; border: 1px solid #fecaca; border-top: 4px solid #b91c1c; border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);" title="Klik untuk membuka Langkah 1: Rekomendasi">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                  <span class="step-badge" style="background: var(--artemis-blue); color: #ffffff; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 1</span>
-                  <span style="font-size: 11px; font-weight: 700; color: #b91c1c; font-style: italic;">Solusi untuk Masalah 1</span>
+                  <span class="step-badge" style="background: #b91c1c; color: #ffffff; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 1</span>
+                  <span style="font-size: 11px; font-weight: 700; color: #991b1b; font-style: italic;">Solusi untuk Masalah 1</span>
                 </div>
                 <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
                   TAHAP 1 — Menentukan Waktu Pendaratan
                 </h3>
-                <div style="font-size: 12px; font-weight: 700; color: var(--artemis-blue); margin-bottom: 10px;">
+                <div style="font-size: 12px; font-weight: 700; color: #b91c1c; margin-bottom: 10px;">
                   Mesin Rekomendasi (MCDA Engine)
                 </div>
                 <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 14px;">
@@ -208,7 +216,7 @@
                 </p>
               </div>
               <div style="margin-top: 14px;">
-                <div class="action-hint" style="font-size: 11.5px; font-weight: 800; color: var(--artemis-blue);">
+                <div class="action-hint" style="font-size: 11.5px; font-weight: 800; color: #b91c1c;">
                   BUKA MESIN REKOMENDASI &rarr;
                 </div>
               </div>
@@ -217,21 +225,21 @@
             <!-- Panah Penghubung: Tahap 1 -> Tahap 2 -->
             <div class="flow-arrow-divider">
               <div class="arrow-circle" title="Lanjut ke Visualisasi">
-                <span class="arrow-icon" style="color: var(--artemis-blue); font-size: 16px; font-weight: 900;">&rarr;</span>
+                <span class="arrow-icon" style="color: #b91c1c; font-size: 16px; font-weight: 900;">&rarr;</span>
               </div>
             </div>
 
-            <!-- Tahap 2: Visualisasi -->
-            <div class="workflow-card-item interactive-card" onclick="switchView('visualisasi'); playAvionicBeep(720, 'sine');" style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid var(--emerald-safe); border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);" title="Klik untuk membuka Langkah 2: Visualisasi Topografi">
+            <!-- Tahap 2: Visualisasi (Matching Masalah 2: Amber/Gold) -->
+            <div class="workflow-card-item interactive-card" onclick="switchView('visualisasi'); playAvionicBeep(720, 'sine');" style="background: #fffdf5; border: 1px solid #fde68a; border-top: 4px solid #b45309; border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);" title="Klik untuk membuka Langkah 2: Visualisasi Topografi">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                  <span class="step-badge" style="background: var(--emerald-safe); color: #ffffff; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 2</span>
-                  <span style="font-size: 11px; font-weight: 700; color: #b45309; font-style: italic;">Solusi untuk Masalah 2</span>
+                  <span class="step-badge" style="background: #b45309; color: #ffffff; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 2</span>
+                  <span style="font-size: 11px; font-weight: 700; color: #92400e; font-style: italic;">Solusi untuk Masalah 2</span>
                 </div>
                 <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
                   TAHAP 2 — Memeriksa Kondisi Permukaan
                 </h3>
-                <div style="font-size: 12px; font-weight: 700; color: var(--emerald-safe); margin-bottom: 10px;">
+                <div style="font-size: 12px; font-weight: 700; color: #b45309; margin-bottom: 10px;">
                   Visualisasi Topografi (2D, 3D, dan Horizon)
                 </div>
                 <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 14px;">
@@ -242,7 +250,7 @@
                 </p>
               </div>
               <div style="margin-top: 14px;">
-                <div class="action-hint" style="font-size: 11.5px; font-weight: 800; color: var(--emerald-safe);">
+                <div class="action-hint" style="font-size: 11.5px; font-weight: 800; color: #b45309;">
                   BUKA VISUALISASI 2D/3D &rarr;
                 </div>
               </div>
@@ -251,21 +259,21 @@
             <!-- Panah Penghubung: Tahap 2 -> Tahap 3 -->
             <div class="flow-arrow-divider">
               <div class="arrow-circle" title="Lanjut ke Simulasi">
-                <span class="arrow-icon" style="color: var(--emerald-safe); font-size: 16px; font-weight: 900;">&rarr;</span>
+                <span class="arrow-icon" style="color: #b45309; font-size: 16px; font-weight: 900;">&rarr;</span>
               </div>
             </div>
 
-            <!-- Tahap 3: Simulasi -->
-            <div class="workflow-card-item interactive-card" onclick="switchView('simulasi'); playAvionicBeep(800, 'sine');" style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid #0284c7; border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);" title="Klik untuk membuka Langkah 3: Simulasi Penerbangan">
+            <!-- Tahap 3: Simulasi (Matching Masalah 3: Biru/Navy) -->
+            <div class="workflow-card-item interactive-card" onclick="switchView('simulasi'); playAvionicBeep(800, 'sine');" style="background: #f8faff; border: 1px solid #bfdbfe; border-top: 4px solid #1d4ed8; border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);" title="Klik untuk membuka Langkah 3: Simulasi Penerbangan">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                  <span class="step-badge" style="background: #0284c7; color: #ffffff; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 3</span>
-                  <span style="font-size: 11px; font-weight: 700; color: #1d4ed8; font-style: italic;">Solusi untuk Masalah 3</span>
+                  <span class="step-badge" style="background: #1d4ed8; color: #ffffff; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 3</span>
+                  <span style="font-size: 11px; font-weight: 700; color: #1e40af; font-style: italic;">Solusi untuk Masalah 3</span>
                 </div>
                 <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
                   TAHAP 3 — Menguji Proses Pendaratan
                 </h3>
-                <div style="font-size: 12px; font-weight: 700; color: #0284c7; margin-bottom: 10px;">
+                <div style="font-size: 12px; font-weight: 700; color: #1d4ed8; margin-bottom: 10px;">
                   Simulasi Penerbangan (6-DOF Flight Dynamics)
                 </div>
                 <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 14px;">
@@ -276,7 +284,7 @@
                 </p>
               </div>
               <div style="margin-top: 14px;">
-                <div class="action-hint" style="font-size: 11.5px; font-weight: 800; color: #0284c7;">
+                <div class="action-hint" style="font-size: 11.5px; font-weight: 800; color: #1d4ed8;">
                   LUNCURKAN SIMULATOR 3D &rarr;
                 </div>
               </div>

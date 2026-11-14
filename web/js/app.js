@@ -208,6 +208,12 @@
       }
     }
 
+    function scrollToWorkflow() {
+      playAvionicBeep(680, 'sine');
+      const elem = document.getElementById("section-workflow");
+      if (elem) elem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
     function toggleHomeGlobeRotation() {
       homeMoonRotating = !homeMoonRotating;
       const btn = document.getElementById("btn-home-rotate");
