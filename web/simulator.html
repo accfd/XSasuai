@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Xesuai — Artemis III Lunar Landing Mission Simulator</title>
+<title>SpaceX Starship HLS — Artemis III Lunar Landing Simulator</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
@@ -610,9 +610,9 @@ body:active { cursor: grabbing; }
 
 <!-- Header -->
 <div id="header">
-  <div class="logo-text">NASA SPACE APPS 2026 · ARTEMIS III LUNAR LANDING NAVIGATOR</div>
-  <div class="mission-title">XESUAI MISSION SIMULATOR</div>
-  <div class="subtitle-link" style="color: #38bdf8; letter-spacing: 2px;">MONS MOUTON SOUTH POLE DESCENT (-84.9°S, 33.3°W)</div>
+  <div class="logo-text">SPACEX STARSHIP HLS · NASA ARTEMIS III LUNAR LANDING</div>
+  <div class="mission-title">STARSHIP TO THE MOON</div>
+  <div class="subtitle-link" style="color: #00f0ff; letter-spacing: 2.5px;">MONS MOUTON SOUTH POLE DESCENT · (-84.9°S, 33.3°W)</div>
 </div>
 
 <!-- Back to Console link -->
@@ -653,6 +653,14 @@ body:active { cursor: grabbing; }
   <div class="stat-card">
     <div class="stat-label">G-Force (Astronaut)</div>
     <div class="stat-value"><span id="val-gforce">1.00</span><span class="stat-unit">G</span></div>
+  </div>
+  <div class="stat-card" style="border-color: rgba(0,240,255,0.3); background: linear-gradient(135deg, rgba(0,30,50,0.85), rgba(0,15,30,0.7));">
+    <div class="stat-label" style="color: #00f0ff;">SpaceX Starship HLS</div>
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #a0ecff; line-height: 1.6;">
+      <div>STATUS: <span id="val-hls-status" style="color:#00ffaa; font-weight:700;">ACTIVE</span></div>
+      <div>THRUSTER: <span id="val-hls-throttle">78% THROTTLE</span></div>
+      <div>TERRAIN: <span style="color:#facc15;">MONS MOUTON</span></div>
+    </div>
   </div>
 </div>
 
@@ -1219,7 +1227,126 @@ let showManeuvers = false;
 // ═══════════════════════════════════════════
 // ORION SPACECRAFT
 // ═══════════════════════════════════════════
+// ═══════════════════════════════════════════
+// SPACEX STARSHIP HLS (HUMAN LANDING SYSTEM)
+// Reference: https://www.spacex.com/humanspaceflight/moon
+// ═══════════════════════════════════════════
+function createStarshipHLS() {
+  const hls = new THREE.Group();
+
+  // Stainless Steel Material (High reflectivity)
+  const steelMat = new THREE.MeshStandardMaterial({
+    color: 0xdddddd,
+    roughness: 0.2,
+    metalness: 0.92,
+    emissive: 0x111118,
+    emissiveIntensity: 0.15
+  });
+
+  // White Ceramic Heatshield & Nosecone Accents
+  const whiteMat = new THREE.MeshStandardMaterial({
+    color: 0xf5f5fa,
+    roughness: 0.35,
+    metalness: 0.4
+  });
+
+  // Dark Solar / Window Accents
+  const glassMat = new THREE.MeshStandardMaterial({
+    color: 0x00f0ff,
+    roughness: 0.1,
+    metalness: 0.9,
+    emissive: 0x00a0cc,
+    emissiveIntensity: 0.5
+  });
+
+  // 1. Main Fuselage Cylinder (Diameter 9m, Height 32m in scale)
+  const bodyRadius = 0.0016;
+  const bodyHeight = 0.0055;
+  const bodyGeo = new THREE.CylinderGeometry(bodyRadius, bodyRadius, bodyHeight, 32);
+  const bodyMesh = new THREE.Mesh(bodyGeo, steelMat);
+  bodyMesh.position.y = bodyHeight * 0.5;
+  hls.add(bodyMesh);
+
+  // 2. Aerodynamic Nosecone (Crew Cabin + Airlock)
+  const noseHeight = 0.0035;
+  const noseGeo = new THREE.ConeGeometry(bodyRadius, noseHeight, 32);
+  const noseMesh = new THREE.Mesh(noseGeo, whiteMat);
+  noseMesh.position.y = bodyHeight + noseHeight * 0.5;
+  hls.add(noseMesh);
+
+  // 3. Crew Observation Windows
+  const winGeo = new THREE.BoxGeometry(0.0006, 0.0004, 0.0002);
+  const winMesh = new THREE.Mesh(winGeo, glassMat);
+  winMesh.position.set(0, bodyHeight + noseHeight * 0.35, bodyRadius * 0.85);
+  hls.add(winMesh);
+
+  // 4. Solar Band (Mid-body ring)
+  const solarGeo = new THREE.CylinderGeometry(bodyRadius * 1.01, bodyRadius * 1.01, 0.0008, 32);
+  const solarMat = new THREE.MeshStandardMaterial({ color: 0x112233, roughness: 0.5, metalness: 0.8 });
+  const solarMesh = new THREE.Mesh(solarGeo, solarMat);
+  solarMesh.position.y = bodyHeight * 0.72;
+  hls.add(solarMesh);
+
+  // 5. High-Mounted Landing Thrusters (4 Mid-Body Pods for Lunar Touchdown)
+  const thrusterGeo = new THREE.BoxGeometry(0.0004, 0.0004, 0.0004);
+  const thrusterMat = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.8 });
+  hls.thrusterPlumes = [];
+
+  for (let i = 0; i < 4; i++) {
+    const angle = (i * Math.PI) / 2;
+    const px = Math.cos(angle) * (bodyRadius + 0.00015);
+    const pz = Math.sin(angle) * (bodyRadius + 0.00015);
+    const pod = new THREE.Mesh(thrusterGeo, thrusterMat);
+    pod.position.set(px, bodyHeight * 0.65, pz);
+    hls.add(pod);
+
+    // Dynamic Landing Plasma Exhaust Plume
+    const plumeGeo = new THREE.ConeGeometry(0.00035, 0.0018, 16);
+    const plumeMat = new THREE.MeshBasicMaterial({
+      color: 0x00f0ff,
+      transparent: true,
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending
+    });
+    const plume = new THREE.Mesh(plumeGeo, plumeMat);
+    plume.position.set(px, bodyHeight * 0.65 - 0.001, pz);
+    plume.rotation.x = Math.PI; // Firing downward
+    plume.visible = false;
+    hls.add(plume);
+    hls.thrusterPlumes.push(plume);
+  }
+
+  // 6. Lunar Landing Legs (4 Wide Stance Deployable Legs with Footpads)
+  const legMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3, metalness: 0.7 });
+  for (let i = 0; i < 4; i++) {
+    const angle = (i * Math.PI) / 2 + Math.PI / 4;
+    const legArmGeo = new THREE.CylinderGeometry(0.0001, 0.00012, 0.0022, 8);
+    const legArm = new THREE.Mesh(legArmGeo, legMat);
+    
+    // Position leg extending outwards and downwards from aft skirt
+    const lx = Math.cos(angle) * (bodyRadius + 0.0008);
+    const lz = Math.sin(angle) * (bodyRadius + 0.0008);
+    legArm.position.set(lx, 0.0002, lz);
+    legArm.rotation.z = Math.cos(angle) * 0.45;
+    legArm.rotation.x = -Math.sin(angle) * 0.45;
+    hls.add(legArm);
+
+    // Footpad
+    const padGeo = new THREE.CylinderGeometry(0.00045, 0.0005, 0.00015, 12);
+    const pad = new THREE.Mesh(padGeo, legMat);
+    pad.position.set(lx * 1.35, -0.0008, lz * 1.35);
+    hls.add(pad);
+  }
+
+  // Center pivot at base of landing legs
+  hls.position.y = 0.0008;
+  return hls;
+}
+
+const starshipHLS = createStarshipHLS();
+
 const orionGroup = new THREE.Group();
+orionGroup.add(starshipHLS);
 let orionMesh = null;
 
 // Load STL model
@@ -1601,6 +1728,9 @@ function animate() {
     const dMoonKm = Math.max(0, orionKm.clone().sub(moonKm).length() - MOON_RADIUS_KM);
     currentAlt = dMoonKm;
 
+    if (starshipHLS.thrusterPlumes) {
+      starshipHLS.thrusterPlumes.forEach(p => { p.visible = false; });
+    }
     if (simDay < 1.05) currentPhaseStr = "Earth Parking Orbit (LEO)";
     else if (simDay < 1.15) currentPhaseStr = "Trans-Lunar Injection (TLI)";
     else if (simDay < 4.85) currentPhaseStr = "Translunar Coast Phase";
@@ -1638,6 +1768,20 @@ function animate() {
     currentFuelPct = pt.fuel_pct;
     currentG = pt.g_force;
     currentPhaseStr = pt.phase;
+
+    // Animate Starship HLS Methalox Landing Thruster Plumes
+    const isBurning = (pt.throttle_pct > 5.0 && pt.alt_m > 0.5);
+    if (starshipHLS.thrusterPlumes) {
+      starshipHLS.thrusterPlumes.forEach(plume => {
+        plume.visible = isBurning;
+        if (isBurning) {
+          const throttle = pt.throttle_pct / 100.0;
+          const flicker = 0.85 + 0.3 * Math.sin(now * 0.03);
+          plume.scale.set(flicker, flicker * throttle, flicker);
+          plume.material.opacity = 0.7 + 0.3 * throttle;
+        }
+      });
+    }
 
     orionKm = orionSc.clone().multiplyScalar(1 / SCALE);
   }
@@ -1764,6 +1908,19 @@ function animate() {
     document.getElementById('val-fuel').textContent = currentFuel.toFixed(1);
     document.getElementById('val-fuel-pct').textContent = currentFuelPct.toFixed(1);
     document.getElementById('val-gforce').textContent = currentG.toFixed(2);
+    const hlsStatusEl = document.getElementById('val-hls-status');
+    const hlsThrotEl = document.getElementById('val-hls-throttle');
+    if (hlsStatusEl && hlsThrotEl) {
+      if (pt.alt_m <= 0.1) {
+        hlsStatusEl.textContent = "TOUCHDOWN (SAFE)";
+        hlsStatusEl.style.color = "#00ffaa";
+        hlsThrotEl.textContent = "ENGINES CUT OFF";
+      } else {
+        hlsStatusEl.textContent = "POWERED DESCENT";
+        hlsStatusEl.style.color = "#00f0ff";
+        hlsThrotEl.textContent = `${pt.throttle_pct.toFixed(0)}% THRUST (${pt.pitch_deg.toFixed(0)}° PITCH)`;
+      }
+    }
   }
 
   composer.render();
