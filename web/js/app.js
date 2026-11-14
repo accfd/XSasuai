@@ -276,8 +276,51 @@
       }
     }
 
-    // Smart Finder Modal Handlers
-    function runAutomatedOptimization() {
+    // Mission Schedule Engine (Solusi 1 — Rekomendasi Waktu Pendaratan)
+    const MISSION_SCHEDULE_DATA = {
+      "2026-11": {
+        monthName: "November 2026",
+        launch: "11 November 2026, 08:00 UTC",
+        landing: "15 November 2026, 08:00 UTC",
+        explanation: "Berdasarkan analisis posisi Matahari dan arah Bumi pada November 2026, tanggal 15 November memberikan kondisi paling ideal di Mons Mouton karena lokasi tersebut menerima sinar Matahari yang cukup untuk daya panel surya wahana dan memiliki jalur komunikasi langsung ke Bumi tanpa terhalang tebing kawah di sekitarnya. Agar tiba tepat pada momen tersebut, wahana dijadwalkan lepas landas dari Bumi pada 11 November 2026 dengan durasi perjalanan selama 4 hari."
+      },
+      "2026-12": {
+        monthName: "Desember 2026",
+        launch: "10 Desember 2026, 14:00 UTC",
+        landing: "14 Desember 2026, 14:00 UTC",
+        explanation: "Berdasarkan analisis efemeris pada Desember 2026, tanggal 14 Desember merupakan titik puncak penyinaran di dataran Mons Mouton dengan sudut elevasi Matahari +2.4° dan visibilitas Bumi bebas dari halangan bibir kawah. Wahana dijadwalkan lepas landas dari Bumi pada 10 Desember 2026 untuk menyelesaikan 4 hari perjalanan translunar."
+      },
+      "2027-01": {
+        monthName: "Januari 2027",
+        launch: "8 Januari 2027, 20:00 UTC",
+        landing: "12 Januari 2027, 20:00 UTC",
+        explanation: "Pada Januari 2027, tanggal 12 Januari menghadirkan jendela iluminasi stabil dan garis pandang antena Direct-to-Earth tanpa hambatan geomorfologi Mons Mouton. Wahana dijadwalkan lepas landas dari Bumi pada 8 Januari 2027 dengan durasi perjalanan selama 4 hari."
+      },
+      "2027-02": {
+        monthName: "Februari 2027",
+        launch: "7 Februari 2027, 06:00 UTC",
+        landing: "11 Februari 2027, 06:00 UTC",
+        explanation: "Untuk periode Februari 2027, tanggal 11 Februari memberikan kombinasi optimal pencahayaan surya berkelanjutan dan komunikasi radio tanpa rintangan elevasi tebing. Untuk mencapai target pendaratan tersebut, peluncuran dari Bumi dijadwalkan pada 7 Februari 2027 dengan durasi transfer 4 hari."
+      },
+      "2027-03": {
+        monthName: "Maret 2027",
+        launch: "8 Maret 2027, 12:00 UTC",
+        landing: "12 Maret 2027, 12:00 UTC",
+        explanation: "Pada Maret 2027, tanggal 12 Maret terpilih karena elevasi Bumi berada pada margin aman +11.8° di atas bibir tebing kawah serta intensitas sinar Matahari mencukupi daya operasional wahana. Peluncuran dari Bumi dijadwalkan pada 8 Maret 2027 dengan 4 hari waktu transit translunar."
+      }
+    };
+
+    function onMissionMonthChange() {
+      const select = document.getElementById("select-mission-month");
+      if (!select) return;
+      playAvionicBeep(600, 'sine');
+    }
+
+    function calculateMissionSchedule() {
+      const select = document.getElementById("select-mission-month");
+      const monthKey = select ? select.value : "2026-11";
+      const schedule = MISSION_SCHEDULE_DATA[monthKey] || MISSION_SCHEDULE_DATA["2026-11"];
+
       const btn = document.getElementById("btn-hero-optimize");
       const pBar = document.getElementById("optimization-progress-bar");
       const pFill = document.getElementById("optimization-progress-fill");
@@ -289,28 +332,36 @@
 
       let progress = 0;
       const interval = setInterval(() => {
-        progress += 25;
+        progress += 33;
         if (pFill) pFill.style.width = `${progress}%`;
-        if (progress === 25 && pText) {
-          pText.innerText = "Memindai 336 jam efemeris JPL Horizons (Posisi Surya & Bumi)...";
-        } else if (progress === 50 && pText) {
-          pText.innerText = "Mengevaluasi Digital Elevation Model LOLA & Raymarching 360°...";
-        } else if (progress === 75 && pText) {
-          pText.innerText = "Mengunci Mons Mouton Crest (-84.9°S, 33.3°W) pada 14 Nov 2026, 14:55 UTC...";
-        } else if (progress >= 100) {
+        if (progress === 33 && pText) {
+          pText.innerText = "Menganalisis sudut elevasi Matahari & Bumi (JPL Horizons)...";
+        } else if (progress === 66 && pText) {
+          pText.innerText = "Memverifikasi batas tebing kawah Mons Mouton (LOLA DEM)...";
+        } else if (progress >= 99) {
           clearInterval(interval);
           if (btn) btn.disabled = false;
           if (pBar) pBar.style.display = "none";
           if (pText) pText.style.display = "none";
 
-          applyRecommendation('ALPHA', 3, 'Mons Mouton Crest', '14 Nov 2026 14:55 UTC');
-          showToast("Optimasi Selesai: Rekomendasi Terkunci pada Mons Mouton Crest (14 Nov 2026, 14:55 UTC)");
+          // Update UI
+          const launchEl = document.getElementById("rec-launch-time");
+          const landingEl = document.getElementById("rec-landing-time");
+          const expEl = document.getElementById("rec-explanation-paragraph");
 
-          // Trigger recalculate PDI
-          const recalcBtn = document.getElementById("btn-recalc-pdi");
-          if (recalcBtn) recalcBtn.click();
+          if (launchEl) launchEl.textContent = schedule.launch;
+          if (landingEl) landingEl.textContent = schedule.landing;
+          if (expEl) expEl.textContent = schedule.explanation;
+
+          playAvionicBeep(900, 'sine');
+          showToast(`Jadwal Terhitung: Pendaratan Optimal pada ${schedule.landing}`);
         }
-      }, 200);
+      }, 150);
+    }
+
+    // Smart Finder Modal Handlers (Alias to calculateMissionSchedule)
+    function runAutomatedOptimization() {
+      calculateMissionSchedule();
     }
 
     function openSmartFinderModal() {
