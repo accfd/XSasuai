@@ -1805,18 +1805,12 @@ function animate() {
   document.getElementById('dist-earth').textContent = formatKm(dEarth);
   document.getElementById('dist-moon').textContent = formatKm(dMoon);
 
-  if (simDay < PDI_START_DAY) {
-    document.getElementById('val-altitude').textContent = formatKm(currentAlt);
-    document.getElementById('unit-altitude').textContent = 'km';
-    document.getElementById('velocity').textContent = currentVel.toFixed(2);
-    document.getElementById('unit-velocity').textContent = 'km/s';
-    document.getElementById('val-fuel').textContent = '450.0';
-    document.getElementById('val-fuel-pct').textContent = '100.0';
-    document.getElementById('val-gforce').textContent = '0.00';
-  } else {
-    document.getElementById('val-altitude').textContent = currentAlt.toLocaleString('en-US');
+  if (isPDIPhase) {
+    const altM = Math.round(currentAlt * 1000);
+    const velMs = (currentVel * 1000).toFixed(1);
+    document.getElementById('val-altitude').textContent = altM.toLocaleString('en-US');
     document.getElementById('unit-altitude').textContent = 'm';
-    document.getElementById('velocity').textContent = currentVel.toFixed(1);
+    document.getElementById('velocity').textContent = velMs;
     document.getElementById('unit-velocity').textContent = 'm/s';
     document.getElementById('val-fuel').textContent = currentFuel.toFixed(1);
     document.getElementById('val-fuel-pct').textContent = currentFuelPct.toFixed(1);
@@ -1824,15 +1818,30 @@ function animate() {
     const hlsStatusEl = document.getElementById('val-hls-status');
     const hlsThrotEl = document.getElementById('val-hls-throttle');
     if (hlsStatusEl && hlsThrotEl) {
-      if (pt.alt_m <= 0.1) {
+      if (currentAlt <= 0.001) {
         hlsStatusEl.textContent = "TOUCHDOWN (SAFE)";
         hlsStatusEl.style.color = "#00ffaa";
         hlsThrotEl.textContent = "ENGINES CUT OFF";
       } else {
         hlsStatusEl.textContent = "POWERED DESCENT";
         hlsStatusEl.style.color = "#00f0ff";
-        hlsThrotEl.textContent = `${pt.throttle_pct.toFixed(0)}% THRUST (${pt.pitch_deg.toFixed(0)}° PITCH)`;
+        hlsThrotEl.textContent = `${(mPoint.throttle_pct || 0).toFixed(0)}% THRUST (${(mPoint.pitch_deg || 0).toFixed(0)}° PITCH)`;
       }
+    }
+  } else {
+    document.getElementById('val-altitude').textContent = formatKm(currentAlt);
+    document.getElementById('unit-altitude').textContent = 'km';
+    document.getElementById('velocity').textContent = currentVel.toFixed(2);
+    document.getElementById('unit-velocity').textContent = 'km/s';
+    document.getElementById('val-fuel').textContent = currentFuel.toFixed(1);
+    document.getElementById('val-fuel-pct').textContent = currentFuelPct.toFixed(1);
+    document.getElementById('val-gforce').textContent = currentG.toFixed(2);
+    const hlsStatusEl = document.getElementById('val-hls-status');
+    const hlsThrotEl = document.getElementById('val-hls-throttle');
+    if (hlsStatusEl && hlsThrotEl) {
+      hlsStatusEl.textContent = "ACTIVE";
+      hlsStatusEl.style.color = "#00ffaa";
+      hlsThrotEl.textContent = "STANDBY / TRANSIT";
     }
   }
 
