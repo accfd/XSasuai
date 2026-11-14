@@ -1022,19 +1022,9 @@
           setupTerrainScrollObserver();
         }, 120);
       } else if (viewName === 'simulasi') {
-        if (simView) simView.style.display = "grid";
+        if (simView) simView.style.display = "block";
         if (btnSim) btnSim.classList.add("active");
         try { history.pushState(null, '', '/simulasi'); } catch(e){}
-        if (!testbedInitialized) {
-          initCockpitEngine();
-          testbedInitialized = true;
-        }
-        // Auto-trigger PDI chart calculation if not yet loaded
-        const pdiBox = document.getElementById("pdi-chart-box");
-        if (pdiBox && (!pdiBox.querySelector("img") || pdiBox.innerHTML.includes("Memuat"))) {
-          const recalcBtn = document.getElementById("btn-recalc-pdi");
-          if (recalcBtn) recalcBtn.click();
-        }
       }
     }
 
