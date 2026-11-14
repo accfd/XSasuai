@@ -67,18 +67,18 @@
       box-sizing: border-box;
     }
 
-    /* 1. COMPACT HEADER BAR */
+    /* 1. COMPACT HEADER BAR (AEROSPACE SPACE BLUE THEME) */
     header {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-light);
+      background: linear-gradient(135deg, #081225 0%, #0d1e3d 50%, #172554 100%);
+      border: 1px solid rgba(56, 189, 248, 0.25);
       border-radius: var(--radius-md);
-      padding: 12px 20px;
+      padding: 12px 22px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
-      box-shadow: var(--shadow-sm);
+      box-shadow: 0 4px 20px rgba(8, 18, 37, 0.35);
       width: 100%;
       box-sizing: border-box;
     }
@@ -86,7 +86,7 @@
     .brand-group {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
     .artemis-mark {
@@ -106,14 +106,14 @@
     .brand-info h1 {
       font-size: 16px;
       font-weight: 800;
-      color: var(--text-primary);
+      color: #ffffff;
       letter-spacing: -0.2px;
     }
 
     .brand-info p {
       font-size: 11px;
       font-weight: 600;
-      color: var(--text-muted);
+      color: #93c5fd;
     }
 
     .header-actions {
@@ -156,22 +156,23 @@
       border: 1px solid var(--emerald-border);
     }
 
-    /* Segmented Tab Switcher */
+    /* Segmented Tab Switcher (Aerospace Cosmic HUD) */
     .segmented-tabs {
       display: inline-flex;
-      background: var(--bg-subtle);
-      padding: 3px;
+      background: rgba(15, 23, 42, 0.65);
+      padding: 4px;
       border-radius: var(--radius-pill);
-      border: 1px solid var(--border-light);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
     }
 
     .tab-btn {
-      padding: 6px 14px;
+      padding: 6px 16px;
       font-size: 12px;
       font-weight: 700;
       border: none;
       background: transparent;
-      color: var(--text-muted);
+      color: #cbd5e1;
       border-radius: var(--radius-pill);
       cursor: pointer;
       display: inline-flex;
@@ -180,10 +181,14 @@
       transition: all 0.15s ease;
     }
 
+    .tab-btn:hover {
+      color: #ffffff;
+    }
+
     .tab-btn.active {
-      background: var(--bg-surface);
-      color: var(--text-primary);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+      background: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 2px 10px rgba(37, 99, 235, 0.5);
     }
 
     /* 2. BENTO CONTAINER */
@@ -1330,7 +1335,7 @@
   <!-- 1. COMPACT HEADER BAR -->
   <header>
     <div class="brand-group">
-      <img src="/logo.png" alt="XASUAI Logo" style="height: 38px; width: auto; object-fit: contain; border-radius: 4px;">
+      <img src="/logo.png" alt="XASUAI Logo" style="height: 42px; width: auto; object-fit: contain;">
       <div class="brand-info">
         <h1>XASUAI — Lunar Landing Site Navigator</h1>
         <p>Artemis Operations | Mons Mouton, Kutub Selatan Bulan (-84,9° LS, 33,3° BB)</p>
