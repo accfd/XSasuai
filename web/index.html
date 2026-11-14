@@ -415,7 +415,7 @@
             <span style="font-size: 32px; z-index: 2;">📡</span>
           </div>
 
-          <div style="display: inline-block; background: #eff6ff; color: #1d4ed8; padding: 4px 14px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 12px;">
+          <div data-i18n="rec_scan_pill" style="display: inline-block; background: #eff6ff; color: #1d4ed8; padding: 4px 14px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 12px;">
             ANALISIS ASTRODINAMIKA &amp; MEDAN BULAN
           </div>
 
@@ -423,26 +423,26 @@
             Memproses Posisi Matahari &amp; Bumi...
           </h3>
 
-          <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0 auto 28px; max-width: 520px;">
+          <p data-i18n="rec_scan_desc" style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0 auto 28px; max-width: 520px;">
             Sistem XASUAI sedang menyinkronkan data efemeris orbit dengan topografi kawah Mons Mouton.
           </p>
 
           <!-- Status Telemetri Berurutan -->
           <div style="text-align: left; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 18px 22px; display: flex; flex-direction: column; gap: 10px; font-family: monospace; font-size: 12px;">
             <div id="scan-step-1" style="display: flex; align-items: center; justify-content: space-between; color: var(--text-muted);">
-              <span>[1/4] Mengakses Efemeris JPL Horizons NASA...</span>
+              <span data-i18n="rec_scan_step1">[1/4] Mengakses Efemeris JPL Horizons NASA...</span>
               <span class="step-status">MENUNGGU</span>
             </div>
             <div id="scan-step-2" style="display: flex; align-items: center; justify-content: space-between; color: var(--text-muted);">
-              <span>[2/4] Menghitung Elevasi Surya &amp; Komunikasi Bumi...</span>
+              <span data-i18n="rec_scan_step2">[2/4] Menghitung Elevasi Surya &amp; Komunikasi Bumi...</span>
               <span class="step-status">MENUNGGU</span>
             </div>
             <div id="scan-step-3" style="display: flex; align-items: center; justify-content: space-between; color: var(--text-muted);">
-              <span>[3/4] Memindai Rintangan Tebing Mons Mouton (LOLA DEM)...</span>
+              <span data-i18n="rec_scan_step3">[3/4] Memindai Rintangan Tebing Mons Mouton (LOLA DEM)...</span>
               <span class="step-status">MENUNGGU</span>
             </div>
             <div id="scan-step-4" style="display: flex; align-items: center; justify-content: space-between; color: var(--text-muted);">
-              <span>[4/4] Mengunci Waktu Touchdown &amp; Peluncuran Translunar...</span>
+              <span data-i18n="rec_scan_step4">[4/4] Mengunci Waktu Touchdown &amp; Peluncuran Translunar...</span>
               <span class="step-status">MENUNGGU</span>
             </div>
           </div>
@@ -460,9 +460,9 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <button onclick="scrollToRecSlide('1')" style="background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 6px;" onmouseover="this.style.color='var(--artemis-blue)'" onmouseout="this.style.color='var(--text-muted)'">
               <span>&uarr;</span>
-              <span>Ubah Periode Misi</span>
+              <span data-i18n="rec_back_btn">Ubah Periode Misi</span>
             </button>
-            <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; font-size: 11.5px; font-weight: 800; padding: 5px 14px; border-radius: 999px; display: flex; align-items: center; gap: 6px;">
+            <div data-i18n="rec_status_badge" style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; font-size: 11.5px; font-weight: 800; padding: 5px 14px; border-radius: 999px; display: flex; align-items: center; gap: 6px;">
               <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></span>
               STATUS: OPTIMAL &amp; AMAN
             </div>
@@ -470,10 +470,10 @@
 
           <!-- Card Title -->
           <div style="margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border-light);">
-            <h3 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
+            <h3 data-i18n="rec_res_title" style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
               Hasil Rekomendasi Jadwal Misi
             </h3>
-            <div style="font-size: 12.5px; color: var(--text-secondary);">
+            <div data-i18n="rec_res_target" style="font-size: 12.5px; color: var(--text-secondary);">
               Target Lokasi: <strong>Mons Mouton Crest (-84.9°S, 33.3°W)</strong>
             </div>
           </div>
@@ -485,19 +485,19 @@
             <div style="flex: 1; min-width: 220px;">
               <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
                 <span style="font-size: 20px;">🚀</span>
-                <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">LEPAS LANDAS DARI BUMI</span>
+                <span data-i18n="rec_col_launch_tag" style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">LEPAS LANDAS DARI BUMI</span>
               </div>
               <div id="rec-launch-time" style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
                 11 November 2026, 08:00 UTC
               </div>
-              <div style="font-size: 11.5px; color: var(--text-secondary);">
+              <div data-i18n="rec_col_launch_desc" style="font-size: 11.5px; color: var(--text-secondary);">
                 Peluncuran roket dari Bumi menuju lintasan translunar
               </div>
             </div>
 
             <!-- Panah Alur Transit 4 Hari -->
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 12px; min-width: 140px;">
-              <div style="font-size: 11px; font-weight: 800; color: var(--artemis-blue); margin-bottom: 4px; background: #e0f2fe; padding: 3px 12px; border-radius: 999px;">
+              <div data-i18n="rec_transit_tag" style="font-size: 11px; font-weight: 800; color: var(--artemis-blue); margin-bottom: 4px; background: #e0f2fe; padding: 3px 12px; border-radius: 999px;">
                 4 Hari Perjalanan
               </div>
               <div style="display: flex; align-items: center; width: 100%; color: var(--artemis-blue);">
@@ -509,13 +509,13 @@
             <!-- Kolom Pendaratan Bulan -->
             <div style="flex: 1; min-width: 220px; text-align: right;">
               <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 6px;">
-                <span style="font-size: 11px; font-weight: 800; color: #047857; text-transform: uppercase; letter-spacing: 0.5px;">PENDARATAN DI BULAN</span>
+                <span data-i18n="rec_col_land_tag" style="font-size: 11px; font-weight: 800; color: #047857; text-transform: uppercase; letter-spacing: 0.5px;">PENDARATAN DI BULAN</span>
                 <span style="font-size: 20px;">🌕</span>
               </div>
               <div id="rec-landing-time" style="font-size: 18px; font-weight: 800; color: #047857; margin-bottom: 4px;">
                 15 November 2026, 08:00 UTC
               </div>
-              <div style="font-size: 11.5px; color: var(--text-secondary);">
+              <div data-i18n="rec_col_land_desc" style="font-size: 11.5px; color: var(--text-secondary);">
                 Touchdown aman di Mons Mouton, Kutub Selatan Bulan
               </div>
             </div>
@@ -524,7 +524,7 @@
 
           <!-- Paragraf Penjelasan Mengapa Waktu Ini Dipilih -->
           <div style="margin-bottom: 26px;">
-            <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 8px;">
+            <h4 data-i18n="rec_box_why_title" style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 8px;">
               Mengapa Waktu Ini Dipilih?
             </h4>
             <p id="rec-explanation-paragraph" style="font-size: 13.5px; line-height: 1.75; color: var(--text-secondary); margin: 0;">
@@ -535,7 +535,7 @@
           <!-- Tombol Aksi Menuju Visualisasi -->
           <div style="display: flex; justify-content: flex-end; align-items: center; padding-top: 18px; border-top: 1px solid var(--border-light);">
             <button class="btn-finder-hero" onclick="switchView('visualisasi'); playAvionicBeep(800, 'sine');" style="padding: 14px 32px; font-size: 13.5px; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(14, 116, 144, 0.35);">
-              <span>Lihat Titik Pendaratan di Visualisasi</span>
+              <span data-i18n="rec_btn_to_vis">Lihat Titik Pendaratan di Visualisasi &rarr;</span>
               <span>&rarr;</span>
             </button>
           </div>
@@ -1107,6 +1107,6 @@
   </div>
 
   <!-- JAVASCRIPT SYSTEM ENGINE -->
-  <script src="/js/app.js?v=65"></script>
+  <script src="/js/app.js?v=75"></script>
 </body>
 </html>

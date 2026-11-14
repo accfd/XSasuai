@@ -380,12 +380,57 @@
       }
     }
 
+    // State recommendation hasil kalkulasi aktif
+    let lastCalculatedMission = {
+      month: 11,
+      year: 2026,
+      launchDay: 11,
+      landingDay: 15,
+      timeStr: "08:00 UTC"
+    };
+
+    function renderRecommendationResultTexts(lang) {
+      const isEn = (lang === 'en');
+      const m = lastCalculatedMission.month;
+      const y = lastCalculatedMission.year;
+      const ld = lastCalculatedMission.landingDay;
+      const lch = lastCalculatedMission.launchDay;
+      const t = lastCalculatedMission.timeStr;
+      const mNames = MONTH_NAMES_I18N[lang] || MONTH_NAMES_I18N['id'];
+      const mName = mNames[m - 1] || (isEn ? "November" : "November");
+
+      const launchText = isEn 
+        ? `${lch} ${mName} ${y}, ${t}`
+        : `${lch} ${mName} ${y}, ${t}`;
+      const landingText = isEn
+        ? `${ld} ${mName} ${y}, ${t}`
+        : `${ld} ${mName} ${y}, ${t}`;
+
+      const explanationText = isEn
+        ? `Based on solar illumination angles and direct Earth line-of-sight analysis for ${mName} ${y}, ${ld} ${mName} provides the most ideal conditions at Mons Mouton Crest. The location receives continuous solar radiation for lander photovoltaic arrays and maintains an unobstructed radio communication link with Earth above surrounding crater rims. To touch down precisely during this optimal window, the spacecraft is scheduled to launch from Earth on ${lch} ${mName} ${y} with a 4-day translunar transit duration.`
+        : `Berdasarkan analisis posisi Matahari dan arah Bumi pada ${mName} ${y}, tanggal ${ld} ${mName} memberikan kondisi paling ideal di Mons Mouton karena lokasi tersebut menerima sinar Matahari yang cukup untuk daya panel surya wahana dan memiliki jalur komunikasi langsung ke Bumi tanpa terhalang tebing kawah di sekitarnya. Agar tiba tepat pada momen tersebut, wahana dijadwalkan lepas landas dari Bumi pada ${lch} ${mName} dengan durasi perjalanan selama 4 hari.`;
+
+      const launchEl = document.getElementById("rec-launch-time");
+      const landingEl = document.getElementById("rec-landing-time");
+      const expEl = document.getElementById("rec-explanation-paragraph");
+      const headingEl = document.getElementById("scan-progress-heading");
+
+      if (launchEl) launchEl.textContent = launchText;
+      if (landingEl) landingEl.textContent = landingText;
+      if (expEl) expEl.textContent = explanationText;
+      if (headingEl) {
+        headingEl.textContent = isEn ? `Scanning Ephemeris ${mName} ${y}...` : `Memindai Efemeris ${mName} ${y}...`;
+      }
+    }
+
     function calculateMissionSchedule() {
       const monthSel = document.getElementById("select-mission-month");
       const yearSel = document.getElementById("select-mission-year");
       const month = parseInt(monthSel ? monthSel.value : "11", 10);
       const year = parseInt(yearSel ? yearSel.value : "2026", 10);
-      const monthName = INDONESIAN_MONTH_NAMES[month] || "November";
+      const isEn = (currentAppLanguage === 'en');
+      const mNames = MONTH_NAMES_I18N[currentAppLanguage] || MONTH_NAMES_I18N['id'];
+      const monthName = mNames[month - 1] || "November";
 
       // 1. Immediately slide to the Radar / Loading Screen
       scrollToRecSlide("loading");
@@ -393,7 +438,9 @@
 
       // Reset Telemetry Status Elements
       const headingEl = document.getElementById("scan-progress-heading");
-      if (headingEl) headingEl.textContent = `Memindai Efemeris ${monthName} ${year}...`;
+      if (headingEl) {
+        headingEl.textContent = isEn ? `Scanning Ephemeris ${monthName} ${year}...` : `Memindai Efemeris ${monthName} ${year}...`;
+      }
 
       for (let i = 1; i <= 4; i++) {
         const step = document.getElementById(`scan-step-${i}`);
@@ -401,7 +448,7 @@
           step.style.color = "var(--text-muted)";
           const statusSpan = step.querySelector(".step-status");
           if (statusSpan) {
-            statusSpan.textContent = "MENUNGGU";
+            statusSpan.textContent = isEn ? "PENDING" : "MENUNGGU";
             statusSpan.style.color = "var(--text-muted)";
           }
         }
@@ -413,7 +460,7 @@
         if (s1) {
           s1.style.color = "var(--text-primary)";
           const st = s1.querySelector(".step-status");
-          if (st) { st.textContent = "TERHUBUNG (OK)"; st.style.color = "#059669"; }
+          if (st) { st.textContent = isEn ? "CONNECTED (OK)" : "TERHUBUNG (OK)"; st.style.color = "#059669"; }
         }
         playAvionicBeep(720, 'sine');
       }, 400);
@@ -423,7 +470,7 @@
         if (s2) {
           s2.style.color = "var(--text-primary)";
           const st = s2.querySelector(".step-status");
-          if (st) { st.textContent = "OPTIMAL (+2.5°)"; st.style.color = "#059669"; }
+          if (st) { st.textContent = isEn ? "OPTIMAL (+2.5°)" : "OPTIMAL (+2.5°)"; st.style.color = "#059669"; }
         }
         playAvionicBeep(800, 'sine');
       }, 950);
@@ -433,7 +480,7 @@
         if (s3) {
           s3.style.color = "var(--text-primary)";
           const st = s3.querySelector(".step-status");
-          if (st) { st.textContent = "KLIRENS +12.4° (BEBAS RINTANGAN)"; st.style.color = "#059669"; }
+          if (st) { st.textContent = isEn ? "CLEARANCE +12.4° (UNOBSTRUCTED)" : "KLIRENS +12.4° (BEBAS RINTANGAN)"; st.style.color = "#059669"; }
         }
         playAvionicBeep(880, 'sine');
       }, 1500);
@@ -443,7 +490,7 @@
         if (s4) {
           s4.style.color = "var(--text-primary)";
           const st = s4.querySelector(".step-status");
-          if (st) { st.textContent = "TERKUNCI (GO)"; st.style.color = "#059669"; }
+          if (st) { st.textContent = isEn ? "LOCKED (GO)" : "TERKUNCI (GO)"; st.style.color = "#059669"; }
         }
         playAvionicBeep(960, 'sine');
 
@@ -463,24 +510,23 @@
           timeStr = timePresets[(month + year) % 5];
         }
 
-        const launchText = `${launchDay} ${monthName} ${year}, ${timeStr}`;
-        const landingText = `${landingDay} ${monthName} ${year}, ${timeStr}`;
-        const explanationText = `Berdasarkan analisis posisi Matahari dan arah Bumi pada ${monthName} ${year}, tanggal ${landingDay} ${monthName} memberikan kondisi paling ideal di Mons Mouton karena lokasi tersebut menerima sinar Matahari yang cukup untuk daya panel surya wahana dan memiliki jalur komunikasi langsung ke Bumi tanpa terhalang tebing kawah di sekitarnya. Agar tiba tepat pada momen tersebut, wahana dijadwalkan lepas landas dari Bumi pada ${launchDay} ${monthName} dengan durasi perjalanan selama 4 hari.`;
+        lastCalculatedMission = {
+          month: month,
+          year: year,
+          launchDay: launchDay,
+          landingDay: landingDay,
+          timeStr: timeStr
+        };
 
-        // Update UI
-        const launchEl = document.getElementById("rec-launch-time");
-        const landingEl = document.getElementById("rec-landing-time");
-        const expEl = document.getElementById("rec-explanation-paragraph");
-
-        if (launchEl) launchEl.textContent = launchText;
-        if (landingEl) landingEl.textContent = landingText;
-        if (expEl) expEl.textContent = explanationText;
+        renderRecommendationResultTexts(currentAppLanguage);
 
         // Auto Scroll to Result Slide
         setTimeout(() => {
           scrollToRecSlide("result");
           playAvionicBeep(1020, 'triangle');
-          showToast(`Jadwal Terhitung: Pendaratan Optimal pada ${landingText}`);
+          const landEl = document.getElementById("rec-landing-time");
+          const lText = landEl ? landEl.textContent : `${landingDay} ${monthName} ${year}`;
+          showToast(isEn ? `Schedule Calculated: Touchdown on ${lText}` : `Jadwal Terhitung: Pendaratan Optimal pada ${lText}`);
         }, 500);
 
       }, 2100);
@@ -2053,6 +2099,14 @@
         sol1_btn_calc: "HITUNG JADWAL REKOMENDASI",
         sol1_lnk_saved: "Lihat Hasil Rekomendasi Tersimpan &darr;",
 
+        // Solusi 1 - Slide 2 Scanning Radar
+        rec_scan_pill: "ANALISIS ASTRODINAMIKA &amp; MEDAN BULAN",
+        rec_scan_desc: "Sistem XASUAI sedang menyinkronkan data efemeris orbit dengan topografi kawah Mons Mouton.",
+        rec_scan_step1: "[1/4] Mengakses Efemeris JPL Horizons NASA...",
+        rec_scan_step2: "[2/4] Menghitung Elevasi Surya &amp; Komunikasi Bumi...",
+        rec_scan_step3: "[3/4] Memindai Rintangan Tebing Mons Mouton (LOLA DEM)...",
+        rec_scan_step4: "[4/4] Mengunci Waktu Touchdown &amp; Peluncuran Translunar...", 
+
         // Solusi 1 - Slide 3 Hasil
         rec_back_btn: "Ubah Periode Misi",
         rec_status_badge: "STATUS: OPTIMAL & AMAN",
@@ -2218,6 +2272,14 @@
         sol1_btn_calc: "CALCULATE OPTIMAL SCHEDULE",
         sol1_lnk_saved: "View Saved Recommendations &darr;",
 
+        // Solution 1 - Slide 2 Scanning Radar
+        rec_scan_pill: "ASTRODYNAMICS &amp; LUNAR TERRAIN ANALYSIS",
+        rec_scan_desc: "XASUAI is synchronizing orbital ephemeris data with Mons Mouton crater topography.",
+        rec_scan_step1: "[1/4] Querying NASA JPL Horizons Ephemeris...",
+        rec_scan_step2: "[2/4] Computing Solar &amp; Earth Communication Elevation...",
+        rec_scan_step3: "[3/4] Scanning Mons Mouton Crater Rim Clearance (LOLA DEM)...",
+        rec_scan_step4: "[4/4] Locking Touchdown Window &amp; Translunar Launch...", 
+
         // Solution 1 - Slide 3 Results
         rec_back_btn: "Change Mission Period",
         rec_status_badge: "STATUS: OPTIMAL & SAFE",
@@ -2343,6 +2405,11 @@
             el.innerHTML = dict[key];
           }
         });
+      }
+
+      // Re-render dynamic recommendation result texts in active language
+      if (typeof renderRecommendationResultTexts === 'function') {
+        renderRecommendationResultTexts(lang);
       }
 
       // Update 3D layer dropdown options if present
