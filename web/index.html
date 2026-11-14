@@ -429,6 +429,29 @@
       padding: 0 2px;
     }
 
+    .dem-controls-overlay {
+      position: absolute;
+      bottom: 14px;
+      right: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 25;
+      pointer-events: auto;
+    }
+
+    .dem-zoom-badge {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: #38bdf8;
+      font-size: 11px;
+      font-weight: 800;
+      font-family: monospace;
+      padding: 5px 9px;
+      border-radius: var(--radius-sm);
+      backdrop-filter: blur(4px);
+    }
+
     /* BENTO 3: TIMELINE SCRUBBER */
     .timeline-controls {
       display: flex;
@@ -1468,12 +1491,25 @@
       </div>
       <div class="dem-map-frame" id="map-frame-box">
         <!-- 1. 2D LOLA DEM View -->
-        <div id="dem-view-container" style="width: 100%; height: 100%; position: relative;">
-          <img src="/data/quickmap-lroc.png" alt="Mons Mouton LOLA DEM" class="dem-img">
-          <!-- Pin Interaktif Sasaran Utama Mons Mouton -->
-          <div class="map-pin active" id="pin-ALPHA" style="top: 38%; left: 75%;" onclick="selectSite('ALPHA')">
-            <div class="pin-circle" style="width: 18px; height: 18px; box-shadow: 0 0 16px #10b981;"></div>
-            <div class="pin-label" style="font-size: 11px; padding: 4px 10px;">Mons Mouton Crest (-84.9°S, 33.3°W) · 5,920m (Elevasi +1,420m)</div>
+        <div id="dem-view-container" style="width: 100%; height: 100%; position: relative; overflow: hidden; cursor: grab; user-select: none;">
+          <div id="dem-zoom-wrapper" style="width: 100%; height: 100%; position: relative; transform-origin: center center; transition: transform 0.05s ease-out; will-change: transform;">
+            <img src="/data/quickmap-lroc.png" alt="Mons Mouton LOLA DEM" class="dem-img" draggable="false" style="pointer-events: none;">
+            <!-- Pin Interaktif Sasaran Utama Mons Mouton -->
+            <div class="map-pin active" id="pin-ALPHA" style="top: 38%; left: 75%;" onclick="selectSite('ALPHA')">
+              <div class="pin-circle" style="width: 18px; height: 18px; box-shadow: 0 0 16px #10b981;"></div>
+              <div class="pin-label" style="font-size: 11px; padding: 4px 10px;">Mons Mouton Crest (-84.9°S, 33.3°W) · 5,920m (Elevasi +1,420m)</div>
+            </div>
+          </div>
+          <!-- DEM Controls & Zoom Badge Overlay -->
+          <div class="dem-controls-overlay">
+            <span class="dem-zoom-badge" id="dem-zoom-badge">1.0×</span>
+            <button class="btn-hud" onclick="zoomDem(0.5)" title="Perbesar (Zoom In)">＋</button>
+            <button class="btn-hud" onclick="zoomDem(-0.5)" title="Perkecil (Zoom Out)">－</button>
+            <button class="btn-hud" onclick="resetDemZoom()" title="Reset Tampilan Zoom">Reset View</button>
+          </div>
+          <!-- Hint Badge -->
+          <div class="dem-hint-badge" style="position: absolute; top: 12px; left: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: var(--radius-sm); padding: 4px 8px; color: #94a3b8; font-size: 10px; font-weight: 600; z-index: 25; pointer-events: none; backdrop-filter: blur(4px);">
+            Roda Gulir Tetikus untuk Zoom (1.0× - 5.0×) • Tarik untuk Geser
           </div>
         </div>
 
@@ -1488,6 +1524,8 @@
               <span id="globe-target-readout" class="hud-coord">SASARAN: MONS MOUTON CREST (-84.9°S, 33.3°W)</span>
             </div>
             <div class="globe-hud-actions">
+              <button class="btn-hud" onclick="zoomGlobe(-2.0)" title="Dolly Zoom In (Mendekat ke Permukaan)">＋</button>
+              <button class="btn-hud" onclick="zoomGlobe(2.0)" title="Dolly Zoom Out (Menjauh)">－</button>
               <button class="btn-hud" onclick="triggerFlyToAnimation()">
                 Fly-To Mons Mouton
               </button>
@@ -1817,6 +1855,136 @@
       }
     }
 
+    // =====================================================================
+    // 2D LOLA DEM INTERACTIVE ZOOM & PAN SYSTEM
+    // =====================================================================
+    let demZoomLevel = 1.0;
+    let demPanX = 0;
+    let demPanY = 0;
+    let isDemPanning = false;
+    let demStartPointer = { x: 0, y: 0 };
+    let demStartPan = { x: 0, y: 0 };
+
+    function applyDemTransform() {
+      const wrapper = document.getElementById("dem-zoom-wrapper");
+      const badge = document.getElementById("dem-zoom-badge");
+      if (!wrapper) return;
+      wrapper.style.transform = `translate(${demPanX}px, ${demPanY}px) scale(${demZoomLevel})`;
+      if (badge) badge.textContent = `${demZoomLevel.toFixed(1)}×`;
+    }
+
+    window.zoomDem = function(delta, clientX, clientY) {
+      const prevZoom = demZoomLevel;
+      demZoomLevel = Math.max(1.0, Math.min(5.0, Math.round((demZoomLevel + delta) * 10) / 10));
+      
+      if (clientX !== undefined && clientY !== undefined && demZoomLevel !== prevZoom) {
+        const container = document.getElementById("dem-view-container");
+        if (container) {
+          const rect = container.getBoundingClientRect();
+          const ox = clientX - (rect.left + rect.width / 2);
+          const oy = clientY - (rect.top + rect.height / 2);
+          const factor = (demZoomLevel / prevZoom) - 1.0;
+          demPanX -= (ox - demPanX) * factor;
+          demPanY -= (oy - demPanY) * factor;
+        }
+      }
+
+      const maxPan = (demZoomLevel - 1.0) * 400;
+      demPanX = Math.max(-maxPan, Math.min(maxPan, demPanX));
+      demPanY = Math.max(-maxPan, Math.min(maxPan, demPanY));
+
+      applyDemTransform();
+    };
+
+    window.resetDemZoom = function() {
+      demZoomLevel = 1.0;
+      demPanX = 0;
+      demPanY = 0;
+      applyDemTransform();
+    };
+
+    function initDemInteractions() {
+      const demContainer = document.getElementById("dem-view-container");
+      if (!demContainer) return;
+
+      // Mouse wheel zoom (1.0x - 5.0x)
+      demContainer.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.35 : -0.35;
+        window.zoomDem(delta, e.clientX, e.clientY);
+      }, { passive: false });
+
+      // Drag to pan
+      demContainer.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.dem-controls-overlay') || e.target.closest('.map-pin')) return;
+        isDemPanning = true;
+        demStartPointer = { x: e.clientX, y: e.clientY };
+        demStartPan = { x: demPanX, y: demPanY };
+        demContainer.style.cursor = 'grabbing';
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDemPanning) return;
+        const dx = e.clientX - demStartPointer.x;
+        const dy = e.clientY - demStartPointer.y;
+        demPanX = demStartPan.x + dx;
+        demPanY = demStartPan.y + dy;
+        const maxPan = (demZoomLevel - 1.0) * 400;
+        demPanX = Math.max(-maxPan, Math.min(maxPan, demPanX));
+        demPanY = Math.max(-maxPan, Math.min(maxPan, demPanY));
+        applyDemTransform();
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (isDemPanning) {
+          isDemPanning = false;
+          demContainer.style.cursor = demZoomLevel > 1.0 ? 'grab' : 'default';
+        }
+      });
+
+      // Touch pinch and pan
+      let touchStartDist = 0;
+      let touchStartZoom = 1.0;
+      demContainer.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+          const dx = e.touches[0].clientX - e.touches[1].clientX;
+          const dy = e.touches[0].clientY - e.touches[1].clientY;
+          touchStartDist = Math.sqrt(dx * dx + dy * dy);
+          touchStartZoom = demZoomLevel;
+        } else if (e.touches.length === 1) {
+          isDemPanning = true;
+          demStartPointer = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+          demStartPan = { x: demPanX, y: demPanY };
+        }
+      }, { passive: true });
+
+      demContainer.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2 && touchStartDist > 0) {
+          e.preventDefault();
+          const dx = e.touches[0].clientX - e.touches[1].clientX;
+          const dy = e.touches[0].clientY - e.touches[1].clientY;
+          const currentDist = Math.sqrt(dx * dx + dy * dy);
+          const ratio = currentDist / touchStartDist;
+          demZoomLevel = Math.max(1.0, Math.min(5.0, touchStartZoom * ratio));
+          applyDemTransform();
+        } else if (e.touches.length === 1 && isDemPanning) {
+          const dx = e.touches[0].clientX - demStartPointer.x;
+          const dy = e.touches[0].clientY - demStartPointer.y;
+          demPanX = demStartPan.x + dx;
+          demPanY = demStartPan.y + dy;
+          const maxPan = (demZoomLevel - 1.0) * 400;
+          demPanX = Math.max(-maxPan, Math.min(maxPan, demPanX));
+          demPanY = Math.max(-maxPan, Math.min(maxPan, demPanY));
+          applyDemTransform();
+        }
+      }, { passive: false });
+
+      demContainer.addEventListener('touchend', () => {
+        isDemPanning = false;
+        touchStartDist = 0;
+      });
+    }
+
     // Map View Toggle (DEM vs 3D Moon Globe)
     function setMapView(mode) {
       currentMapMode = mode;
@@ -1983,10 +2151,79 @@
         prevMousePos = { x: e.clientX, y: e.clientY };
       });
 
+      function updateGlobeAltitudeHUD(dist) {
+        const altElem = document.getElementById("globe-alt-readout");
+        if (!altElem || isFlyToActive) return;
+        // Radius bola bulan = 8.0 unit (ekuivalen 1,737.4 km)
+        const deltaUnits = Math.max(0.069, dist - 8.0);
+        const altKm = Math.round(deltaUnits * (1737.4 / 8.0));
+        if (altKm <= 35) {
+          altElem.textContent = `ALTITUDE: 15.0 KM [TARGET LOCKED]`;
+          altElem.style.color = "#00ffaa";
+        } else {
+          altElem.textContent = `ALTITUDE: ${altKm.toLocaleString('en-US')} KM`;
+          altElem.style.color = "#ffffff";
+        }
+      }
+
+      window.zoomGlobe = function(delta) {
+        if (!threeCamera) return;
+        isFlyToActive = false;
+        let camDist = threeCamera.position.length();
+        camDist = Math.max(8.2, Math.min(50.0, camDist + delta));
+        threeCamera.position.normalize().multiplyScalar(camDist);
+        updateGlobeAltitudeHUD(camDist);
+      };
+
       dom.addEventListener('wheel', (e) => {
         e.preventDefault();
-        threeCamera.position.z = Math.max(10, Math.min(45, threeCamera.position.z + e.deltaY * 0.02));
+        isFlyToActive = false;
+        let camDist = threeCamera.position.length();
+        const delta = e.deltaY * 0.015;
+        // Batas minDistance 8.2 unit (hanya ~15-20 km di atas permukaan Mons Mouton)
+        camDist = Math.max(8.2, Math.min(50.0, camDist + delta));
+        threeCamera.position.normalize().multiplyScalar(camDist);
+        updateGlobeAltitudeHUD(camDist);
       }, { passive: false });
+
+      // Touch gestures for 3D Globe (pinch-to-zoom & pan)
+      let touchStartGlobeDist = 0;
+      let touchStartGlobeCamDist = 0;
+      dom.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 2) {
+          const dx = e.touches[0].clientX - e.touches[1].clientX;
+          const dy = e.touches[0].clientY - e.touches[1].clientY;
+          touchStartGlobeDist = Math.sqrt(dx * dx + dy * dy);
+          touchStartGlobeCamDist = threeCamera.position.length();
+        } else if (e.touches.length === 1) {
+          isDragging = true;
+          prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+      }, { passive: true });
+
+      dom.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 2 && touchStartGlobeDist > 0) {
+          e.preventDefault();
+          const dx = e.touches[0].clientX - e.touches[1].clientX;
+          const dy = e.touches[0].clientY - e.touches[1].clientY;
+          const curDist = Math.sqrt(dx * dx + dy * dy);
+          const ratio = touchStartGlobeDist / curDist;
+          let camDist = Math.max(8.2, Math.min(50.0, touchStartGlobeCamDist * ratio));
+          threeCamera.position.normalize().multiplyScalar(camDist);
+          updateGlobeAltitudeHUD(camDist);
+        } else if (e.touches.length === 1 && isDragging && !isFlyToActive) {
+          const dx = e.touches[0].clientX - prevMousePos.x;
+          const dy = e.touches[0].clientY - prevMousePos.y;
+          moonGlobeMesh.rotation.y += dx * 0.006;
+          moonGlobeMesh.rotation.x += dy * 0.006;
+          prevMousePos = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+      }, { passive: false });
+
+      dom.addEventListener('touchend', () => {
+        isDragging = false;
+        touchStartGlobeDist = 0;
+      });
 
       // 9. Render Loop
       function animateThree() {
@@ -2495,6 +2732,8 @@
     document.getElementById("timeline-slider").oninput = updateEvaluationFromSlider;
 
     (async () => {
+      // Inisialisasi zoom & pan interaktif 2D DEM
+      initDemInteractions();
       // Panggil skyplot dan trajektori langsung agar tidak menunggu timeline
       debounceSkyplotUpdate("2026-11-14 12:00");
       document.getElementById("btn-recalc-pdi").click();
