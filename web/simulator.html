@@ -714,10 +714,10 @@ body:active { cursor: grabbing; }
                min="0" max="10000" value="0" oninput="onTimelineScrub(this.value)">
       </div>
       <div class="timeline-phases">
-        <span class="phase-marker" id="pm-orbit">Earth Orbit</span>
+        <span class="phase-marker" id="pm-orbit">Peluncuran Bumi</span>
         <span class="phase-marker" id="pm-tli">TLI</span>
         <span class="phase-marker" id="pm-coast">Translunar</span>
-        <span class="phase-marker" id="pm-loi">Orbit Bulan</span>
+        <span class="phase-marker" id="pm-loi">Mengitari Bulan</span>
         <span class="phase-marker" id="pm-pdi">PDI Descent</span>
         <span class="phase-marker" id="pm-touchdown">Touchdown</span>
       </div>
@@ -746,6 +746,7 @@ import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
 import { NASA_TRAJ, NASA_MOON, TRAJ_START_DAY, TRAJ_END_DAY, TRAJ_STEP_DAYS, TRAJ_N, TLI_INDEX } from './trajectory.js';
 import { LANDING_SUMMARY, LANDING_POINTS, getLandingPointByTime } from './lunar_landing_trajectory.js';
+import { MISSION_SUMMARY, MISSION_TRAJECTORY_POINTS, getMissionPointByDay } from './synthetic_mission_trajectory.js';
 
 // ═══════════════════════════════════════════
 // CONSTANTS
@@ -754,17 +755,23 @@ const EARTH_RADIUS_KM = 6371;
 const MOON_RADIUS_KM = 1737;
 const SCALE = 1 / 4000;
 const LAUNCH_TIME = Date.UTC(2026, 3, 1, 22, 35, 0);
-// Artemis III Mission Timeline: Ends at Lunar South Pole Touchdown!
-const PDI_START_DAY = 5.0;
-const LANDING_DURATION_DAYS = 720.0 / 86400.0; // 12 minutes (0.00833 days)
-const TOUCHDOWN_DAY = PDI_START_DAY + LANDING_DURATION_DAYS; // 5.00833 days
-const MISSION_DAYS = TOUCHDOWN_DAY; 
+// ═══════════════════════════════════════════
+// UNIFIED ARTEMIS III MISSION TIMELINE
+// 1. Earth Launch at KSC (Day 0.0, 0 km)
+// 2. Earth LEO Parking Orbit (185 km)
+// 3. Trans-Lunar Injection (TLI, Day 0.073)
+// 4. Translunar Transit (384,400 km)
+// 5. Lunar Orbit Insertion + 2 Full Polar Revolutions Orbiting the Moon (Day 4.45 - 4.613)
+// 6. Powered Descent Initiation (PDI 12 min, Day 4.613 - 4.62193)
+// 7. Touchdown at Mons Mouton (Day 4.62193)
+// ═══════════════════════════════════════════
+const MISSION_START_DAY = 0.0; // Launch from Earth Surface
+const MISSION_DAYS = MISSION_SUMMARY.touchdown_day; // Day 4.62193
 const MISSION_DURATION_MS = MISSION_DAYS * 86400000;
 const J2000_MS = Date.UTC(2000, 0, 1, 12, 0, 0);
 
 const eR = EARTH_RADIUS_KM * SCALE;
 const mR = MOON_RADIUS_KM * SCALE;
-const TLI_DAY = TRAJ_START_DAY + TLI_INDEX * TRAJ_STEP_DAYS;
 
 // ═══════════════════════════════════════════
 // INTERPOLATION
@@ -810,58 +817,11 @@ function getTrajectoryPos(day) { return getInterpolatedPos(NASA_TRAJ, day); }
 
 function buildTrajectoryCurve() {
   const pts = [];
-  const SUBDIV = 2;
-  
-  // 1. Translunar flight up to LOI initiation (Day 4.85 / Index 678)
-  const LOI_IDX = 678;
-  for (let i = 0; i < LOI_IDX; i++) {
-    for (let s = 0; s < SUBDIV; s++) {
-      const t = s / SUBDIV;
-      const i0 = Math.max(0, i - 1);
-      const i3 = Math.min(TRAJ_N - 1, i + 2);
-      const p = catmullRom(
-        horizonsToThree(NASA_TRAJ[i0]),
-        horizonsToThree(NASA_TRAJ[i]),
-        horizonsToThree(NASA_TRAJ[i + 1]),
-        horizonsToThree(NASA_TRAJ[i3]), t
-      );
-      pts.push(new THREE.Vector3(p.x * SCALE, p.y * SCALE, p.z * SCALE));
-    }
-  }
-
-  // 2. Lunar Orbit Insertion (LOI) retro-burn arc into South Pole Perilune (Day 4.85 -> 5.0)
-  const pLoiStart = pts[pts.length - 1].clone();
-  const moonAt5 = horizonsToThree(NASA_MOON[700]).multiplyScalar(SCALE);
-  const pPerilune = moonAt5.clone().add(new THREE.Vector3(
-    LANDING_POINTS[0].three_pos[0],
-    LANDING_POINTS[0].three_pos[1],
-    LANDING_POINTS[0].three_pos[2]
-  ));
-
-  const LOI_STEPS = 40;
-  for (let s = 1; s <= LOI_STEPS; s++) {
-    const u = s / LOI_STEPS;
-    // Smooth cubic Hermite curve pulling into lunar polar orbit
-    const curvePos = new THREE.Vector3().lerpVectors(pLoiStart, pPerilune, u);
-    // Add realistic gravitational inward curving toward Moon center
-    const midMoon = new THREE.Vector3().lerpVectors(pts[pts.length - 1], moonAt5, u);
-    const towardMoon = midMoon.clone().sub(curvePos).multiplyScalar(0.25 * Math.sin(u * Math.PI));
-    curvePos.add(towardMoon);
-    pts.push(curvePos);
-  }
-
-  // 3. Powered Descent Trajectory down to Mons Mouton Touchdown!
-  // Subsample every 10 points for clean 60fps ribbon
-  for (let j = 0; j < LANDING_POINTS.length; j += 10) {
-    const lp = LANDING_POINTS[j];
-    const ptWorld = moonAt5.clone().add(new THREE.Vector3(lp.three_pos[0], lp.three_pos[1], lp.three_pos[2]));
-    pts.push(ptWorld);
-  }
-  // Final touchdown point on Mons Mouton surface
-  const finalLp = LANDING_POINTS[LANDING_POINTS.length - 1];
-  const touchdownWorld = moonAt5.clone().add(new THREE.Vector3(finalLp.three_pos[0], finalLp.three_pos[1], finalLp.three_pos[2]));
-  pts.push(touchdownWorld);
-
+  // Build continuous 3D line from Earth surface launch, through LEO, TLI,
+  // Translunar coast, 2 full polar orbits around the Moon, and touchdown on Mons Mouton!
+  MISSION_TRAJECTORY_POINTS.forEach(pt => {
+    pts.push(new THREE.Vector3(pt.pos[0], pt.pos[1], pt.pos[2]));
+  });
   return pts;
 }
 
@@ -1481,8 +1441,8 @@ window.setCamera = (mode) => {
     targetLook = new THREE.Vector3(mid.x, -50, mid.z);
   } else if (mode === 'mons') {
     // Focus camera directly onto Mons Mouton landing site on the Moon's South Pole
-    if (simDay < 5.0) {
-      simDay = 5.0; // Jump right to Powered Descent Phase
+    if (simDay < 4.613) {
+      simDay = 4.613; // Jump right to Powered Descent Phase
       speedMult = 10;
       document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
       const s10 = Array.from(document.querySelectorAll('.speed-btn')).find(b => b.textContent.includes('10'));
@@ -1498,7 +1458,7 @@ window.setCamera = (mode) => {
 
 window.togglePlay = () => {
   if (!isPlaying && simDay >= MISSION_DAYS) {
-    simDay = TRAJ_START_DAY;
+    simDay = 0.0;
   }
   isPlaying = !isPlaying;
   const btn = document.getElementById('play-btn');
@@ -1549,8 +1509,8 @@ window.toggleManeuvers = () => {
 
 window.onTimelineScrub = (val) => {
   scrubbing = true;
-  // Map slider 0-10000 to TRAJ_START_DAY through MISSION_DAYS
-  simDay = TRAJ_START_DAY + (val / 10000) * (MISSION_DAYS - TRAJ_START_DAY);
+  // Map slider 0-10000 to 0.0 (Earth Launch) through MISSION_DAYS (Touchdown)
+  simDay = (val / 10000) * MISSION_DAYS;
 };
 
 document.getElementById('timeline-slider').addEventListener('pointerup', () => { scrubbing = false; });
@@ -1693,108 +1653,62 @@ function animate() {
   beaconOuterRing.scale.set(pulseOuter, pulseOuter, 1);
   beaconOuterRing.material.opacity = 0.3 + 0.3 * Math.sin(now * 0.004);
 
-  // ═══ ASTRODYNAMICS TIMELINE ENGINE ═══
-  // Translunar Transit: Days 0.14 - 5.0
-  // Powered Descent Initiation (PDI): Day 5.0 - 5.00833 (720 seconds)
-  // Mons Mouton Touchdown: Day 5.00833+
-  const PDI_START_DAY = 5.0;
-  const LANDING_DURATION_DAYS = 720.0 / 86400.0;
-  const TOUCHDOWN_DAY = PDI_START_DAY + LANDING_DURATION_DAYS;
+  // ═══ UNIFIED ASTRODYNAMICS TIMELINE ENGINE ═══
+  const mPoint = getMissionPointByDay(simDay);
+  
+  const orionSc = new THREE.Vector3(mPoint.pos[0], mPoint.pos[1], mPoint.pos[2]);
+  orionGroup.position.copy(orionSc);
 
-  let orionSc = new THREE.Vector3();
-  let orionKm = new THREE.Vector3();
-  let currentAlt = 0;
-  let currentVel = 0;
-  let currentFuel = 450.0;
-  let currentFuelPct = 100.0;
-  let currentG = 0.0;
-  let currentPhaseStr = "Translunar Coast";
+  // Orientation: Points along forward velocity vector, orients vertically at touchdown
+  const isPDIPhase = mPoint.phase.includes("BRAKING") || mPoint.phase.includes("APPROACH") || mPoint.phase.includes("TOUCHDOWN");
+  
+  if (isPDIPhase) {
+    // During powered descent and touchdown: align with lunar surface normal at Mons Mouton
+    const worldMons = moonGroup.localToWorld(MONS_MOUTON_POS.clone());
+    const surfaceNormal = worldMons.clone().sub(moonGroup.position).normalize();
+    orionGroup.up.copy(surfaceNormal);
+    orionGroup.lookAt(orionSc.clone().add(surfaceNormal));
 
-  if (simDay < PDI_START_DAY) {
-    // ─── TRANSLUNAR COAST & LEO ───
-    orionKm = getTrajectoryPos(simDay);
-    orionSc = new THREE.Vector3(orionKm.x * SCALE, orionKm.y * SCALE, orionKm.z * SCALE);
-    orionGroup.position.copy(orionSc);
-
-    const nextKm = getTrajectoryPos(Math.min(simDay + 0.005, PDI_START_DAY));
-    const dir = new THREE.Vector3().subVectors(
-      new THREE.Vector3(nextKm.x, nextKm.y, nextKm.z),
-      orionKm
-    ).normalize();
-    orionGroup.lookAt(orionSc.clone().sub(dir.clone().multiplyScalar(SCALE)));
-
-    const prevKm = getTrajectoryPos(Math.max(0, simDay - 0.001));
-    currentVel = orionKm.clone().sub(prevKm).length() / (0.001 * 86400);
-    const dMoonKm = Math.max(0, orionKm.clone().sub(moonKm).length() - MOON_RADIUS_KM);
-    currentAlt = dMoonKm;
-
-    if (starshipHLS.thrusterPlumes) {
-      starshipHLS.thrusterPlumes.forEach(p => { p.visible = false; });
-    }
-    if (simDay < 1.05) currentPhaseStr = "Earth Parking Orbit (LEO)";
-    else if (simDay < 1.15) currentPhaseStr = "Trans-Lunar Injection (TLI)";
-    else if (simDay < 4.85) currentPhaseStr = "Translunar Coast Phase";
-    else {
-      // LOI phase: smoothly curving into polar orbit
-      currentPhaseStr = "Lunar Orbit Insertion (LOI Retro-Burn)";
-      const uLoi = (simDay - 4.85) / (5.0 - 4.85);
-      const periluneWorld = moonGroup.localToWorld(new THREE.Vector3(
-        LANDING_POINTS[0].three_pos[0],
-        LANDING_POINTS[0].three_pos[1],
-        LANDING_POINTS[0].three_pos[2]
-      ));
-      orionSc.lerp(periluneWorld, uLoi);
-      orionGroup.position.copy(orionSc);
-      currentAlt = 15000 + (1 - uLoi) * 20000;
-    }
-  } else {
-    // ─── POWERED DESCENT INITIATION (PDI) TO MONS MOUTON ───
-    const t_sec = Math.min(720.0, (simDay - PDI_START_DAY) * 86400.0);
-    const pt = getLandingPointByTime(t_sec);
-
-    const localLandingPos = new THREE.Vector3(pt.three_pos[0], pt.three_pos[1], pt.three_pos[2]);
-    orionSc = moonGroup.localToWorld(localLandingPos.clone());
-    orionGroup.position.copy(orionSc);
-
-    // Orientation: Tilts from braking angle (-15°) up to vertical touchdown (90°)
-    const surfaceNormal = localLandingPos.clone().normalize();
-    const worldNormal = surfaceNormal.clone().applyQuaternion(moonGroup.quaternion);
-    orionGroup.up.copy(worldNormal);
-    orionGroup.lookAt(orionSc.clone().add(worldNormal));
-
-    currentAlt = pt.alt_m;
-    currentVel = pt.v_tot_ms;
-    currentFuel = pt.fuel_kg;
-    currentFuelPct = pt.fuel_pct;
-    currentG = pt.g_force;
-    currentPhaseStr = pt.phase;
-
-    // Animate Starship HLS Methalox Landing Thruster Plumes
-    const isBurning = (pt.throttle_pct > 5.0 && pt.alt_m > 0.5);
+    // Starship landing thrusters active during descent
+    const isBurning = (mPoint.throttle_pct > 5.0 && mPoint.alt_km > 0.001);
     if (starshipHLS.thrusterPlumes) {
       starshipHLS.thrusterPlumes.forEach(plume => {
         plume.visible = isBurning;
         if (isBurning) {
-          const throttle = pt.throttle_pct / 100.0;
+          const throttle = mPoint.throttle_pct / 100.0;
           const flicker = 0.85 + 0.3 * Math.sin(now * 0.03);
           plume.scale.set(flicker, flicker * throttle, flicker);
           plume.material.opacity = 0.7 + 0.3 * throttle;
         }
       });
     }
-
-    orionKm = orionSc.clone().multiplyScalar(1 / SCALE);
+  } else {
+    // In orbit & transit: point forward along flight direction
+    if (starshipHLS.thrusterPlumes) {
+      starshipHLS.thrusterPlumes.forEach(p => { p.visible = false; });
+    }
+    const nextPt = getMissionPointByDay(Math.min(simDay + 0.002, MISSION_DAYS));
+    const dir = new THREE.Vector3(nextPt.pos[0] - mPoint.pos[0], nextPt.pos[1] - mPoint.pos[1], nextPt.pos[2] - mPoint.pos[2]).normalize();
+    if (dir.lengthSq() > 0.0001) {
+      orionGroup.lookAt(orionSc.clone().add(dir));
+    }
   }
 
-  // Beacon pulse
+  const orionKm = orionSc.clone().multiplyScalar(1 / SCALE);
+  const currentAlt = mPoint.alt_km;
+  const currentVel = mPoint.vel_kms;
+  const currentFuel = mPoint.fuel_kg;
+  const currentFuelPct = (mPoint.fuel_kg / 450.0) * 100.0;
+  const currentG = mPoint.g_force;
+  const currentPhaseStr = mPoint.phase;
+// Beacon pulse
   const camDist = camera.position.distanceTo(orionGroup.position);
   const fade = Math.min(1, camDist / 3);
   if (beaconSprite) beaconSprite.material.opacity = fade * (0.7 + 0.3 * Math.sin(now * 0.005));
 
-  // Traveled path - includes Earth orbit phase
-  const dataIdx = (simDay - TRAJ_START_DAY) / TRAJ_STEP_DAYS;
-  const trajIdx = Math.max(0, dataIdx * 2); // 2 subdivisions per data point
-  const traveledIdx = Math.min(trajPts.length, Math.max(2, Math.ceil(trajIdx)));
+  // Traveled path from Earth launch to current position
+  const progressRatio = Math.max(0, Math.min(1.0, simDay / MISSION_DAYS));
+  const traveledIdx = Math.min(trajPts.length, Math.max(2, Math.ceil(progressRatio * trajPts.length)));
   const traveledPts = trajPts.slice(0, traveledIdx);
   const positions = [];
   traveledPts.forEach(p => positions.push(p.x, p.y, p.z));
@@ -1864,21 +1778,20 @@ function animate() {
   const missionDate = new Date(LAUNCH_TIME + hudMs);
   document.getElementById('date-display').textContent = missionDate.toUTCString().slice(0, 22) + ' UTC';
 
-  // Timeline slider - maps TRAJ_START_DAY to MISSION_DAYS onto 0-100%
+  // Timeline slider - maps 0.0 (Earth Launch) to MISSION_DAYS (Touchdown) onto 0-100%
   if (!scrubbing) {
-    const timeRange = MISSION_DAYS - TRAJ_START_DAY;
-    const pct = Math.max(0, (simDay - TRAJ_START_DAY) / timeRange) * 100;
+    const pct = Math.max(0, Math.min(1.0, simDay / MISSION_DAYS)) * 100;
     document.getElementById('timeline-slider').value = Math.min(10000, pct * 100);
     document.getElementById('timeline-progress').style.width = `${Math.min(100, pct)}%`;
   }
 
   // Phase markers (based on mission day)
-  [['pm-orbit', 0, 1.05],
-   ['pm-tli', 1.05, 1.15],
-   ['pm-coast', 1.15, 4.85],
-   ['pm-loi', 4.85, 5.0],
-   ['pm-pdi', 5.0, 5.00833],
-   ['pm-touchdown', 5.00833, MISSION_DAYS + 1]].forEach(([id, s, e]) => {
+  [['pm-orbit', 0.0, 0.073],
+   ['pm-tli', 0.073, 0.09],
+   ['pm-coast', 0.09, 4.45],
+   ['pm-loi', 4.45, 4.613],
+   ['pm-pdi', 4.613, 4.62193],
+   ['pm-touchdown', 4.62193, MISSION_DAYS + 1]].forEach(([id, s, e]) => {
     const el = document.getElementById(id);
     if (el) el.classList.toggle('active', simDay >= s && simDay < e);
   });
@@ -1940,7 +1853,7 @@ window.addEventListener('resize', () => {
 
 // Initialize
 (() => {
-  simDay = TRAJ_START_DAY; // Start at data start (ICPS separation, ~3h24m after launch)
+  simDay = 0.0; // Start at Launch Pad 39B at Kennedy Space Center, Earth
   const moonKm = getMoonPos(simDay);
   moonGroup.position.set(moonKm.x * SCALE, moonKm.y * SCALE, moonKm.z * SCALE);
   const mid = moonGroup.position.clone().multiplyScalar(0.4);
