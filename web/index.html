@@ -1164,17 +1164,17 @@
         <span>✓</span> MISSION STATUS: GO (SAFE)
       </div>
       <button class="btn-finder-trigger" onclick="openSmartFinderModal()">
-        <span>⚡</span> Cari Rekomendasi Pendaratan
+        Cari Rekomendasi Pendaratan
       </button>
       <div class="segmented-tabs">
         <button class="tab-btn" id="tab-btn-guide" onclick="switchView('guide')">
-          <span>📖</span> Panduan & Alur
+          Panduan Misi
         </button>
         <button class="tab-btn active" id="tab-btn-console" onclick="switchView('console')">
-          <span>📊</span> Mission Console
+          Mission Console
         </button>
         <button class="tab-btn" id="tab-btn-testbed" onclick="switchView('testbed')">
-          <span>🕹️</span> Flight Testbed
+          Flight Testbed
         </button>
       </div>
     </div>
@@ -1185,7 +1185,7 @@
     <!-- Hero Banner -->
     <div class="guide-hero">
       <div class="guide-badge">
-        <span>🚀</span> NASA Space Apps Challenge • Artemis Landing Navigator
+        NASA Space Apps Challenge • Artemis Landing Navigator
       </div>
       <h2>Platform Xesuai: Panduan Sistem & Strategi Pendaratan Mons Mouton</h2>
       <p>
@@ -1206,7 +1206,7 @@
           <strong>Solusi Xesuai:</strong> Memindai model elevasi digital LOLA DEM menggunakan algoritma <em>360° Radial Raymarching</em> dengan koreksi kelengkungan Bulan, disinkronkan secara langsung dengan vektor efemeris NASA JPL Horizons untuk menjamin pencahayaan panel surya dan komunikasi <em>Direct-to-Earth (DTE)</em> tetap bebas dari halangan tebing kawah.
         </div>
         <div class="pillar-feature">
-          <span>📍</span> Fitur: Peta LOLA DEM & 360° Polar Sky-Plot Radar
+          Instrumen: Peta LOLA DEM & Radar Polar & 360° Polar Sky-Plot Radar
         </div>
       </div>
 
@@ -1221,7 +1221,7 @@
           <strong>Solusi Xesuai:</strong> Mengimplementasikan solver numerik Runge-Kutta Orde 4/5 (RK45) presisi tinggi dengan model gravitasi non-sferis Bulan (koefisien zonal \(J_2 = 2.027 \times 10^{-4}\)), modulasi dorongan mesin (400 N – 3.200 N), pembatasan kecepatan impak aman (\(V_z \le 2.0\text{ m/s}, V_h \le 0.5\text{ m/s}\)), serta clearance kawah koridor pendekatan &gt; 150 meter.
         </div>
         <div class="pillar-feature">
-          <span>🚀</span> Fitur: RK45 Powered Descent Solver & Delta-V Budget
+          Instrumen: RK45 Powered Descent Solver Solver & Delta-V Budget
         </div>
       </div>
 
@@ -1237,7 +1237,7 @@
           Radar Polar 360° seperti radar cuaca, <em>timeline scrubber</em> 14-hari (0–336 jam) yang interaktif seperti pemutar video, lencana keputusan instan <strong>MISSION STATUS: GO / NO-GO</strong>, serta simulator pendaratan interaktif (<em>Flight Testbed</em>) yang dapat dimainkan langsung di peramban.
         </div>
         <div class="pillar-feature">
-          <span>🕹️</span> Fitur: Bento Console & Canvas Flight Simulator
+          Instrumen: Bento Console & Flight Testbed & Canvas Flight Simulator
         </div>
       </div>
     </div>
@@ -1293,10 +1293,10 @@
 
       <div class="guide-cta-row">
         <button class="btn-cta-secondary" onclick="switchView('testbed')">
-          <span>🕹️</span> Coba Flight Testbed
+          Uji Flight Testbed
         </button>
         <button class="btn-cta-primary" onclick="switchView('console')">
-          <span>📊</span> Buka Mission Console Sekarang ➔
+          <span></span> Buka Mission Console Sekarang
         </button>
       </div>
     </div>
@@ -1308,21 +1308,21 @@
     <!-- BENTO 1: SITES (3 HORIZONTAL CARDS) -->
     <div class="bento-card bento-full">
       <div class="card-header">
-        <span class="card-title">📍 Kandidat Lokasi Pendaratan Mons Mouton</span>
+        <span class="card-title">Kandidat Lokasi Pendaratan Mons Mouton</span>
         <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Pilih salah satu situs untuk evaluasi komprehensif</span>
       </div>
 
       <!-- SMART FINDER CALLOUT BANNER (SANGAT MENCOLOK) -->
       <div class="smart-finder-callout">
         <div class="callout-left">
-          <div class="callout-badge">⚡ FITUR REKOMENDASI PENDARATAN OTOMATIS (MCDA)</div>
+          <div class="callout-badge"> FITUR REKOMENDASI PENDARATAN OTOMATIS (MCDA)</div>
           <div class="callout-title">Cari Tanggal, Waktu & Posisi Pendaratan Paling Tepat</div>
           <div class="callout-desc">
             Sistem otomatis memindai seluruh durasi misi 336 jam untuk mencari kombinasi aman dengan pencahayaan surya 100%, lereng &lt; 10°, dan sinyal Bumi stabil.
           </div>
         </div>
         <button class="btn-finder-hero" onclick="openSmartFinderModal()">
-          <span>⚡</span> CARI TANGGAL & POSISI OPTIMAL
+          CARI TANGGAL & POSISI OPTIMAL
         </button>
       </div>
 
@@ -1334,14 +1334,14 @@
     <!-- BENTO 2A: TOPOGRAFI MONS MOUTON & GLOBE BULAN 3D -->
     <div class="bento-card">
       <div class="card-header">
-        <span class="card-title">🗺️ Topografi & Posisi Bulan</span>
+        <span class="card-title">Topografi & Posisi Bulan</span>
         <div style="display: flex; gap: 8px; align-items: center;">
           <div class="segmented-tabs" style="padding: 2px;">
             <button class="tab-btn active" id="btn-view-dem" onclick="setMapView('dem')" style="padding: 3px 8px; font-size: 10px;">
               DEM Mons Mouton
             </button>
             <button class="tab-btn" id="btn-view-globe" onclick="setMapView('globe')" style="padding: 3px 8px; font-size: 10px;">
-              🌕 Globe Bulan 3D
+               Globe Bulan 3D
             </button>
           </div>
           <span class="badge-slope-safe" id="lbl-active-coords">-84.9°S, -33.3°W</span>
@@ -1380,7 +1380,7 @@
     <!-- BENTO 2B: 360° POLAR HORIZON SKY-PLOT -->
     <div class="bento-card">
       <div class="card-header">
-        <span class="card-title">🌐 360° Polar Horizon Sky-Plot (Rintangan Kawah)</span>
+        <span class="card-title">360° Polar Horizon Sky-Plot (Rintangan Kawah)</span>
         <span id="skyplot-badge" style="font-size: 11px; font-weight: 700; color: var(--emerald-safe);">Direct Line-of-Sight</span>
       </div>
       <div class="radar-frame" id="skyplot-box">
@@ -1395,7 +1395,7 @@
     <!-- BENTO 3: TIMELINE SCRUBBER 14-HARI -->
     <div class="bento-card bento-full">
       <div class="card-header">
-        <span class="card-title">⏱ Timeline Misi 14-Hari (0 - 336 Jam) — Evaluasi Surya & Sinyal Bumi</span>
+        <span class="card-title">Timeline Misi 14-Hari (0 - 336 Jam) — Evaluasi Surya & Sinyal Bumi</span>
         <div class="time-readout-pill" id="timeline-time-badge">
           2026-11-14 12:00 UTC (+0h)
         </div>
@@ -1437,9 +1437,9 @@
     <!-- BENTO 4: DESCENT GUIDANCE & PDI RK45 -->
     <div class="bento-card bento-full">
       <div class="card-header">
-        <span class="card-title">🚀 Powered Descent Initiation (PDI) Solver (RK45 & J2 Gravitasi)</span>
+        <span class="card-title">Powered Descent Initiation (PDI) Solver (RK45 & J2 Gravitasi)</span>
         <button class="btn-recalc" id="btn-recalc-pdi">
-          <span>⚡</span> Hitung Trajektori RK45
+          Hitung Trajektori RK45
         </button>
       </div>
 
@@ -1487,7 +1487,7 @@
           ↺ Reset Posisi
         </button>
         <button class="tab-btn" id="btn-sim-auto" style="background: var(--bg-selected); color: var(--artemis-blue);">
-          🤖 Autopilot Descent
+           Autopilot Descent
         </button>
       </div>
     </div>
@@ -1499,7 +1499,7 @@
       <div class="modal-header">
         <div>
           <div class="guide-badge">
-            <span>⚡</span> Automated Decision Matrix • NASA JPL Horizons & LOLA DEM
+            Automated Decision Matrix • NASA JPL Horizons & LOLA DEM
           </div>
           <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin-top: 4px;">
             Rekomendasi Tanggal, Waktu & Lokasi Pendaratan Optimal
@@ -1515,21 +1515,21 @@
         <!-- OPSI 1: PRIMARY -->
         <div class="rec-card best">
           <div>
-            <div class="rec-badge-tag badge-primary-rec">⭐ REKOMENDASI UTAMA • GOLDEN SOLAR WINDOW</div>
+            <div class="rec-badge-tag badge-primary-rec">[PRIORITAS 1] REKOMENDASI UTAMA — GOLDEN SOLAR WINDOW</div>
             <div class="rec-title">Site Alpha — Mons Mouton Crest (Dataran Tinggi Utama)</div>
             <div class="rec-time">
-              <span>📅</span> Waktu Terbaik: <strong>14 November 2026, 12:00 UTC</strong> (+0 Jam Operasi)
+              Waktu Optimal: <strong>14 November 2026, 12:00 UTC</strong> (+0 Jam Operasi)
             </div>
             <div class="rec-specs-grid">
-              <span class="rec-spec-pill">📐 Lereng: <strong>0.08°</strong> (Sangat Datar &lt; 10°)</span>
-              <span class="rec-spec-pill">☀️ Surya: <strong>100% Aktif</strong> (168 Jam Cahaya Maksimal)</span>
-              <span class="rec-spec-pill">📡 Bumi DTE: <strong>+6.8°</strong> (Clearance Bibir Kawah Aman)</span>
-              <span class="rec-spec-pill" style="color: var(--emerald-safe); background: var(--emerald-bg);">🏆 Skor MCDA: <strong>92 / 100 (SANGAT AMAN)</strong></span>
+              <span class="rec-spec-pill">Kemiringan Lereng: <strong>0.08°</strong> (Sangat Datar &lt; 10°)</span>
+              <span class="rec-spec-pill">Iluminasi Surya: <strong>100% Aktif</strong> (168 Jam Cahaya Maksimal)</span>
+              <span class="rec-spec-pill">Elevasi Bumi (DTE): <strong>+6.8°</strong> (Clearance Bibir Kawah Aman)</span>
+              <span class="rec-spec-pill" style="color: var(--emerald-safe); background: var(--emerald-bg);">Skor MCDA: <strong>92 / 100 (SANGAT AMAN)</strong></span>
             </div>
           </div>
           <div>
             <button class="btn-apply-rec" onclick="applyRecommendation('ALPHA', 0, 'Site Alpha (Mons Mouton Crest)', '14 Nov 2026 12:00 UTC')">
-              <span>📍</span> Lihat Tempat & Visualisasikan
+              Tinjau Lokasi & Visualisasi
             </button>
           </div>
         </div>
@@ -1537,21 +1537,21 @@
         <!-- OPSI 2: PEAK DTE -->
         <div class="rec-card">
           <div>
-            <div class="rec-badge-tag badge-sec-rec">📡 KONEKTIVITAS BUMI MAKSIMAL • PEAK EARTH LINK</div>
+            <div class="rec-badge-tag badge-sec-rec">[PRIORITAS 2] KONEKTIVITAS BUMI MAKSIMAL — PEAK EARTH LINK</div>
             <div class="rec-title">Site Beta — Plateau North Rim (Tebing Utara)</div>
             <div class="rec-time">
-              <span>📅</span> Waktu Terbaik: <strong>17 November 2026, 06:00 UTC</strong> (+66 Jam Operasi)
+              Waktu Optimal: <strong>17 November 2026, 06:00 UTC</strong> (+66 Jam Operasi)
             </div>
             <div class="rec-specs-grid">
-              <span class="rec-spec-pill">📐 Lereng: <strong>0.06°</strong> (Paling Datar)</span>
-              <span class="rec-spec-pill">☀️ Surya: <strong>95% Aktif</strong> (Bebas Bayangan)</span>
-              <span class="rec-spec-pill">📡 Bumi DTE: <strong>+8.4°</strong> (Elevasi Terjernih Tanpa Halangan)</span>
-              <span class="rec-spec-pill" style="color: var(--emerald-safe); background: var(--emerald-bg);">🏆 Skor MCDA: <strong>88 / 100 (AMAN)</strong></span>
+              <span class="rec-spec-pill">Kemiringan Lereng: <strong>0.06°</strong> (Paling Datar)</span>
+              <span class="rec-spec-pill">Iluminasi Surya: <strong>95% Aktif</strong> (Bebas Bayangan)</span>
+              <span class="rec-spec-pill">Elevasi Bumi (DTE): <strong>+8.4°</strong> (Elevasi Terjernih Tanpa Halangan)</span>
+              <span class="rec-spec-pill" style="color: var(--emerald-safe); background: var(--emerald-bg);">Skor MCDA: <strong>88 / 100 (AMAN)</strong></span>
             </div>
           </div>
           <div>
             <button class="btn-apply-rec" onclick="applyRecommendation('BETA', 66, 'Site Beta (Plateau North Rim)', '17 Nov 2026 06:00 UTC')">
-              <span>📍</span> Lihat Tempat & Visualisasikan
+              Tinjau Lokasi & Visualisasi
             </button>
           </div>
         </div>
@@ -1559,21 +1559,21 @@
         <!-- OPSI 3: CONTINGENCY -->
         <div class="rec-card">
           <div>
-            <div class="rec-badge-tag badge-sec-rec">🛡️ CADANGAN KONTINJENSI • SHIELDED BASIN</div>
+            <div class="rec-badge-tag badge-sec-rec">[PRIORITAS 3] CADANGAN KONTINJENSI — SHIELDED BASIN</div>
             <div class="rec-title">Site Gamma — West Basin Ridge (Punggung Cekungan Barat)</div>
             <div class="rec-time">
-              <span>📅</span> Waktu Terbaik: <strong>21 November 2026, 18:00 UTC</strong> (+174 Jam Operasi)
+              Waktu Optimal: <strong>21 November 2026, 18:00 UTC</strong> (+174 Jam Operasi)
             </div>
             <div class="rec-specs-grid">
-              <span class="rec-spec-pill">📐 Lereng: <strong>0.17°</strong> (Stabil &lt; 10°)</span>
-              <span class="rec-spec-pill">☀️ Surya: <strong>82% Aktif</strong></span>
-              <span class="rec-spec-pill">📡 Bumi DTE: <strong>+4.5°</strong> di atas rintangan</span>
-              <span class="rec-spec-pill" style="color: var(--amber-warn); background: var(--amber-bg);">🏆 Skor MCDA: <strong>79 / 100 (LAYAK - KONTINJENSI)</strong></span>
+              <span class="rec-spec-pill">Kemiringan Lereng: <strong>0.17°</strong> (Stabil &lt; 10°)</span>
+              <span class="rec-spec-pill">Iluminasi Surya: <strong>82% Aktif</strong></span>
+              <span class="rec-spec-pill">Elevasi Bumi (DTE): <strong>+4.5°</strong> di atas rintangan</span>
+              <span class="rec-spec-pill" style="color: var(--amber-warn); background: var(--amber-bg);">Skor MCDA: <strong>79 / 100 (LAYAK - KONTINJENSI)</strong></span>
             </div>
           </div>
           <div>
             <button class="btn-apply-rec" onclick="applyRecommendation('GAMMA', 174, 'Site Gamma (West Basin Ridge)', '21 Nov 2026 18:00 UTC')">
-              <span>📍</span> Lihat Tempat & Visualisasikan
+              Tinjau Lokasi & Visualisasi
             </button>
           </div>
         </div>
@@ -1583,7 +1583,7 @@
 
   <!-- FLOATING TOAST NOTIFICATION -->
   <div class="notification-toast" id="notificationToast">
-    <span style="font-size: 16px;">🎯</span>
+    <span style="font-size: 16px;"></span>
     <span id="toastMessage">Lokasi & waktu berhasil disinkronkan!</span>
   </div>
 
@@ -1646,7 +1646,7 @@
         renderMoonGlobe();
       }
 
-      showToast(`🎯 Rekomendasi Terpilih: ${siteName} • ${dateStr}`);
+      showToast(`Rekomendasi Terpilih: ${siteName} • ${dateStr}`);
 
       // Scroll to map
       const mapBox = document.getElementById("map-frame-box");
@@ -1954,7 +1954,7 @@
         pill.style.background = "var(--amber-bg)";
         pill.style.color = "var(--amber-warn)";
         pill.style.borderColor = "#fde68a";
-        pill.innerHTML = `<span>⚠</span> MISSION STATUS: MARGINAL`;
+        pill.innerHTML = `<span>[PERINGATAN]</span> MISSION STATUS: MARGINAL`;
       } else {
         pill.style.background = "var(--coral-bg)";
         pill.style.color = "var(--coral-crit)";
