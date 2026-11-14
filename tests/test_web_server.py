@@ -61,7 +61,7 @@ def test_endpoints():
     assert "mcda" in ev
     print("✓ POST /api/evaluate PASS")
 
-    print("\nALL WEB ENDPOINTS TESTED & PASSED! 🚀")
+    print("\nALL WEB ENDPOINTS TESTED & PASSED! [PASS]")
 
 if __name__ == "__main__":
     test_endpoints()

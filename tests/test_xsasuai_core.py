@@ -82,4 +82,4 @@ if __name__ == "__main__":
     test_trajectory_calculator()
     test_corridor_validation()
     test_visualizer()
-    print("\nALL TESTS PASSED SUCCESSFULLY! 🚀")
+    print("\nALL TESTS PASSED SUCCESSFULLY! [PASS]")

@@ -16,12 +16,12 @@
     95000.0,
     5920.0
   ],
-  "total_dv_ms": 161.4,
-  "prop_remaining_kg": 308.64,
+  "total_dv_ms": 1714.8,
+  "prop_remaining_kg": 115.3,
   "touchdown_time_s": 60.049999999998725,
   "touchdown_vz_ms": 1.1981684902715348,
   "trajectory_solved": true,
-  "last_updated": "2026-11-14T12:07:12.228140+00:00",
+  "last_updated": "2026-11-14T12:34:14.456853+00:00",
   "schema_version": "1.0.0",
   "last_written_by": "simulate_landing"
 }

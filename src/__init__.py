@@ -1,14 +1,28 @@
 # -*- coding: utf-8 -*-
 """
-XSasuai — Smart Unified Artemis Interface
-NASA Space Apps Challenge 2026 | Team: Pilar Karya
-Package core modules:
-- site_evaluator: Topography, Slope, 360 Horizon Raymarching, Solar & DTE Analysis, MCDA
-- trajectory_calculator: Non-spherical Lunar Gravity Propagation, PDI Delta-V, Hazard Clearance
-- visualizer_ui: Polar Horizon Sky-Plot, 14-Day Timeline, Indicator Badges, Descent Visualizations
+XASUAI Astrodynamics Engine Package
+===================================
+Proyek  : XASUAI (NASA Space Apps Challenge 2026 - Mons Mouton Lunar Landing Navigator)
 """
 
-__version__ = "2.0.0"
-__team__ = "Pilar Karya"
-__challenge__ = "Lunar Landing Site Navigator"
+from . import constants
+from . import mission_state
+from . import ephemeris_loader
+from . import lola_analyzer
+from . import horizon_scanner
+from . import mcda_optimizer
+from . import site_evaluator
+from . import trajectory_calculator
+from . import visualizer_ui
 
+__all__ = [
+    "constants",
+    "mission_state",
+    "ephemeris_loader",
+    "lola_analyzer",
+    "horizon_scanner",
+    "mcda_optimizer",
+    "site_evaluator",
+    "trajectory_calculator",
+    "visualizer_ui"
+]
