@@ -1,145 +1,199 @@
-# XSasuai (Smart Unified Artemis Interface)
+# XSASUAI — Lunar Landing Site Navigator
 > **NASA Space Apps Challenge 2026 | Challenge: Lunar Landing Site Navigator**  
-> **Team: Pilar Karya | Target Region: Mons Mouton, Lunar South Pole (-84.9°S, 33.3°W)**
+> **Team: Pilar Karya | Target Region: Mons Mouton, Lunar South Pole (-84.9°S, 33.3°W)**  
+> **Repository:** [https://github.com/accfd/XSasuai](https://github.com/accfd/XSasuai)
 
 ---
 
-## 🌒 Ringkasan Eksekutif (Executive Summary)
+## 🌒 Tentang Proyek (About XSasuai)
 
-**XSasuai (Smart Unified Artemis Interface)** adalah sistem navigasi dan perencana pendaratan Bulan terpadu yang dirancang untuk memecahkan kendala ekstrem pencahayaan dan komunikasi di kawasan Kutub Selatan Bulan (Mons Mouton). 
+**XSasuai (Smart Unified Artemis Interface)** adalah sistem navigasi eksekutif terpadu untuk mengevaluasi rintangan cakrawala 360°, pencahayaan surya kontinu, dan jalur komunikasi langsung ke Bumi (*Direct-to-Earth / DTE*) di dataran tinggi **Mons Mouton**, Kutub Selatan Bulan.
 
-Sistem ini mengintegrasikan data elevasi satelit **NASA LRO LOLA DEM**, ephemeris presisi tinggi **NASA JPL Horizons API**, solver fisika trajektori orbital non-spherical ($J_2$ lunar gravity harmonics), serta Multi-Criteria Decision Analysis (**MCDA**) ke dalam antarmuka interaktif modern (**Web Application & Desktop GUI**).
+Sistem ini memadukan:
+1. **NASA LRO LOLA DEM:** Model elevasi topografi satelit resolusi tinggi untuk memverifikasi kemiringan lereng aman ($< 10^\circ$).
+2. **NASA JPL Horizons API:** Ephemeris posisi presisi Matahari (ID: `10`) dan Bumi (ID: `399`) terhadap titik acuan observer di permukaan Bulan.
+3. **Raymarching Cakrawala 360°:** Pemetaan siluet rintangan kawah lokal dengan koreksi kelengkungan Bulan.
+4. **Solver Trajektori PDI (RK45):** Simulasi fisika pendaratan roket dengan perturbasi gravitasi non-spherical ($J_2$).
+5. **Clean Bento Grid Executive Web Console:** Antarmuka interaktif responsif bergaya NASA / Linear Aerospace.
 
 ---
 
-## 🏛️ Arsitektur Sistem & Fitur Utama
+## 🚀 Panduan Membuka & Menjalankan Proyek (Step-by-Step)
+
+Panduan ini dibuat sangat ringkas dan jelas agar siapa saja (termasuk rekan tim yang belum terbiasa dengan coding) dapat langsung menjalankannya dalam hitungan menit.
+
+---
+
+### METODE 1: Menggunakan Antigravity IDE (Sangat Direkomendasikan)
+
+1. **Buka Antigravity IDE** di laptop Anda.
+2. Di halaman pembuka Antigravity IDE, klik menu **"Clone Git Repository"** (atau buka menu atas: `File` ➔ `New` ➔ `Clone Repository`).
+3. Masukkan tautan URL repositori GitHub resmi:
+   ```text
+   https://github.com/accfd/XSasuai.git
+   ```
+4. Pilih folder di laptop Anda untuk menyimpannya (misalnya di `Documents` atau `D:\LOMBA`), lalu klik **Clone & Open**.
+5. Tunggu proses unduhan selesai dan folder proyek terbuka otomatis di Antigravity IDE.
+6. Buka **Terminal** bawaan di Antigravity IDE dengan menekan shortcut keyboard:
+   ```text
+   Ctrl + `  (tombol petik di bawah tombol Esc)
+   ```
+7. Pasang pustaka pendukung (cukup dijalankan satu kali di awal):
+   ```bash
+   pip install -r requirements.txt
+   ```
+8. **Jalankan Aplikasi Web Dashboard:**
+   ```bash
+   python main.py --web
+   ```
+9. **Selesai!** Peramban browser Anda (Chrome/Edge) akan otomatis terbuka di alamat:
+   👉 **`http://127.0.0.1:8888`**
+
+---
+
+### METODE 2: Menggunakan Visual Studio Code (VS Code)
+
+1. **Buka VS Code** di laptop Anda.
+2. Buka Command Palette dengan menekan: `Ctrl + Shift + P`.
+3. Ketik dan pilih **`Git: Clone`**.
+4. Masukkan URL repositori:
+   ```text
+   https://github.com/accfd/XSasuai.git
+   ```
+5. Pilih folder penyimpanan, lalu klik **Open Repository**.
+6. Buka Terminal di VS Code: `Ctrl + ` ` ` (atau menu `Terminal` ➔ `New Terminal`).
+7. Instal paket pendukung:
+   ```bash
+   pip install -r requirements.txt
+   ```
+8. Jalankan aplikasi web:
+   ```bash
+   python main.py --web
+   ```
+9. Buka browser di **`http://127.0.0.1:8888`**.
+
+---
+
+### METODE 3: Menggunakan Terminal / Command Prompt Langsung (CLI)
+
+1. Buka **Command Prompt (CMD)** atau **PowerShell**.
+2. Masuk ke direktori yang Anda inginkan, lalu clone repositori:
+   ```bash
+   git clone https://github.com/accfd/XSasuai.git
+   ```
+3. Pindah ke dalam folder proyek:
+   ```bash
+   cd XSasuai
+   ```
+4. Instal dependensi:
+   ```bash
+   pip install -r requirements.txt
+   ```
+5. Jalankan aplikasi:
+   ```bash
+   python main.py --web
+   ```
+6. Buka browser favorit Anda di **`http://127.0.0.1:8888`**.
+
+---
+
+### UPDATE: Jika Anda Sudah Memiliki Foldernya (Cukup Pull)
+
+Jika rekan tim Anda sudah pernah meng-clone folder proyek sebelumnya dan ingin mengambil pembaruan sistem terbaru:
+1. Buka folder proyek di terminal / IDE.
+2. Ketik perintah:
+   ```bash
+   git pull origin main
+   ```
+3. Jalankan aplikasi web:
+   ```bash
+   python main.py --web
+   ```
+4. Tekan **`Ctrl + F5`** di browser pada alamat `http://127.0.0.1:8888` untuk Hard Refresh.
+
+---
+
+## 🎮 Pilihan Perintah Menjalankan Aplikasi (`main.py`)
+
+Aplikasi ini dilengkapi launcher fleksibel multi-mode:
+
+| Perintah Terminal | Deskripsi Mode |
+| :--- | :--- |
+| **`python main.py --web`** | **[Rekomendasi Utama]** Menjalankan Web Dashboard interaktif Bento Grid di browser (`http://127.0.0.1:8888`). |
+| **`python main.py --desktop`** | Menjalankan aplikasi Desktop GUI 5-Tab native berbasis PyQt6. |
+| **`python main.py --sim`** | Menjalankan Simulator Uji Terbang 3D Cockpit secara langsung. |
+| **`python main.py --eval`** | Menjalankan evaluasi cepat spasiotemporal & scoring MCDA langsung di terminal teks. |
+| **`python main.py --help`** | Menampilkan seluruh bantuan opsi perintah. |
+
+---
+
+## 🖥️ Cara Menggunakan Web Dashboard Bento Grid
+
+Setelah membuka **`http://127.0.0.1:8888`** di browser:
 
 ```
-                     ┌──────────────────────────────────────────────┐
-                     │          XSASUAI CORE ENGINE ARCH            │
-                     └──────────────────────┬───────────────────────┘
-                                            │
-        ┌───────────────────────────────────┼───────────────────────────────────┐
-        ▼                                   ▼                                   ▼
-┌───────────────────────┐       ┌───────────────────────┐       ┌───────────────────────┐
-│ Fitur 1: Evaluator    │       │ Fitur 2: Trajectory   │       │ Fitur 3: Visualizer   │
-│ (src/site_evaluator)  │       │ (src/trajectory_calc) │       │ (src/visualizer_ui)   │
-├───────────────────────┤       ├───────────────────────┤       ├───────────────────────┤
-│ • LOLA DEM Loader     │       │ • J2 Gravity Perturb. │       │ • 360° Polar Skyplot  │
-│ • Slope Gradient      │       │ • solve_ivp (RK45)    │       │ • 14-Day Timeline (h) │
-│ • 360° Raymarching    │       │ • PDI Throttle Ctrl   │       │ • Descent Profiles    │
-│ • Solar Illumination  │       │ • Approach Corridor   │       │ • Safety Status Badges│
-│ • Earth DTE Visibility│       │ • Fuel & ΔV Budget    │       │ • Base64 PNG Streamer │
-│ • MCDA Scoring Engine │       │ • Safe Touchdown Gate │       │                       │
-└───────────────────────┘       └───────────────────────┘       └───────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│                        XSASUAI BENTO WORKSPACE                         │
+├────────────────────────────────────────────────────────────────────────┤
+│ 📍 PEMILIH LOKASI: Klik [Site Alpha], [Site Beta], atau [Site Gamma]  │
+├───────────────────────────────────┬────────────────────────────────────┤
+│ 🗺️ Topografi Satelit LOLA DEM     │ 🌐 Radar 360° Polar Horizon Skyplot│
+│    (Pin interaktif Mons Mouton)   │    (Rintangan tebing & posisi Sun) │
+├───────────────────────────────────┴────────────────────────────────────┤
+│ ⏱ TIMELINE 14-HARI: Geser slider 0h s.d 336h untuk simulasi matahari  │
+├────────────────────────────────────────────────────────────────────────┤
+│ 🚀 DESCENT GUIDANCE: Tekan [Hitung Trajektori RK45] untuk ΔV & propelan│
+│ 🕹️ FLIGHT TESTBED: Buka tab kanan atas untuk coba menyetir wahana 3D   │
+└────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 1. Fitur 1: Penentuan Tanggal & Posisi Pendaratan di Batas Aman Cakrawala (`src/site_evaluator.py`)
-- **Topografi Presisi:** Memuat Digital Elevation Model dari Mons Mouton LOLA DEM (250m/px).
-- **Slope Gradient Calculation:** Perhitungan kemiringan lereng dengan central difference gradient. **Hard Gate:** Lokasi dengan kemiringan $\ge 10^\circ$ otomatis dieliminasi.
-- **360° Raymarching Cakrawala:** Menembakkan vektor sinar radial ke seluruh azimut $[0^\circ, 360^\circ)$ dengan koreksi kelengkungan Bulan ($R_{\text{moon}} = 1,737,400\text{ m}$) untuk mendeteksi dinding kawah dan puncak bukit perintang.
-- **JPL Horizons Ephemeris Live Client:** Mengambil posisi real-time Matahari (ID: `10`) dan Bumi (ID: `399`) dengan observer geodetic Bulan (`coord@301`) serta cache cerdas 24 jam.
-- **MCDA Scoring Engine:**
-  $$S = w_{\text{slope}} \cdot S_{\text{slope}} + w_{\text{illum}} \cdot S_{\text{illum}} + w_{\text{dte}} \cdot S_{\text{dte}}$$
-  Bobot: Kemiringan Lereng (35%), Iluminasi Surya (35%), Komunikasi Direct-to-Earth (30%).
-
-### 2. Fitur 2: Perhitungan Trajektori & Koridor Pendekatan (`src/trajectory_calculator.py`)
-- **Gravitasi Non-Spherical Bulan:** Mengakomodasi percepatan perturbasi gravitasi harmonik zonal $J_2 = 2.027 \times 10^{-4}$ dan $\mu_{\text{moon}} = 4.9048695 \times 10^{12}\ \text{m}^3/\text{s}^2$.
-- **Integrasi Numerik RK45 (`scipy.integrate.solve_ivp`):** Simulasi fasa *Powered Descent Initiation* (PDI) dari perilune 15 km hingga pendaratan di permukaan.
-- **Profil Propulsi Wahana:** Variasi gaya dorong kontinu ($T_{\min} = 400\text{ N}$ hingga $T_{\max} = 3200\text{ N}$, $I_{\text{sp}} = 310\text{ s}$).
-- **Validasi Koridor Pendekatan:** Memeriksa jarak bebas vertikal pendarat terhadap dinding tebing kawah sepanjang 15 km glideslope ($> 150\text{ meter}$).
-- **Kriteria Touchdown Aman:** Kecepatan vertikal $V_z \le 2.0\text{ m/s}$, kecepatan horizontal $V_h \le 0.5\text{ m/s}$, dan sisa propelan $> 15\text{ kg}$.
-
-### 3. Fitur 3: Visualisasi Interaktif & Horizon Sky-Plot (`src/visualizer_ui.py`)
-- **360° Polar Horizon Sky-Plot:** Memproyeksikan rintangan cakrawala lokal sebagai poligon radial dengan zenith di pusat dan elevasi rintangan di tepi, memplot posisi seketika serta lintasan Matahari & Bumi.
-- **14-Day Mission Timeline Slider (0–336 jam):** Menggeser slider waktu untuk melihat secara instan pergerakan sudut datang surya, keterlihatan Bumi, efisiensi daya, dan status keamanan pendaratan.
-- **Indikator Keselamatan Tiga Tingkat:**
-  - 🟢 **AMAN (GO):** Skor $\ge 0.75$, Iluminasi $> 20\%$, DTE $> 20\%$, Slope $< 10^\circ$.
-  - 🟡 **WASPADA (MARGINAL):** Skor $0.50 - 0.74$.
-  - 🔴 **KRITIS (NO-GO):** Skor $< 0.50$ atau terjadi gerhana/terhalang tebing kawah.
-
-### 4. Fitur 4: Cockpit Flight Simulator Testbed (`simulator/` & `lunar_game_simulator.py`)
-- Simulator 3D real-time berbasis Pygame dengan dinamika fisika gravitasi Bulan $1.62\ \text{m/s}^2$.
-- HUD terintegrasi: Artificial Horizon, Fuel Indicator, Radar Altitude, Touchdown Velocimeter.
-- Dapat diluncurkan langsung dari Web UI atau Desktop GUI dengan satu klik.
+1. **Membandingkan Kandidat Lokasi:** Klik kartu **Site Alpha (Crest)**, **Site Beta (Rim)**, atau **Site Gamma (Ridge)** untuk membandingkan kemiringan lereng (*Slope*) dan elevasi.
+2. **Peta Topografi Satelit:** Peta topografi di sebelah kiri menampilkan citra satelit NASA LOLA DEM dengan pin lokasi seketika.
+3. **Radar Cakrawala 360° (Polar Sky-Plot):** Menampilkan siluet rintangan kawah di sekeliling pendarat beserta posisi seketika Matahari (Kuning) dan Bumi (Biru).
+4. **Menguji Jendela Waktu (Timeline Scrubber 14-Hari):** Geser slider horisontal (0 jam s.d. 336 jam) untuk melihat pergerakan sudut matahari dan memeriksa kapan suplai daya surya atau sinyal Bumi aktif.
+5. **Simulator Cockpit 3D:** Klik tab **`[🕹️ Flight Testbed]`** di pojok kanan atas untuk menguji coba pendaratan secara manual:
+   - Tombol **`Spasi` / `W`**: Menyalakan mesin pendorong utama (*Thrust*).
+   - Tombol **`A` / `D`**: Menyeimbangkan arah wahana (*RCS Roll*).
+   - Tombol **`R`**: Reset pendaratan.
+   - Tombol **`Autopilot Descent`**: Pendaratan otomatis berbantuan komputer.
 
 ---
 
-## 📁 Struktur Direktori
+## 📁 Struktur Berkas Proyek
 
 ```text
-lunar-mission-planner/
+XSasuai/
 ├── data/
-│   ├── quickmap-lroc.png          # LOLA DEM Elevasi Raster Mons Mouton
-│   ├── quickmap-lroc.vrt          # Metadata Geospasial LROC
-│   ├── mons_mouton_illum/         # Komposit Iluminasi Penyinaran Surya
+│   ├── quickmap-lroc.png          # Citra Satelit Elevasi NASA LRO LOLA DEM
+│   ├── quickmap-lroc.vrt          # Metadata Geospasial Proyeksi Kutub
 │   └── horizons_cache.json        # Cache Ephemeris NASA JPL Horizons
 ├── output/
 │   └── mission_state.json         # Shared State Bus Antar-Modul
 ├── src/
-│   ├── __init__.py                # Package Descriptor
-│   ├── site_evaluator.py          # Fitur 1: DEM, Slope, 360 Raymarching, MCDA
-│   ├── trajectory_calculator.py   # Fitur 2: J2 Gravity, PDI RK45, Corridor Check
-│   └── visualizer_ui.py           # Fitur 3: Polar Sky-Plot, Timeline, Plots
+│   ├── __init__.py
+│   ├── site_evaluator.py          # Fitur 1: Analisis Slope, 360° Raymarching, MCDA
+│   ├── trajectory_calculator.py   # Fitur 2: J2 Gravity, Solver PDI RK45
+│   └── visualizer_ui.py           # Fitur 3: Polar Sky-Plot & Visualizer
 ├── web/
-│   ├── index.html                 # Modern Responsive Dashboard (HTML5/CSS3/JS)
+│   ├── index.html                 # Bento Grid Executive Dashboard
 │   └── server.py                  # Backend REST API Server (Tornado)
 ├── simulator/
-│   ├── __init__.py
-│   └── lunar_game_simulator.py    # 3D Cockpit Flight Simulator
+│   └── lunar_game_simulator.py    # 3D Flight Cockpit Simulator
 ├── tests/
-│   ├── test_xsasuai_core.py       # Unit Test Fitur 1, 2, 3
-│   └── test_web_server.py         # Integration Test REST API Endpoints
+│   ├── test_xsasuai_core.py       # Pengujian Unit Fitur 1, 2, 3
+│   └── test_web_server.py         # Pengujian Integrasi REST API
 ├── constants.py                   # Single Source of Truth Fisika & Astronomi
 ├── mission_state.py               # Shared Mission State Manager
-├── horizons_api.py                # NASA JPL Horizons Ephemeris REST Client
-├── main.py                        # Unified Launcher Console
-└── requirements.txt
-```
-
----
-
-## 🚀 Cara Menjalankan Aplikasi
-
-### 1. Menjalankan Web Application Interaktif (Rekomendasi)
-Buka terminal dan jalankan:
-```bash
-python main.py --web
-```
-Aplikasi web modern akan otomatis terbuka di browser: `http://127.0.0.1:8888`.
-Di sini Anda dapat:
-- Memilih situs **Site Alpha**, **Site Beta**, atau **Site Gamma**.
-- Menggeser **Slider Timeline Misi 14-Hari** (0 s.d. 336 Jam) untuk analisis pencahayaan seketika.
-- Melihat **360° Polar Horizon Sky-Plot**.
-- Menekan **"Hitung Trajektori RK45"** untuk kalkulasi dinamika pendaratan PDI.
-- Menekan **"Buka Simulator Pendaratan 3D"** untuk mencoba mendaratkan wahana secara langsung!
-
-### 2. Menjalankan Desktop GUI (PyQt6)
-Jika ingin menggunakan antarmuka desktop PyQt6 5-Tab:
-```bash
-python main.py --desktop
-# atau cukup:
-python main.py
-```
-
-### 3. Menjalankan Evaluasi Cepat CLI
-```bash
-python main.py --eval
-```
-
-### 4. Menjalankan Simulator 3D Langsung
-```bash
-python main.py --sim
-```
-
-### 5. Menjalankan Unit Tests
-```bash
-python tests/test_xsasuai_core.py
-python tests/test_web_server.py
+├── horizons_api.py                # Klien API Resmi NASA JPL Horizons
+├── main.py                        # Launcher Terpadu
+├── requirements.txt               # Daftar Pustaka Python
+└── README.md
 ```
 
 ---
 
 ## 👥 Tim Pengembang
 **Tim: Pilar Karya**  
-Proyek dibuat untuk **NASA Space Apps Challenge 2026** — *Lunar Landing Site Navigator*.
+- Proyek dibuat untuk **NASA Space Apps Challenge 2026**
+- Kategori Tantangan: *Lunar Landing Site Navigator*
+- Lokasi Event: *Purwokerto*
