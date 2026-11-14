@@ -1634,215 +1634,238 @@ function animate() {
   const dt = (now - prevFrameTime) / 1000;
   prevFrameTime = now;
 
-  // Advance simulation
-  if (isPlaying && !scrubbing) {
-    simDay += (dt * speedMult) / 86400;
-    if (simDay > MISSION_DAYS) simDay = MISSION_DAYS;
-  }
-
-  // Moon position
-  const moonKm = getMoonPos(simDay);
-  moonGroup.position.set(moonKm.x * SCALE, moonKm.y * SCALE, moonKm.z * SCALE);
-  moonMesh.lookAt(moonGroup.worldToLocal(new THREE.Vector3(0, 0, 0)));
-  moonMesh.rotateY(Math.PI);
-
-  // Pulse Radar Beacon on Mons Mouton
-  const pulseScale = 1.0 + 0.25 * Math.sin(now * 0.006);
-  beaconRing.scale.set(pulseScale, pulseScale, 1);
-  const pulseOuter = 1.0 + 0.45 * Math.sin(now * 0.003);
-  beaconOuterRing.scale.set(pulseOuter, pulseOuter, 1);
-  beaconOuterRing.material.opacity = 0.3 + 0.3 * Math.sin(now * 0.004);
-
-  // ═══ UNIFIED ASTRODYNAMICS TIMELINE ENGINE ═══
-  const mPoint = getMissionPointByDay(simDay);
-  
-  const orionSc = new THREE.Vector3(mPoint.pos[0], mPoint.pos[1], mPoint.pos[2]);
-  orionGroup.position.copy(orionSc);
-
-  // Orientation: Points along forward velocity vector, orients vertically at touchdown
-  const isPDIPhase = mPoint.phase.includes("BRAKING") || mPoint.phase.includes("APPROACH") || mPoint.phase.includes("TOUCHDOWN");
-  
-  if (isPDIPhase) {
-    // During powered descent and touchdown: align with lunar surface normal at Mons Mouton
-    const worldMons = moonGroup.localToWorld(MONS_MOUTON_POS.clone());
-    const surfaceNormal = worldMons.clone().sub(moonGroup.position).normalize();
-    orionGroup.up.copy(surfaceNormal);
-    orionGroup.lookAt(orionSc.clone().add(surfaceNormal));
-
-    // Starship landing thrusters active during descent
-    const isBurning = (mPoint.throttle_pct > 5.0 && mPoint.alt_km > 0.001);
-    if (starshipHLS.thrusterPlumes) {
-      starshipHLS.thrusterPlumes.forEach(plume => {
-        plume.visible = isBurning;
-        if (isBurning) {
-          const throttle = mPoint.throttle_pct / 100.0;
-          const flicker = 0.85 + 0.3 * Math.sin(now * 0.03);
-          plume.scale.set(flicker, flicker * throttle, flicker);
-          plume.material.opacity = 0.7 + 0.3 * throttle;
-        }
-      });
+  try {
+    // Advance simulation
+    if (isPlaying && !scrubbing) {
+      simDay += (dt * speedMult) / 86400;
+      if (simDay > MISSION_DAYS) simDay = MISSION_DAYS;
     }
-  } else {
-    // In orbit & transit: point forward along flight direction
-    if (starshipHLS.thrusterPlumes) {
-      starshipHLS.thrusterPlumes.forEach(p => { p.visible = false; });
-    }
-    const nextPt = getMissionPointByDay(Math.min(simDay + 0.002, MISSION_DAYS));
-    const dir = new THREE.Vector3(nextPt.pos[0] - mPoint.pos[0], nextPt.pos[1] - mPoint.pos[1], nextPt.pos[2] - mPoint.pos[2]).normalize();
-    if (dir.lengthSq() > 0.0001) {
-      orionGroup.lookAt(orionSc.clone().add(dir));
-    }
-  }
 
-  const orionKm = orionSc.clone().multiplyScalar(1 / SCALE);
-  const currentAlt = mPoint.alt_km;
-  const currentVel = mPoint.vel_kms;
-  const currentFuel = mPoint.fuel_kg;
-  const currentFuelPct = (mPoint.fuel_kg / 450.0) * 100.0;
-  const currentG = mPoint.g_force;
-  const currentPhaseStr = mPoint.phase;
-// Beacon pulse
-  const camDist = camera.position.distanceTo(orionGroup.position);
-  const fade = Math.min(1, camDist / 3);
-  if (beaconSprite) beaconSprite.material.opacity = fade * (0.7 + 0.3 * Math.sin(now * 0.005));
+    // Moon position
+    const moonKm = getMoonPos(simDay);
+    moonGroup.position.set(moonKm.x * SCALE, moonKm.y * SCALE, moonKm.z * SCALE);
+    moonMesh.lookAt(moonGroup.worldToLocal(new THREE.Vector3(0, 0, 0)));
+    moonMesh.rotateY(Math.PI);
 
-  // Traveled path from Earth launch to current position
-  const progressRatio = Math.max(0, Math.min(1.0, simDay / MISSION_DAYS));
-  const traveledIdx = Math.min(trajPts.length, Math.max(2, Math.ceil(progressRatio * trajPts.length)));
-  const traveledPts = trajPts.slice(0, traveledIdx);
-  const positions = [];
-  traveledPts.forEach(p => positions.push(p.x, p.y, p.z));
-  traveledLine.geometry.dispose();
-  traveledLine.geometry = new LineGeometry();
-  traveledLine.geometry.setPositions(positions);
-  traveledLine.computeLineDistances();
+    // Pulse Radar Beacon on Mons Mouton
+    const pulseScale = 1.0 + 0.25 * Math.sin(now * 0.006);
+    beaconRing.scale.set(pulseScale, pulseScale, 1);
+    const pulseOuter = 1.0 + 0.45 * Math.sin(now * 0.003);
+    beaconOuterRing.scale.set(pulseOuter, pulseOuter, 1);
+    beaconOuterRing.material.opacity = 0.3 + 0.3 * Math.sin(now * 0.004);
 
-  // Earth-Moon line
-  emLine.geometry.dispose();
-  emLine.geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), moonGroup.position.clone()]);
-  emLine.computeLineDistances();
+    // ═══ UNIFIED ASTRODYNAMICS TIMELINE ENGINE ═══
+    const mPoint = getMissionPointByDay(simDay);
+    
+    const orionSc = new THREE.Vector3(mPoint.pos[0], mPoint.pos[1], mPoint.pos[2]);
+    orionGroup.position.copy(orionSc);
 
-  // Earth rotation (GMST)
-  const simMs = LAUNCH_TIME + simDay * 86400000;
-  const dJ2000 = (simMs - J2000_MS) / 86400000;
-  const gmstDeg = (280.46061837 + 360.98564736629 * dJ2000) % 360;
-  earthMesh.rotation.y = gmstDeg * Math.PI / 180;
-
-  // Camera
-  if (targetPos) {
-    camera.position.lerp(targetPos, 0.05);
-    controls.target.lerp(targetLook, 0.05);
-    if (camera.position.distanceTo(targetPos) < 0.5) { targetPos = null; targetLook = null; }
-  }
-
-  if (!targetPos) {
-    if (cameraMode === 'follow') {
-      const offset = camera.position.clone().sub(controls.target);
-      controls.target.copy(orionSc);
-      camera.position.copy(orionSc).add(offset);
-    } else if (cameraMode === 'moon') {
-      const offset = camera.position.clone().sub(controls.target);
-      controls.target.copy(moonGroup.position);
-      camera.position.copy(moonGroup.position).add(offset);
-    } else if (cameraMode === 'mons') {
+    // Orientation: Points along forward velocity vector, orients vertically at touchdown
+    const isPDIPhase = mPoint.phase && (mPoint.phase.includes("BRAKING") || mPoint.phase.includes("APPROACH") || mPoint.phase.includes("TOUCHDOWN"));
+    
+    if (isPDIPhase) {
+      // During powered descent and touchdown: align with lunar surface normal at Mons Mouton
       const worldMons = moonGroup.localToWorld(MONS_MOUTON_POS.clone());
-      controls.target.copy(worldMons);
-    }
-  }
+      const surfaceNormal = worldMons.clone().sub(moonGroup.position).normalize();
+      orionGroup.up.copy(surfaceNormal);
+      orionGroup.lookAt(orionSc.clone().add(surfaceNormal));
 
-  controls.update();
-
-  // Labels face camera
-  earthLabel.lookAt(camera.position);
-  moonLabel.lookAt(camera.position);
-  orionLabel.lookAt(camera.position);
-  if (typeof monsLabel !== 'undefined') monsLabel.lookAt(camera.position);
-  
-  // Dynamic Orion label scaling based on camera distance
-  const orionCamDist = camera.position.distanceTo(orionGroup.position);
-  const labelScale = Math.max(0.3, Math.min(1, orionCamDist / 15));
-  orionLabel.scale.set(5 * labelScale, 0.65 * labelScale, 1);
-
-  // ═══ HUD Update ═══
-  const hudMs = simDay * 86400000;
-  
-  // MET
-  const metD = Math.floor(simDay);
-  const metH = Math.floor((hudMs % 86400000) / 3600000);
-  const metM = Math.floor((hudMs % 3600000) / 60000);
-  const metS = Math.floor((hudMs % 60000) / 1000);
-  document.getElementById('met-display').textContent = 
-    `T+${String(metD).padStart(2,'0')}:${String(metH).padStart(2,'0')}:${String(metM).padStart(2,'0')}:${String(metS).padStart(2,'0')}`;
-
-  // Date
-  const missionDate = new Date(LAUNCH_TIME + hudMs);
-  document.getElementById('date-display').textContent = missionDate.toUTCString().slice(0, 22) + ' UTC';
-
-  // Timeline slider - maps 0.0 (Earth Launch) to MISSION_DAYS (Touchdown) onto 0-100%
-  if (!scrubbing) {
-    const pct = Math.max(0, Math.min(1.0, simDay / MISSION_DAYS)) * 100;
-    document.getElementById('timeline-slider').value = Math.min(10000, pct * 100);
-    document.getElementById('timeline-progress').style.width = `${Math.min(100, pct)}%`;
-  }
-
-  // Phase markers (based on mission day)
-  [['pm-orbit', 0.0, 0.073],
-   ['pm-tli', 0.073, 0.09],
-   ['pm-coast', 0.09, 4.45],
-   ['pm-loi', 4.45, 4.613],
-   ['pm-pdi', 4.613, 4.62193],
-   ['pm-touchdown', 4.62193, MISSION_DAYS + 1]].forEach(([id, s, e]) => {
-    const el = document.getElementById(id);
-    if (el) el.classList.toggle('active', simDay >= s && simDay < e);
-  });
-
-  // Phase text
-  document.getElementById('phase-text').textContent = currentPhaseStr;
-
-  // Telemetry HUD update
-  const dEarth = Math.max(0, orionKm.length() - EARTH_RADIUS_KM);
-  const dMoon = Math.max(0, orionKm.clone().sub(moonKm).length() - MOON_RADIUS_KM);
-  document.getElementById('dist-earth').textContent = formatKm(dEarth);
-  document.getElementById('dist-moon').textContent = formatKm(dMoon);
-
-  if (isPDIPhase) {
-    const altM = Math.round(currentAlt * 1000);
-    const velMs = (currentVel * 1000).toFixed(1);
-    document.getElementById('val-altitude').textContent = altM.toLocaleString('en-US');
-    document.getElementById('unit-altitude').textContent = 'm';
-    document.getElementById('velocity').textContent = velMs;
-    document.getElementById('unit-velocity').textContent = 'm/s';
-    document.getElementById('val-fuel').textContent = currentFuel.toFixed(1);
-    document.getElementById('val-fuel-pct').textContent = currentFuelPct.toFixed(1);
-    document.getElementById('val-gforce').textContent = currentG.toFixed(2);
-    const hlsStatusEl = document.getElementById('val-hls-status');
-    const hlsThrotEl = document.getElementById('val-hls-throttle');
-    if (hlsStatusEl && hlsThrotEl) {
-      if (currentAlt <= 0.001) {
-        hlsStatusEl.textContent = "TOUCHDOWN (SAFE)";
-        hlsStatusEl.style.color = "#00ffaa";
-        hlsThrotEl.textContent = "ENGINES CUT OFF";
-      } else {
-        hlsStatusEl.textContent = "POWERED DESCENT";
-        hlsStatusEl.style.color = "#00f0ff";
-        hlsThrotEl.textContent = `${(mPoint.throttle_pct || 0).toFixed(0)}% THRUST (${(mPoint.pitch_deg || 0).toFixed(0)}° PITCH)`;
+      // Starship landing thrusters active during descent
+      const isBurning = ((mPoint.throttle_pct || 0) > 5.0 && (mPoint.alt_km || 0) > 0.001);
+      if (starshipHLS && starshipHLS.thrusterPlumes) {
+        starshipHLS.thrusterPlumes.forEach(plume => {
+          plume.visible = isBurning;
+          if (isBurning) {
+            const throttle = (mPoint.throttle_pct || 70) / 100.0;
+            const flicker = 0.85 + 0.3 * Math.sin(now * 0.03);
+            plume.scale.set(flicker, flicker * throttle, flicker);
+            plume.material.opacity = 0.7 + 0.3 * throttle;
+          }
+        });
+      }
+    } else {
+      // In orbit & transit: point forward along flight direction
+      if (starshipHLS && starshipHLS.thrusterPlumes) {
+        starshipHLS.thrusterPlumes.forEach(p => { p.visible = false; });
+      }
+      const nextPt = getMissionPointByDay(Math.min(simDay + 0.002, MISSION_DAYS));
+      if (nextPt && nextPt.pos) {
+        const dir = new THREE.Vector3(nextPt.pos[0] - mPoint.pos[0], nextPt.pos[1] - mPoint.pos[1], nextPt.pos[2] - mPoint.pos[2]).normalize();
+        if (dir.lengthSq() > 0.0001) {
+          orionGroup.lookAt(orionSc.clone().add(dir));
+        }
       }
     }
-  } else {
-    document.getElementById('val-altitude').textContent = formatKm(currentAlt);
-    document.getElementById('unit-altitude').textContent = 'km';
-    document.getElementById('velocity').textContent = currentVel.toFixed(2);
-    document.getElementById('unit-velocity').textContent = 'km/s';
-    document.getElementById('val-fuel').textContent = currentFuel.toFixed(1);
-    document.getElementById('val-fuel-pct').textContent = currentFuelPct.toFixed(1);
-    document.getElementById('val-gforce').textContent = currentG.toFixed(2);
+
+    const orionKm = orionSc.clone().multiplyScalar(1 / SCALE);
+    const currentAlt = (typeof mPoint.alt_km === 'number') ? mPoint.alt_km : 0;
+    const currentVel = (typeof mPoint.vel_kms === 'number') ? mPoint.vel_kms : 0;
+    const currentFuel = (typeof mPoint.fuel_kg === 'number') ? mPoint.fuel_kg : 450.0;
+    const currentFuelPct = (typeof mPoint.fuel_kg === 'number') ? (mPoint.fuel_kg / 450.0) * 100.0 : 100.0;
+    const currentG = (typeof mPoint.g_force === 'number') ? mPoint.g_force : (mPoint.phase && mPoint.phase.includes('LAUNCH') ? 1.4 : 1.0);
+    const currentPhaseStr = mPoint.phase || 'FLIGHT';
+
+    // Beacon pulse
+    const camDist = camera.position.distanceTo(orionGroup.position);
+    const fade = Math.min(1, camDist / 3);
+    if (beaconSprite) beaconSprite.material.opacity = fade * (0.7 + 0.3 * Math.sin(now * 0.005));
+
+    // Traveled path from Earth launch to current position
+    const progressRatio = Math.max(0, Math.min(1.0, simDay / MISSION_DAYS));
+    const traveledIdx = Math.min(trajPts.length, Math.max(2, Math.ceil(progressRatio * trajPts.length)));
+    const traveledPts = trajPts.slice(0, traveledIdx);
+    const positions = [];
+    traveledPts.forEach(p => positions.push(p.x, p.y, p.z));
+    traveledLine.geometry.dispose();
+    traveledLine.geometry = new LineGeometry();
+    traveledLine.geometry.setPositions(positions);
+    traveledLine.computeLineDistances();
+
+    // Earth-Moon line
+    emLine.geometry.dispose();
+    emLine.geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), moonGroup.position.clone()]);
+    emLine.computeLineDistances();
+
+    // Earth rotation (GMST)
+    const simMs = LAUNCH_TIME + simDay * 86400000;
+    const dJ2000 = (simMs - J2000_MS) / 86400000;
+    const gmstDeg = (280.46061837 + 360.98564736629 * dJ2000) % 360;
+    earthMesh.rotation.y = gmstDeg * Math.PI / 180;
+
+    // Camera
+    if (targetPos) {
+      camera.position.lerp(targetPos, 0.05);
+      controls.target.lerp(targetLook, 0.05);
+      if (camera.position.distanceTo(targetPos) < 0.5) { targetPos = null; targetLook = null; }
+    }
+
+    if (!targetPos) {
+      if (cameraMode === 'follow') {
+        const offset = camera.position.clone().sub(controls.target);
+        controls.target.copy(orionSc);
+        camera.position.copy(orionSc).add(offset);
+      } else if (cameraMode === 'moon') {
+        const offset = camera.position.clone().sub(controls.target);
+        controls.target.copy(moonGroup.position);
+        camera.position.copy(moonGroup.position).add(offset);
+      } else if (cameraMode === 'mons') {
+        const worldMons = moonGroup.localToWorld(MONS_MOUTON_POS.clone());
+        controls.target.copy(worldMons);
+      }
+    }
+
+    controls.update();
+
+    // Labels face camera
+    if (earthLabel) earthLabel.lookAt(camera.position);
+    if (moonLabel) moonLabel.lookAt(camera.position);
+    if (orionLabel) {
+      orionLabel.lookAt(camera.position);
+      const orionCamDist = camera.position.distanceTo(orionGroup.position);
+      const labelScale = Math.max(0.3, Math.min(1, orionCamDist / 15));
+      orionLabel.scale.set(5 * labelScale, 0.65 * labelScale, 1);
+    }
+    if (typeof monsLabel !== 'undefined' && monsLabel) monsLabel.lookAt(camera.position);
+
+    // ═══ HUD Update ═══
+    const hudMs = simDay * 86400000;
+    
+    // MET
+    const metD = Math.floor(simDay);
+    const metH = Math.floor((hudMs % 86400000) / 3600000);
+    const metM = Math.floor((hudMs % 3600000) / 60000);
+    const metS = Math.floor((hudMs % 60000) / 1000);
+    const metEl = document.getElementById('met-display');
+    if (metEl) {
+      metEl.textContent = `T+${String(metD).padStart(2,'0')}:${String(metH).padStart(2,'0')}:${String(metM).padStart(2,'0')}:${String(metS).padStart(2,'0')}`;
+    }
+
+    // Date
+    const missionDate = new Date(LAUNCH_TIME + hudMs);
+    const dateEl = document.getElementById('date-display');
+    if (dateEl) {
+      dateEl.textContent = missionDate.toUTCString().slice(0, 22) + ' UTC';
+    }
+
+    // Timeline slider - maps 0.0 (Earth Launch) to MISSION_DAYS (Touchdown) onto 0-100%
+    if (!scrubbing) {
+      const pct = Math.max(0, Math.min(1.0, simDay / MISSION_DAYS)) * 100;
+      const sliderEl = document.getElementById('timeline-slider');
+      const progressEl = document.getElementById('timeline-progress');
+      if (sliderEl) sliderEl.value = Math.min(10000, pct * 100);
+      if (progressEl) progressEl.style.width = `${Math.min(100, pct)}%`;
+    }
+
+    // Phase markers (based on mission day)
+    [['pm-orbit', 0.0, 0.073],
+     ['pm-tli', 0.073, 0.09],
+     ['pm-coast', 0.09, 4.45],
+     ['pm-loi', 4.45, 4.613],
+     ['pm-pdi', 4.613, 4.62193],
+     ['pm-touchdown', 4.62193, MISSION_DAYS + 1]].forEach(([id, s, e]) => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('active', simDay >= s && simDay < e);
+    });
+
+    // Phase text
+    const phaseTextEl = document.getElementById('phase-text');
+    if (phaseTextEl) phaseTextEl.textContent = currentPhaseStr;
+
+    // Telemetry HUD update
+    const dEarth = Math.max(0, orionKm.length() - EARTH_RADIUS_KM);
+    const dMoon = Math.max(0, orionKm.clone().sub(moonKm).length() - MOON_RADIUS_KM);
+    const distEarthEl = document.getElementById('dist-earth');
+    const distMoonEl = document.getElementById('dist-moon');
+    if (distEarthEl) distEarthEl.textContent = formatKm(dEarth);
+    if (distMoonEl) distMoonEl.textContent = formatKm(dMoon);
+
+    const altEl = document.getElementById('val-altitude');
+    const altUnitEl = document.getElementById('unit-altitude');
+    const velEl = document.getElementById('velocity');
+    const velUnitEl = document.getElementById('unit-velocity');
+    const fuelEl = document.getElementById('val-fuel');
+    const fuelPctEl = document.getElementById('val-fuel-pct');
+    const gforceEl = document.getElementById('val-gforce');
     const hlsStatusEl = document.getElementById('val-hls-status');
     const hlsThrotEl = document.getElementById('val-hls-throttle');
-    if (hlsStatusEl && hlsThrotEl) {
-      hlsStatusEl.textContent = "ACTIVE";
-      hlsStatusEl.style.color = "#00ffaa";
-      hlsThrotEl.textContent = "STANDBY / TRANSIT";
+
+    if (isPDIPhase) {
+      const altM = Math.round(currentAlt * 1000);
+      const velMs = (currentVel * 1000).toFixed(1);
+      if (altEl) altEl.textContent = altM.toLocaleString('en-US');
+      if (altUnitEl) altUnitEl.textContent = 'm';
+      if (velEl) velEl.textContent = velMs;
+      if (velUnitEl) velUnitEl.textContent = 'm/s';
+      if (fuelEl) fuelEl.textContent = currentFuel.toFixed(1);
+      if (fuelPctEl) fuelPctEl.textContent = currentFuelPct.toFixed(1);
+      if (gforceEl) gforceEl.textContent = currentG.toFixed(2);
+      if (hlsStatusEl && hlsThrotEl) {
+        if (currentAlt <= 0.001) {
+          hlsStatusEl.textContent = "TOUCHDOWN (SAFE)";
+          hlsStatusEl.style.color = "#00ffaa";
+          hlsThrotEl.textContent = "ENGINES CUT OFF";
+        } else {
+          hlsStatusEl.textContent = "POWERED DESCENT";
+          hlsStatusEl.style.color = "#00f0ff";
+          hlsThrotEl.textContent = `${(mPoint.throttle_pct || 0).toFixed(0)}% THRUST (${(mPoint.pitch_deg || 0).toFixed(0)}° PITCH)`;
+        }
+      }
+    } else {
+      if (altEl) altEl.textContent = formatKm(currentAlt);
+      if (altUnitEl) altUnitEl.textContent = 'km';
+      if (velEl) velEl.textContent = currentVel.toFixed(2);
+      if (velUnitEl) velUnitEl.textContent = 'km/s';
+      if (fuelEl) fuelEl.textContent = currentFuel.toFixed(1);
+      if (fuelPctEl) fuelPctEl.textContent = currentFuelPct.toFixed(1);
+      if (gforceEl) gforceEl.textContent = currentG.toFixed(2);
+      if (hlsStatusEl && hlsThrotEl) {
+        hlsStatusEl.textContent = "ACTIVE";
+        hlsStatusEl.style.color = "#00ffaa";
+        hlsThrotEl.textContent = "STANDBY / TRANSIT";
+      }
     }
+  } catch (err) {
+    console.error("Simulation loop non-fatal error:", err);
   }
 
   composer.render();
