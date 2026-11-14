@@ -1368,7 +1368,8 @@
        FULL-SCREEN CINEMATIC SLIDE / SCROLL-SNAP SYSTEM
        ===================================================================== */
 .home-slides-container,
-.rekomendasi-slides-container {
+.rekomendasi-slides-container,
+.visualisasi-slides-container {
   width: 100%;
   height: calc(100vh - 90px);
   overflow-y: auto;
@@ -1381,12 +1382,14 @@
 }
 
 .home-slides-container::-webkit-scrollbar,
-.rekomendasi-slides-container::-webkit-scrollbar {
+.rekomendasi-slides-container::-webkit-scrollbar,
+.visualisasi-slides-container::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
 
 .home-slide-section,
-.rekomendasi-slide-section {
+.rekomendasi-slide-section,
+.visualisasi-slide-section {
   width: 100%;
   min-height: calc(100vh - 90px);
   height: calc(100vh - 90px);

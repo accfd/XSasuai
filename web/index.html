@@ -6,7 +6,7 @@
   <title>XASUAI — Sistem Navigasi Lokasi Pendaratan di Bulan</title>
   <link rel="icon" type="image/png" href="/logo.png">
   <script src="/three.min.js"></script>
-  <link rel="stylesheet" href="/css/style.css?v=9">
+  <link rel="stylesheet" href="/css/style.css?v=10">
 </head>
 <body>
 
@@ -513,187 +513,207 @@
   </main>
 
   <!-- ===================================================================== -->
-  <!-- LAYAR 2: VISUALISASI TOPOGRAFI & MEDAN KAWAH MONS MOUTON -->
+  <!-- LAYAR 2: VISUALISASI TOPOGRAFI & MEDAN KAWAH MONS MOUTON (SOLUSI 2) -->
   <!-- ===================================================================== -->
-  <main id="view-visualisasi" class="bento-container" style="display: none;">
-    <div class="bento-card bento-full" id="card-topography-hero">
-      <div class="card-header">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span class="step-badge" style="background: var(--emerald-safe); color: #ffffff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">SOLUSI 2 • TOPOGRAFI</span>
-          <span class="card-title">Hasil Rekomendasi Terverifikasi &amp; Topografi 3D Bulan</span>
-        </div>
-        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-          <div class="segmented-tabs" style="padding: 2px;">
-            <button class="tab-btn active" id="btn-view-dem" onclick="setMapView('dem')" style="padding: 4px 12px; font-size: 11px;">
-              DEM Mons Mouton
-            </button>
-            <button class="tab-btn" id="btn-view-globe" onclick="setMapView('globe')" style="padding: 4px 12px; font-size: 11px;">
-              Globe Bulan 3D
-            </button>
-          </div>
-          <span class="badge-slope-safe" id="lbl-active-coords" style="font-size: 11px; padding: 4px 10px;">-84.9°S, 33.3°W (Mons Mouton Crest)</span>
-        </div>
-      </div>
+  <main id="view-visualisasi" style="display: none; width: 100%; position: relative;">
+    <div class="visualisasi-slides-container" id="visualisasi-slides">
 
-      <!-- RECOMMENDATION SOLUTION SUMMARY BANNER -->
-      <div id="solution-banner" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 14px 16px;">
-        <div>
-          <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">WAKTU TOUCHDOWN OPTIMAL</div>
-          <div style="font-size: 15px; font-weight: 800; color: var(--emerald-safe); margin-top: 2px;">14 Nov 2026, 14:55 UTC</div>
-          <div style="font-size: 11px; color: var(--text-dim); margin-top: 1px;">Penyinaran Surya 100% Penuh (Terang Bebas Bayangan)</div>
-        </div>
-        <div>
-          <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">LOKASI SASARAN PENDARATAN</div>
-          <div style="font-size: 15px; font-weight: 800; color: var(--artemis-blue); margin-top: 2px;">Mons Mouton Crest (-84.9°S, 33.3°W)</div>
-          <div style="font-size: 11px; color: var(--text-dim); margin-top: 1px;">Elevasi +5.920 m (Puncak Dataran Tinggi Aman)</div>
-        </div>
-        <div>
-          <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">KEMIRINGAN LERENG (SLOPE)</div>
-          <div style="font-size: 15px; font-weight: 800; color: var(--emerald-safe); margin-top: 2px;">0.08° (Sangat Datar &lt; 10°)</div>
-          <div style="font-size: 11px; color: var(--text-dim); margin-top: 1px;">Bebas Risiko Terguling (Rollover Margin Safe)</div>
-        </div>
-        <div>
-          <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">STATUS KELAYAKAN MISI</div>
-          <div style="font-size: 15px; font-weight: 800; color: var(--emerald-safe); margin-top: 2px;">MISSION GO (OPTIMAL)</div>
-          <div style="font-size: 11px; color: var(--text-dim); margin-top: 1px;">Skor MCDA 0.94 / 1.0 (Direct-To-Earth Terkunci)</div>
-        </div>
-      </div>
-          <div class="segmented-tabs" style="padding: 2px;">
-            <button class="tab-btn active" id="btn-view-dem" onclick="setMapView('dem')" style="padding: 4px 12px; font-size: 11px;">
-              DEM Mons Mouton
-            </button>
-            <button class="tab-btn" id="btn-view-globe" onclick="setMapView('globe')" style="padding: 4px 12px; font-size: 11px;">
-              Globe Bulan 3D
-            </button>
-          </div>
-          <span class="badge-slope-safe" id="lbl-active-coords" style="font-size: 11px; padding: 4px 10px;">-84.9°S, -33.3°W (Mons Mouton Crest)</span>
-        </div>
-      </div>
-      <div class="dem-map-frame" id="map-frame-box">
-        <!-- 1. 2D LOLA DEM View -->
-        <div id="dem-view-container" style="width: 100%; height: 100%; position: relative; overflow: hidden; cursor: grab; user-select: none;">
-          <div id="dem-zoom-wrapper" style="width: 100%; height: 100%; position: relative; transform-origin: center center; transition: transform 0.05s ease-out; will-change: transform;">
-            <img src="/data/quickmap-lroc.png" alt="Mons Mouton LOLA DEM" class="dem-img" draggable="false" style="pointer-events: none;">
-            <!-- Pin Interaktif Sasaran Utama Mons Mouton -->
-            <div class="map-pin active" id="pin-ALPHA" style="top: 38%; left: 75%;" onclick="selectSite('ALPHA')">
-              <div class="pin-circle" style="width: 18px; height: 18px; box-shadow: 0 0 16px #10b981;"></div>
-              <div class="pin-label" style="font-size: 11px; padding: 4px 10px;">Mons Mouton Crest (-84.9°S, 33.3°W) · 5,920m (Elevasi +1,420m)</div>
+      <!-- =================================================================== -->
+      <!-- SLIDE 1: INSPEKSI PERMUKAAN MONS MOUTON 2D & 3D (1 LAYAR PENUH) -->
+      <!-- =================================================================== -->
+      <section id="vis-slide-1" class="visualisasi-slide-section">
+        <div class="bento-card bento-full" id="card-topography-hero" style="max-width: 1200px; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 24px; box-sizing: border-box; margin: 0;">
+          
+          <!-- Header Bar: Title, Tabs & Coordinates -->
+          <div class="card-header" style="margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--border-light);">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="step-badge" style="background: var(--emerald-safe); color: #ffffff; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px;">
+                SOLUSI 2 — TOPOGRAFI
+              </span>
+              <span class="card-title" style="font-size: 17px; font-weight: 800;">
+                Inspeksi Bentuk Permukaan Mons Mouton
+              </span>
+            </div>
+            
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+              <div class="segmented-tabs" style="padding: 2px;">
+                <button class="tab-btn active" id="btn-view-dem" onclick="setMapView('dem')" style="padding: 5px 14px; font-size: 11.5px; font-weight: 700;">
+                  🗺️ 2D Peta Kontur (LOLA DEM)
+                </button>
+                <button class="tab-btn" id="btn-view-globe" onclick="setMapView('globe')" style="padding: 5px 14px; font-size: 11.5px; font-weight: 700;">
+                  🌐 3D Globe Orbit Bulan
+                </button>
+              </div>
+              <span class="badge-slope-safe" id="lbl-active-coords" style="font-size: 11px; font-weight: 800; padding: 5px 12px;">
+                -84.9°S, 33.3°W (Mons Mouton Crest)
+              </span>
             </div>
           </div>
-          <!-- DEM Controls & Zoom Badge Overlay -->
-          <div class="dem-controls-overlay">
-            <span class="dem-zoom-badge" id="dem-zoom-badge">1.0×</span>
-            <button class="btn-hud" onclick="zoomDem(0.5)" title="Perbesar (Zoom In)">＋</button>
-            <button class="btn-hud" onclick="zoomDem(-0.5)" title="Perkecil (Zoom Out)">－</button>
-            <button class="btn-hud" onclick="resetDemZoom()" title="Reset Tampilan Zoom">Reset View</button>
-          </div>
-          <!-- Hint Badge -->
-          <div class="dem-hint-badge" style="position: absolute; top: 12px; left: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: var(--radius-sm); padding: 4px 8px; color: #94a3b8; font-size: 10px; font-weight: 600; z-index: 25; pointer-events: none; backdrop-filter: blur(4px);">
-            Roda Gulir Tetikus untuk Zoom (1.0× - 5.0×) • Tarik untuk Geser
-          </div>
-        </div>
 
-        <!-- 2. 3D Moon Globe View -->
-        <div id="globe-view-container" style="width: 100%; height: 100%; display: none; position: relative; background: #030712; border-radius: var(--radius-sm); overflow: hidden;">
-          <div id="threeMoonContainer" style="width: 100%; height: 100%;"></div>
-          <!-- 3D Globe HUD Overlay -->
-          <div class="globe-hud-overlay">
-            <div class="globe-hud-info">
-              <span class="hud-tag">ORBITAL CAMERA 3D</span>
-              <span id="globe-alt-readout" class="hud-alt">ALTITUDE: 15.0 KM [TARGET LOCKED]</span>
-              <span id="globe-target-readout" class="hud-coord">SASARAN: MONS MOUTON CREST (-84.9°S, 33.3°W)</span>
+          <!-- Interactive Map View Box (2D DEM & 3D Globe) -->
+          <div class="dem-map-frame" id="map-frame-box" style="flex: 1; min-height: 380px; max-height: 480px; position: relative; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-light);">
+            
+            <!-- 1. 2D LOLA DEM View -->
+            <div id="dem-view-container" style="width: 100%; height: 100%; position: relative; overflow: hidden; cursor: grab; user-select: none;">
+              <div id="dem-zoom-wrapper" style="width: 100%; height: 100%; position: relative; transform-origin: center center; transition: transform 0.05s ease-out; will-change: transform;">
+                <img src="/data/quickmap-lroc.png" alt="Mons Mouton LOLA DEM" class="dem-img" draggable="false" style="pointer-events: none; width: 100%; height: 100%; object-fit: cover;">
+                <!-- Pin Interaktif Sasaran Utama Mons Mouton -->
+                <div class="map-pin active" id="pin-ALPHA" style="top: 38%; left: 75%;" onclick="selectSite('ALPHA')">
+                  <div class="pin-circle" style="width: 18px; height: 18px; box-shadow: 0 0 16px #10b981;"></div>
+                  <div class="pin-label" style="font-size: 11px; padding: 4px 10px;">Mons Mouton Crest (-84.9°S, 33.3°W) · 5.920 m (Elevasi Aman)</div>
+                </div>
+              </div>
+              <!-- DEM Controls Overlay -->
+              <div class="dem-controls-overlay">
+                <span class="dem-zoom-badge" id="dem-zoom-badge">1.0×</span>
+                <button class="btn-hud" onclick="zoomDem(0.5)" title="Perbesar (Zoom In)">＋</button>
+                <button class="btn-hud" onclick="zoomDem(-0.5)" title="Perkecil (Zoom Out)">－</button>
+                <button class="btn-hud" onclick="resetDemZoom()" title="Reset Tampilan Zoom">Reset</button>
+              </div>
+              <div class="dem-hint-badge" style="position: absolute; top: 12px; left: 12px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: var(--radius-sm); padding: 4px 10px; color: #94a3b8; font-size: 10.5px; font-weight: 600; z-index: 25; pointer-events: none; backdrop-filter: blur(4px);">
+                Gunakan Roda Gulir untuk Zoom • Klik &amp; Tarik untuk Menggeser Peta
+              </div>
             </div>
-            <div class="globe-hud-actions">
-              <button class="btn-hud" onclick="zoomGlobe(-2.0)" title="Dolly Zoom In (Mendekat ke Permukaan)">＋</button>
-              <button class="btn-hud" onclick="zoomGlobe(2.0)" title="Dolly Zoom Out (Menjauh)">－</button>
-              <button class="btn-hud" onclick="triggerFlyToAnimation()">
-                Fly-To Mons Mouton
-              </button>
-              <button class="btn-hud" onclick="resetGlobeOrbit()">
-                Reset Orbit
-              </button>
-              <a href="https://trek.nasa.gov/moon/#v=0.1&x=-33.3&y=-84.9&z=8&p=urn:ogc:def:crs:EPSG::3032" target="_blank" class="btn-hud" style="text-decoration: none;">
-                NASA Moon Trek 3D ↗
-              </a>
+
+            <!-- 2. 3D Moon Globe View -->
+            <div id="globe-view-container" style="width: 100%; height: 100%; display: none; position: relative; background: #030712; border-radius: var(--radius-sm); overflow: hidden;">
+              <div id="threeMoonContainer" style="width: 100%; height: 100%;"></div>
+              <div class="globe-hud-overlay">
+                <div class="globe-hud-info">
+                  <span class="hud-tag">ORBITAL CAMERA 3D</span>
+                  <span id="globe-alt-readout" class="hud-alt">ALTITUDE: 15.0 KM [TARGET LOCKED]</span>
+                  <span id="globe-target-readout" class="hud-coord">SASARAN: MONS MOUTON CREST (-84.9°S, 33.3°W)</span>
+                </div>
+                <div class="globe-hud-actions">
+                  <button class="btn-hud" onclick="zoomGlobe(-2.0)" title="Dolly Zoom In">＋</button>
+                  <button class="btn-hud" onclick="zoomGlobe(2.0)" title="Dolly Zoom Out">－</button>
+                  <button class="btn-hud" onclick="triggerFlyToAnimation()">Fly-To Mons Mouton</button>
+                  <button class="btn-hud" onclick="resetGlobeOrbit()">Reset Orbit</button>
+                  <a href="https://trek.nasa.gov/moon/#v=0.1&x=-33.3&y=-84.9&z=8&p=urn:ogc:def:crs:EPSG::3032" target="_blank" class="btn-hud" style="text-decoration: none;">
+                    NASA Moon Trek ↗
+                  </a>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Verification Metric Tiles (4 Bukti Ilmiah) -->
+          <div id="solution-banner" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 12px 16px; margin-top: 12px;">
+            <div>
+              <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">KEMIRINGAN LERENG (SLOPE)</div>
+              <div style="font-size: 15px; font-weight: 800; color: var(--emerald-safe); margin-top: 2px;">0.08° (Sangat Datar &lt; 10°)</div>
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 1px;">Bebas Risiko Terguling (Rollover Safe)</div>
+            </div>
+            <div>
+              <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">ELEVASI PUNCAK DATARAN</div>
+              <div style="font-size: 15px; font-weight: 800; color: var(--artemis-blue); margin-top: 2px;">+5.920 m (Puncak Dataran Tinggi)</div>
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 1px;">Berada jauh di atas dasar kawah gelap</div>
+            </div>
+            <div>
+              <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">ILUMINASI SURYA</div>
+              <div style="font-size: 15px; font-weight: 800; color: var(--emerald-safe); margin-top: 2px;">100% Terang Bebas Bayangan</div>
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 1px;">Pasokan listrik panel surya terjaga penuh</div>
+            </div>
+            <div>
+              <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">STATUS TOPOGRAFI</div>
+              <div style="font-size: 15px; font-weight: 800; color: var(--emerald-safe); margin-top: 2px;">VERIFIKASI GO (AMAN)</div>
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 1px;">Lolos kriteria batas pendaratan NASA</div>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="frame-caption">
-        <span id="map-caption-left">Resolusi: 250 meter / piksel (LOLA DEM Topografi)</span>
-        <span id="map-caption-right">Perspektif: 3D Satellite Moon Globe · Mons Mouton Beacon (-84.9°S, 33.3°W)</span>
-      </div>
-    </div>
 
-    <!-- ROW 3: SPLIT GRID (TIMELINE MISI 14-HARI & 360° POLAR SKY-PLOT KOMPAK) -->
-    <div class="bento-row-split bento-full">
-      <!-- BENTO 3: TIMELINE SCRUBBER 14-HARI -->
-      <div class="bento-card" style="margin: 0;">
-        <div class="card-header">
-          <span class="card-title">Timeline Misi 14-Hari (0 - 336 Jam) — Evaluasi Surya & Sinyal Bumi</span>
-          <div class="time-readout-pill" id="timeline-time-badge">
-            2026-11-14 12:00 UTC (+0h)
+          <!-- Subtle Cue to Slide 2 -->
+          <div onclick="scrollToVisSlide(2)" style="cursor: pointer; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--artemis-blue);">
+            <span>Periksa Bebas Halangan Tebing &amp; Jalur Sinyal ke Bumi</span>
+            <span>&darr;</span>
           </div>
-        </div>
 
-        <div class="timeline-controls">
-          <div class="slider-row">
-            <input type="range" min="0" max="336" value="0" step="3" class="clean-slider" id="timeline-slider">
-          </div>
-          <div class="timeline-scale">
-            <span>0h (Awal Misi)</span>
-            <span>84h (Hari 3.5)</span>
-            <span>168h (Puncak Penyinaran)</span>
-            <span>252h (Hari 10.5)</span>
-            <span>336h (Akhir Jendela)</span>
-          </div>
         </div>
+      </section>
 
-        <div class="tiles-grid">
-          <div class="data-tile">
-            <div class="tile-lbl">Matahari (Azimuth / Elevasi)</div>
-            <div class="tile-val" id="tile-sun" style="color: #b45309;">45.0° / +2.1°</div>
+      <!-- =================================================================== -->
+      <!-- SLIDE 2: VERIFIKASI BEBAS TEBING & KOMUNIKASI SINYAL BUMI (1 LAYAR PENUH) -->
+      <!-- =================================================================== -->
+      <section id="vis-slide-2" class="visualisasi-slide-section">
+        <div style="max-width: 1100px; width: 100%; background: #ffffff; border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 36px 36px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); position: relative;">
+          
+          <!-- Top bar with Back Button & Status -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <button onclick="scrollToVisSlide(1)" style="background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 6px;" onmouseover="this.style.color='var(--artemis-blue)'" onmouseout="this.style.color='var(--text-muted)'">
+              <span>&uarr;</span>
+              <span>Kembali ke Peta Topografi</span>
+            </button>
+            <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; font-size: 11.5px; font-weight: 800; padding: 5px 14px; border-radius: 999px; display: flex; align-items: center; gap: 6px;">
+              <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></span>
+              SINYAL BUMI: DIRECT LINE-OF-SIGHT (100%)
+            </div>
           </div>
-          <div class="data-tile">
-            <div class="tile-lbl">Bumi DTE (Azimuth / Elevasi)</div>
-            <div class="tile-val" id="tile-earth" style="color: #0284c7;">12.5° / +6.8°</div>
-          </div>
-          <div class="data-tile">
-            <div class="tile-lbl">Suplai Daya Panel Surya</div>
-            <div class="tile-val" id="tile-solar" style="color: var(--emerald-safe);">100% ACTIVE</div>
-          </div>
-          <div class="data-tile">
-            <div class="tile-lbl">Jalur Komunikasi Bumi</div>
-            <div class="tile-val" id="tile-dte" style="color: var(--emerald-safe);">DIRECT LINE-OF-SIGHT</div>
-          </div>
-        </div>
-      </div>
 
-      <!-- BENTO 2B: 360° POLAR HORIZON SKY-PLOT (KOMPAK & RAPI) -->
-      <div class="bento-card" style="margin: 0;">
-        <div class="card-header">
-          <span class="card-title">360° Polar Sky-Plot (Rintangan Kawah)</span>
-          <span id="skyplot-badge" style="font-size: 11px; font-weight: 700; color: var(--emerald-safe);">Direct Line-of-Sight</span>
-        </div>
-        <div class="radar-frame" id="skyplot-box">
-          <div class="spinner"></div>
-        </div>
-        <div class="frame-caption" style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
-          <span id="skyplot-clearance-text" style="color: var(--artemis-blue); font-weight: 700;">Direct-to-Earth Clearance: +10.25° di atas bibir kawah</span>
-          <span style="color: var(--emerald-safe); font-weight: 700;">Matahari: Terang Bebas Bayangan</span>
-        </div>
-      </div>
-    </div>
+          <!-- Section Heading -->
+          <div style="margin-bottom: 24px; padding-bottom: 14px; border-bottom: 1px solid var(--border-light);">
+            <h3 style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0 0 6px;">
+              Verifikasi Tebing Kawah &amp; Jalur Sinyal ke Bumi
+            </h3>
+            <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0; line-height: 1.6;">
+              Membuktikan garis pandang antena wahana mengarah langsung ke Bumi tanpa terpotong oleh tebing kawah di sekeliling Mons Mouton.
+            </p>
+          </div>
 
-    <!-- Navigasi Lanjut ke Simulasi -->
-    <div class="bento-card bento-full" style="background: var(--bg-surface); border: 1px solid var(--border-light); display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 16px 20px;">
-      <div>
-        <div style="font-size: 13px; font-weight: 800; color: var(--text-primary);">Verifikasi Topografi Mons Mouton Selesai</div>
-        <div style="font-size: 11px; color: var(--text-muted);">Kontur lereng 0.08° dan elevasi +5.920 m telah tervalidasi siap untuk pendaratan lunak Artemis HLS.</div>
-      </div>
-      <button class="btn-finder-hero" onclick="switchView('simulasi')" style="padding: 12px 28px; font-size: 13px;">
-        Uji Pendaratan di Simulator Penerbangan &rarr;
-      </button>
+          <!-- Split Grid: 360° Polar Skyplot (Left) + Scientific Explanation (Right) -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 28px; align-items: center; margin-bottom: 28px;">
+            
+            <!-- Left Column: Polar Skyplot Container -->
+            <div style="background: #f8fafc; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 20px; text-align: center;">
+              <div style="font-size: 12px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 10px;">
+                Radar 360° Polar Sky-Plot (Horizon Clearance)
+              </div>
+              <div class="radar-frame" id="skyplot-box" style="margin: 0 auto 12px; max-width: 280px; height: 280px; position: relative;">
+                <div class="spinner"></div>
+              </div>
+              <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: var(--radius-sm); padding: 8px 12px; font-size: 11.5px; font-weight: 700; color: var(--artemis-blue);">
+                <span id="skyplot-clearance-text">Direct-to-Earth Clearance: +12.35° di atas bibir tebing kawah</span>
+              </div>
+            </div>
+
+            <!-- Right Column: Human-Friendly Explanation -->
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+              <h4 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0 0 10px;">
+                Mengapa Lokasi Ini Bebas Hambatan Sinyal?
+              </h4>
+              <p style="font-size: 13.5px; line-height: 1.75; color: var(--text-secondary); margin: 0 0 18px;">
+                Mons Mouton merupakan dataran tinggi terangkat (*elevated plateau*) di Kutub Selatan Bulan dengan elevasi puncak mencapai <strong>+5.920 meter</strong>. Ketinggian ini menempatkan wahana jauh di atas dinding kawah di sekitarnya.
+              </p>
+              <p style="font-size: 13.5px; line-height: 1.75; color: var(--text-secondary); margin: 0 0 20px;">
+                Arah antena radio wahana ke Bumi berada pada elevasi <strong>+10.25°</strong>, yang menghasilkan margin sudut <strong>+12.35° di atas tebing kawah tertinggi</strong>. Dengan posisi ini, komunikasi transmisi data dengan stasiun kendali di Bumi dapat berlangsung tanpa putus (*zero loss-of-signal*).
+              </p>
+
+              <!-- Safe Attribute Badges -->
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <span style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px;">
+                  ✓ Sinyal Bumi: Direct Line-of-Sight
+                </span>
+                <span style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px;">
+                  ✓ Daya Surya: 100% Aktif
+                </span>
+                <span style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px;">
+                  ✓ Lereng: 0.08° (Datar &amp; Stabil)
+                </span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom CTA to Simulator -->
+          <div style="display: flex; justify-content: flex-end; align-items: center; padding-top: 18px; border-top: 1px solid var(--border-light);">
+            <button class="btn-finder-hero" onclick="switchView('simulasi'); playAvionicBeep(800, 'sine');" style="padding: 14px 32px; font-size: 13.5px; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(14, 116, 144, 0.35);">
+              <span>Lanjut: Uji Pendaratan di Simulator Penerbangan</span>
+              <span>&rarr;</span>
+            </button>
+          </div>
+
+        </div>
+      </section>
+
     </div>
   </main>
 
@@ -881,6 +901,6 @@
   </div>
 
   <!-- JAVASCRIPT SYSTEM ENGINE -->
-  <script src="/js/app.js?v=9"></script>
+  <script src="/js/app.js?v=10"></script>
 </body>
 </html>

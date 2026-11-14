@@ -304,6 +304,18 @@
       }
     }
 
+    function scrollToVisSlide(slideIndex) {
+      const container = document.getElementById("visualisasi-slides");
+      const targetEl = document.getElementById(`vis-slide-${slideIndex}`);
+      if (container && targetEl) {
+        container.scrollTo({
+          top: targetEl.offsetTop,
+          behavior: "smooth"
+        });
+        playAvionicBeep(640, 'sine');
+      }
+    }
+
     function calculateMissionSchedule() {
       const monthSel = document.getElementById("select-mission-month");
       const yearSel = document.getElementById("select-mission-year");
