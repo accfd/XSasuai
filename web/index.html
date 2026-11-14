@@ -1268,6 +1268,60 @@
       transform: translateY(0);
       opacity: 1;
     }
+
+    /* Workflow Pipeline Arrow Connectors */
+    .workflow-cards-wrapper {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .workflow-card-item {
+      flex: 1 1 290px;
+      max-width: 335px;
+    }
+
+    .flow-arrow-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      align-self: center;
+      padding: 0 2px;
+    }
+
+    .flow-arrow-divider .arrow-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+    }
+
+    .flow-arrow-divider .arrow-circle:hover {
+      transform: scale(1.1);
+      border-color: var(--artemis-blue);
+    }
+
+    @media (max-width: 992px) {
+      .flow-arrow-divider {
+        width: 100%;
+        margin: 4px 0;
+      }
+      .flow-arrow-divider .arrow-icon {
+        transform: rotate(90deg);
+        display: inline-block;
+      }
+      .workflow-card-item {
+        max-width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1407,19 +1461,38 @@
 
         <!-- Bagian 2: Tiga Tahap Alur Kerja -->
         <div style="text-align: left; margin-bottom: 40px;">
-          <div style="margin-bottom: 20px; text-align: center;">
-            <h2 style="font-size: 19px; font-weight: 800; color: var(--text-primary); margin: 0 0 6px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+          <div style="margin-bottom: 24px; text-align: center;">
+            <h2 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0 0 6px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
               <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--artemis-blue);"></span>
               Alur Kerja XASUAI — 3 Tahap Penyelesaian
             </h2>
-            <p style="font-size: 13.5px; color: var(--text-muted); margin: 0;">
+            <p style="font-size: 13.5px; color: var(--text-muted); margin: 0 0 16px;">
               Setiap tahap dirancang untuk menyelesaikan satu masalah utama secara berurutan.
             </p>
+
+            <!-- Alur 3 Tahap: Rekomendasi -> Visualisasi -> Simulasi -->
+            <div style="display: inline-flex; align-items: center; justify-content: center; gap: 12px; background: var(--bg-surface); padding: 8px 20px; border-radius: var(--radius-pill); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); flex-wrap: wrap;">
+              <span style="font-size: 12px; font-weight: 800; color: var(--artemis-blue); display: inline-flex; align-items: center; gap: 6px;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--artemis-blue);"></span>
+                Rekomendasi
+              </span>
+              <span style="color: var(--artemis-blue); font-size: 15px; font-weight: 900;">&rarr;</span>
+              <span style="font-size: 12px; font-weight: 800; color: var(--emerald-safe); display: inline-flex; align-items: center; gap: 6px;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--emerald-safe);"></span>
+                Visualisasi
+              </span>
+              <span style="color: var(--emerald-safe); font-size: 15px; font-weight: 900;">&rarr;</span>
+              <span style="font-size: 12px; font-weight: 800; color: #0284c7; display: inline-flex; align-items: center; gap: 6px;">
+                <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #0284c7;"></span>
+                Simulasi
+              </span>
+            </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 18px;">
-            <!-- Tahap 1 -->
-            <div style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid var(--artemis-blue); border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+          <!-- 3 Cards dengan Panah Penghubung -->
+          <div class="workflow-cards-wrapper">
+            <!-- Tahap 1: Rekomendasi -->
+            <div class="workflow-card-item" style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid var(--artemis-blue); border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                   <span class="step-badge" style="background: var(--artemis-blue); color: #ffffff; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 1</span>
@@ -1445,8 +1518,15 @@
               </div>
             </div>
 
-            <!-- Tahap 2 -->
-            <div style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid var(--emerald-safe); border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+            <!-- Panah Penghubung: Tahap 1 -> Tahap 2 -->
+            <div class="flow-arrow-divider">
+              <div class="arrow-circle" title="Lanjut ke Visualisasi">
+                <span class="arrow-icon" style="color: var(--artemis-blue); font-size: 16px; font-weight: 900;">&rarr;</span>
+              </div>
+            </div>
+
+            <!-- Tahap 2: Visualisasi -->
+            <div class="workflow-card-item" style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid var(--emerald-safe); border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                   <span class="step-badge" style="background: var(--emerald-safe); color: #ffffff; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 2</span>
@@ -1472,8 +1552,15 @@
               </div>
             </div>
 
-            <!-- Tahap 3 -->
-            <div style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid #0284c7; border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+            <!-- Panah Penghubung: Tahap 2 -> Tahap 3 -->
+            <div class="flow-arrow-divider">
+              <div class="arrow-circle" title="Lanjut ke Simulasi">
+                <span class="arrow-icon" style="color: var(--emerald-safe); font-size: 16px; font-weight: 900;">&rarr;</span>
+              </div>
+            </div>
+
+            <!-- Tahap 3: Simulasi -->
+            <div class="workflow-card-item" style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid #0284c7; border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                   <span class="step-badge" style="background: #0284c7; color: #ffffff; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 3</span>
