@@ -304,10 +304,25 @@
       }
     }
 
-    function scrollToVisSlide(slideIndex) {
+    function scrollToVisSlide(target) {
       const container = document.getElementById("visualisasi-slides");
-      const targetEl = document.getElementById(`vis-slide-${slideIndex}`);
-      if (container && targetEl) {
+      if (!container) return;
+      let targetEl;
+      if (target === 'menu' || target === 1) {
+        targetEl = document.getElementById("vis-slide-menu");
+      } else if (target === 'globe' || target === 2) {
+        targetEl = document.getElementById("vis-slide-globe");
+        if (!threeGlobeInitialized) initThreeMoonGlobe();
+        setTimeout(triggerFlyToAnimation, 250);
+      } else if (target === 'dem' || target === 3) {
+        targetEl = document.getElementById("vis-slide-dem");
+      } else if (target === 'terrain' || target === 4) {
+        targetEl = document.getElementById("vis-slide-terrain");
+        if (!horizonViewerInitialized) initThreeHorizonViewer();
+      } else {
+        targetEl = document.getElementById(`vis-slide-${target}`) || document.getElementById(target);
+      }
+      if (targetEl) {
         container.scrollTo({
           top: targetEl.offsetTop,
           behavior: "smooth"
@@ -993,22 +1008,12 @@
         if (btnVis) btnVis.classList.add("active");
         try { history.pushState(null, '', '/visualisasi'); } catch(e){}
 
-        // Ensure visualisasi starts at Slide 1 (3D Globe)
-        scrollToVisSlide(1);
+        // Start at Slide 1 (Menu Portal Card)
+        scrollToVisSlide('menu');
 
         setTimeout(() => {
-          if (!threeGlobeInitialized) {
-            initThreeMoonGlobe();
-          } else {
-            onWindowResizeGlobe();
-          }
-          // Immediate dramatic cinematic Fly-To animation towards Mons Mouton Crest!
-          setTimeout(() => {
-            triggerFlyToAnimation();
-          }, 300);
-
-          // Initialize 3D Horizon & Signal Beam Viewer in Slide 3
-          initThreeHorizonViewer();
+          if (!threeGlobeInitialized) initThreeMoonGlobe();
+          else onWindowResizeGlobe();
         }, 120);
       } else if (viewName === 'simulasi') {
         if (simView) simView.style.display = "grid";
