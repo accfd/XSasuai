@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>XSasuai — Lunar Landing Site Navigator | Artemis Mission Operations</title>
+  <title>Xesuai — Lunar Landing Site Navigator | Artemis Mission Operations</title>
   <style>
     /* =====================================================================
        CLEAN INDUSTRIAL AEROSPACE AESTHETIC (BENTO GRID - NASA/LINEAR STYLE)
@@ -601,6 +601,479 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+
+    /* VIEW 3: SYSTEM GUIDE & ONBOARDING (PANDUAN & ALUR SISTEM) */
+    #view-guide {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 1240px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .guide-hero {
+      background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .guide-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--artemis-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .guide-hero h2 {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.3px;
+    }
+
+    .guide-hero p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 960px;
+    }
+
+    .three-pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .pillar-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 22px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .pillar-card:hover {
+      border-color: #93c5fd;
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .pillar-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg-selected);
+      color: var(--artemis-blue);
+      font-weight: 800;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #bfdbfe;
+    }
+
+    .pillar-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.35;
+    }
+
+    .pillar-subtitle {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .pillar-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .pillar-feature {
+      margin-top: auto;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border-light);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--artemis-blue);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* STEP FLOW PIPELINE */
+    .workflow-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .workflow-header h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .workflow-header p {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .flow-steps-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+    }
+
+    .flow-step-item {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .flow-step-item:hover {
+      background: var(--bg-selected);
+      border-color: #bfdbfe;
+    }
+
+    .step-pill {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--artemis-blue);
+      background: #ffffff;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-light);
+      width: fit-content;
+    }
+
+    .step-name {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1.35;
+    }
+
+    .step-detail {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .guide-cta-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 12px;
+      padding-top: 10px;
+    }
+
+    .btn-cta-primary {
+      background: var(--artemis-blue);
+      color: #ffffff;
+      padding: 10px 22px;
+      border-radius: var(--radius-sm);
+      font-weight: 800;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s ease;
+    }
+
+    .btn-cta-primary:hover {
+      background: var(--artemis-blue-hover);
+    }
+
+    .btn-cta-secondary {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-weight: 700;
+      font-size: 13px;
+      border: 1px solid var(--border-subtle);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-cta-secondary:hover {
+      background: var(--bg-subtle);
+      border-color: var(--text-muted);
+    }
+
+    /* SMART FINDER MODAL & 3D MOON GLOBE STYLES */
+    .btn-finder-trigger {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      border: none;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
+      transition: all 0.15s ease;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-finder-trigger:hover {
+      background: linear-gradient(135deg, #1d4ed8, #1e40af);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(37, 99, 235, 0.35);
+    }
+
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      max-width: 900px;
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      animation: modalFadeIn 0.2s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      background: #fafcff;
+      border-top-left-radius: var(--radius-lg);
+      border-top-right-radius: var(--radius-lg);
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s ease;
+    }
+
+    .modal-close-btn:hover {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+    }
+
+    .rec-options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 20px 24px;
+    }
+
+    .rec-card {
+      background: #ffffff;
+      border: 1.5px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      transition: all 0.15s ease;
+    }
+
+    .rec-card:hover {
+      border-color: #93c5fd;
+      box-shadow: var(--shadow-md);
+      background: #fafcff;
+    }
+
+    .rec-card.best {
+      border-color: #60a5fa;
+      background: linear-gradient(135deg, #ffffff 0%, #eff6ff 100%);
+    }
+
+    .rec-badge-tag {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      letter-spacing: 0.5px;
+      width: fit-content;
+      margin-bottom: 6px;
+    }
+
+    .badge-primary-rec {
+      background: #dbeafe;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+    }
+
+    .badge-sec-rec {
+      background: #f1f5f9;
+      color: #475569;
+      border: 1px solid #cbd5e1;
+    }
+
+    .rec-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .rec-time {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--artemis-blue);
+      margin: 4px 0 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .rec-specs-grid {
+      display: flex;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+    }
+
+    .rec-spec-pill {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+    }
+
+    .btn-apply-rec {
+      background: var(--artemis-blue);
+      color: #ffffff;
+      border: none;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 10px 18px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-apply-rec:hover {
+      background: var(--artemis-blue-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    /* Radar Pin Animation */
+    @keyframes pinPulseRadar {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.8); }
+      70% { transform: scale(1.3); box-shadow: 0 0 0 20px rgba(37, 99, 235, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+    }
+
+    .map-pin.highlight-pulse .pin-circle {
+      animation: pinPulseRadar 1.2s infinite ease-out !important;
+      background: #facc15 !important;
+      border-color: #ffffff !important;
+    }
+
+    /* Floating Notification Toast */
+    .notification-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      z-index: 3000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid #334155;
+    }
+
+    .notification-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -608,9 +1081,9 @@
   <!-- 1. COMPACT HEADER BAR -->
   <header>
     <div class="brand-group">
-      <div class="artemis-mark">XS</div>
+      <div class="artemis-mark">XE</div>
       <div class="brand-info">
-        <h1>XSASUAI — Lunar Landing Site Navigator</h1>
+        <h1>XESUAI — Lunar Landing Site Navigator</h1>
         <p>Artemis Operations • Mons Mouton, Lunar South Pole (-84.9°S, 33.3°W)</p>
       </div>
     </div>
@@ -622,7 +1095,13 @@
       <div class="mission-status-pill" id="global-status-pill">
         <span>✓</span> MISSION STATUS: GO (SAFE)
       </div>
+      <button class="btn-finder-trigger" onclick="openSmartFinderModal()">
+        <span>⚡</span> Cari Rekomendasi Pendaratan
+      </button>
       <div class="segmented-tabs">
+        <button class="tab-btn" id="tab-btn-guide" onclick="switchView('guide')">
+          <span>📖</span> Panduan & Alur
+        </button>
         <button class="tab-btn active" id="tab-btn-console" onclick="switchView('console')">
           <span>📊</span> Mission Console
         </button>
@@ -633,6 +1112,128 @@
     </div>
   </header>
 
+  <!-- VIEW 0: SYSTEM GUIDE & ONBOARDING (PANDUAN & ALUR SISTEM) -->
+  <main id="view-guide">
+    <!-- Hero Banner -->
+    <div class="guide-hero">
+      <div class="guide-badge">
+        <span>🚀</span> NASA Space Apps Challenge • Artemis Landing Navigator
+      </div>
+      <h2>Platform Xesuai: Panduan Sistem & Strategi Pendaratan Mons Mouton</h2>
+      <p>
+        <strong>Xesuai</strong> adalah sistem navigasi lokasi pendaratan presisi dan simulator trajektori penerbangan <em>Powered Descent Guidance</em> untuk misi Artemis di dataran tinggi <strong>Mons Mouton, Kutub Selatan Bulan (-84.9°S, 33.3°W)</strong>. Sistem ini mengintegrasikan data topografi elevasi riil NASA LROC LOLA, dinamika efemeris langsung NASA JPL Horizons, solver integrasi numerik RK45, serta antarmuka visual intuitif untuk menjawab 3 pertanyaan kritis misi antariksa.
+      </p>
+    </div>
+
+    <!-- 3 Pillars answering the 3 Key Questions -->
+    <div class="three-pillars-grid">
+      <!-- Pillar 1 -->
+      <div class="pillar-card">
+        <div class="pillar-num">1</div>
+        <div class="pillar-subtitle">Pertanyaan 1 • Penentuan Waktu & Posisi</div>
+        <div class="pillar-title">Menentukan Tanggal & Posisi Aman Cakrawala</div>
+        <div class="pillar-desc">
+          Di Kutub Selatan Bulan, sudut elevasi Matahari dan Bumi sangat rendah (&lt; 2°–7°). Sedikit kecerobohan dapat menjebak wahana di dalam bayangan tebing abadi (<em>Permanently Shadowed Regions</em>) atau memutus sinyal radio ke Bumi. 
+          <br><br>
+          <strong>Solusi Xesuai:</strong> Memindai model elevasi digital LOLA DEM menggunakan algoritma <em>360° Radial Raymarching</em> dengan koreksi kelengkungan Bulan, disinkronkan secara langsung dengan vektor efemeris NASA JPL Horizons untuk menjamin pencahayaan panel surya dan komunikasi <em>Direct-to-Earth (DTE)</em> tetap bebas dari halangan tebing kawah.
+        </div>
+        <div class="pillar-feature">
+          <span>📍</span> Fitur: Peta LOLA DEM & 360° Polar Sky-Plot Radar
+        </div>
+      </div>
+
+      <!-- Pillar 2 -->
+      <div class="pillar-card">
+        <div class="pillar-num">2</div>
+        <div class="pillar-subtitle">Pertanyaan 2 • Perhitungan Trajektori</div>
+        <div class="pillar-title">Memperhitungkan Lintasan Orbit & Pendaratan Tepat</div>
+        <div class="pillar-desc">
+          Wahana antariksa harus turun dari orbit <em>perilune</em> (kecepatan 1.690 m/s pada ketinggian 15 km) menuju sentuhan permukaan yang lembut tanpa kehabisan propelan atau menabrak dinding kawah terjal Mons Mouton.
+          <br><br>
+          <strong>Solusi Xesuai:</strong> Mengimplementasikan solver numerik Runge-Kutta Orde 4/5 (RK45) presisi tinggi dengan model gravitasi non-sferis Bulan (koefisien zonal \(J_2 = 2.027 \times 10^{-4}\)), modulasi dorongan mesin (400 N – 3.200 N), pembatasan kecepatan impak aman (\(V_z \le 2.0\text{ m/s}, V_h \le 0.5\text{ m/s}\)), serta clearance kawah koridor pendekatan &gt; 150 meter.
+        </div>
+        <div class="pillar-feature">
+          <span>🚀</span> Fitur: RK45 Powered Descent Solver & Delta-V Budget
+        </div>
+      </div>
+
+      <!-- Pillar 3 -->
+      <div class="pillar-card">
+        <div class="pillar-num">3</div>
+        <div class="pillar-subtitle">Pertanyaan 3 • Visualisasi Cepat & Intuitif</div>
+        <div class="pillar-title">Visualisasi Cepat yang Mudah Dipahami Publik</div>
+        <div class="pillar-desc">
+          Masyarakat umum dan pengambil keputusan seringkali kesulitan mencerna ratusan baris data telemetri, matriks vektor, dan koordinat orbit yang rumit.
+          <br><br>
+          <strong>Solusi Xesuai:</strong> Merangkum data ilmiah kompleks ke dalam <strong>Bento Grid Dashboard</strong>:
+          Radar Polar 360° seperti radar cuaca, <em>timeline scrubber</em> 14-hari (0–336 jam) yang interaktif seperti pemutar video, lencana keputusan instan <strong>MISSION STATUS: GO / NO-GO</strong>, serta simulator pendaratan interaktif (<em>Flight Testbed</em>) yang dapat dimainkan langsung di peramban.
+        </div>
+        <div class="pillar-feature">
+          <span>🕹️</span> Fitur: Bento Console & Canvas Flight Simulator
+        </div>
+      </div>
+    </div>
+
+    <!-- Step-by-Step System Flow -->
+    <div class="workflow-section">
+      <div class="workflow-header">
+        <h3>Alur Lengkap Penggunaan Sistem Xesuai (User Workflow)</h3>
+        <p>Ikuti 5 langkah terpadu berikut saat merencanakan dan memverifikasi misi pendaratan:</p>
+      </div>
+
+      <div class="flow-steps-grid">
+        <div class="flow-step-item">
+          <div class="step-pill">LANGKAH 1</div>
+          <div class="step-name">Pilih Kandidat Lokasi</div>
+          <div class="step-detail">
+            Pilih antara <strong>Site Alpha</strong> (Puncak), <strong>Site Beta</strong> (Rim Utara), atau <strong>Site Gamma</strong> (Barat) melalui kartu situs atau pin peta satelit LOLA.
+          </div>
+        </div>
+
+        <div class="flow-step-item">
+          <div class="step-pill">LANGKAH 2</div>
+          <div class="step-name">Cek Rintangan 360°</div>
+          <div class="step-detail">
+            Periksa <strong>Radar Polar Sky-Plot</strong> untuk memastikan posisi Matahari dan Bumi berada di atas garis kontur bibir kawah dan kemiringan tanah &lt; 10°.
+          </div>
+        </div>
+
+        <div class="flow-step-item">
+          <div class="step-pill">LANGKAH 3</div>
+          <div class="step-name">Geser Timeline 14-Hari</div>
+          <div class="step-detail">
+            Gunakan penggeser waktu <strong>0 - 336 Jam</strong> untuk memilih jam pendaratan optimal dengan suplai daya surya 100% dan koneksi sinyal Bumi aktif.
+          </div>
+        </div>
+
+        <div class="flow-step-item">
+          <div class="step-pill">LANGKAH 4</div>
+          <div class="step-name">Hitung Trajektori RK45</div>
+          <div class="step-detail">
+            Klik tombol <strong>Hitung Trajektori RK45</strong> untuk memvalidasi kebutuhan Delta-V, margin cadangan propelan (&gt; 15 kg), dan ketinggian bebas tebing (&gt; 150 m).
+          </div>
+        </div>
+
+        <div class="flow-step-item">
+          <div class="step-pill">LANGKAH 5</div>
+          <div class="step-name">Validasi & Uji Terbang</div>
+          <div class="step-detail">
+            Pastikan lencana status <strong>GO (SAFE)</strong> aktif, lalu buka tab <strong>Flight Testbed</strong> untuk menguji pendaratan wahana dengan kontrol manual atau autopilot.
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-cta-row">
+        <button class="btn-cta-secondary" onclick="switchView('testbed')">
+          <span>🕹️</span> Coba Flight Testbed
+        </button>
+        <button class="btn-cta-primary" onclick="switchView('console')">
+          <span>📊</span> Buka Mission Console Sekarang ➔
+        </button>
+      </div>
+    </div>
+  </main>
+
   <!-- VIEW 1: MISSION CONSOLE (DEFAULT) -->
   <main id="view-console" class="bento-container">
 
@@ -640,38 +1241,61 @@
     <div class="bento-card bento-full">
       <div class="card-header">
         <span class="card-title">📍 Kandidat Lokasi Pendaratan Mons Mouton</span>
-        <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Pilih salah satu situs untuk evaluasi komprehensif</span>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button class="btn-finder-trigger" onclick="openSmartFinderModal()">
+            <span>⚡</span> Cari Rekomendasi Optimal
+          </button>
+          <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Pilih salah satu situs untuk evaluasi</span>
+        </div>
       </div>
       <div class="sites-row" id="sites-grid">
         <!-- Injected via JavaScript -->
       </div>
     </div>
 
-    <!-- BENTO 2A: TOPOGRAFI MONS MOUTON (CITRA ASLI SATELIT) -->
+    <!-- BENTO 2A: TOPOGRAFI MONS MOUTON & GLOBE BULAN 3D -->
     <div class="bento-card">
       <div class="card-header">
-        <span class="card-title">🗺️ Topografi LROC LOLA DEM Mons Mouton</span>
-        <span class="badge-slope-safe" id="lbl-active-coords">-84.9°S, -33.3°W</span>
+        <span class="card-title">🗺️ Topografi & Posisi Bulan</span>
+        <div style="display: flex; gap: 8px; align-items: center;">
+          <div class="segmented-tabs" style="padding: 2px;">
+            <button class="tab-btn active" id="btn-view-dem" onclick="setMapView('dem')" style="padding: 3px 8px; font-size: 10px;">
+              DEM Mons Mouton
+            </button>
+            <button class="tab-btn" id="btn-view-globe" onclick="setMapView('globe')" style="padding: 3px 8px; font-size: 10px;">
+              🌕 Globe Bulan 3D
+            </button>
+          </div>
+          <span class="badge-slope-safe" id="lbl-active-coords">-84.9°S, -33.3°W</span>
+        </div>
       </div>
-      <div class="dem-map-frame">
-        <img src="/data/quickmap-lroc.png" alt="Mons Mouton LOLA DEM" class="dem-img">
-        <!-- Pin Interaktif -->
-        <div class="map-pin active" id="pin-ALPHA" style="top: 38%; left: 75%;" onclick="selectSite('ALPHA')">
-          <div class="pin-circle"></div>
-          <div class="pin-label">Site Alpha (5,920m)</div>
+      <div class="dem-map-frame" id="map-frame-box">
+        <!-- 1. 2D LOLA DEM View -->
+        <div id="dem-view-container" style="width: 100%; height: 100%; position: relative;">
+          <img src="/data/quickmap-lroc.png" alt="Mons Mouton LOLA DEM" class="dem-img">
+          <!-- Pin Interaktif -->
+          <div class="map-pin active" id="pin-ALPHA" style="top: 38%; left: 75%;" onclick="selectSite('ALPHA')">
+            <div class="pin-circle"></div>
+            <div class="pin-label">Site Alpha (5,920m)</div>
+          </div>
+          <div class="map-pin" id="pin-BETA" style="top: 26%; left: 89%;" onclick="selectSite('BETA')">
+            <div class="pin-circle"></div>
+            <div class="pin-label">Site Beta (5,640m)</div>
+          </div>
+          <div class="map-pin" id="pin-GAMMA" style="top: 51%; left: 52%;" onclick="selectSite('GAMMA')">
+            <div class="pin-circle"></div>
+            <div class="pin-label">Site Gamma (5,410m)</div>
+          </div>
         </div>
-        <div class="map-pin" id="pin-BETA" style="top: 26%; left: 89%;" onclick="selectSite('BETA')">
-          <div class="pin-circle"></div>
-          <div class="pin-label">Site Beta (5,640m)</div>
-        </div>
-        <div class="map-pin" id="pin-GAMMA" style="top: 51%; left: 52%;" onclick="selectSite('GAMMA')">
-          <div class="pin-circle"></div>
-          <div class="pin-label">Site Gamma (5,410m)</div>
+
+        <!-- 2. 3D Moon Globe View -->
+        <div id="globe-view-container" style="width: 100%; height: 100%; display: none; position: relative; background: #030712;">
+          <canvas id="moonGlobeCanvas" style="width: 100%; height: 100%; display: block;"></canvas>
         </div>
       </div>
       <div class="frame-caption">
-        <span>Resolusi: 250 meter / piksel</span>
-        <span>Kutub Selatan Bulan</span>
+        <span id="map-caption-left">Resolusi: 250 meter / piksel</span>
+        <span id="map-caption-right">Kutub Selatan Bulan (-84.9°S, 33.3°W)</span>
       </div>
     </div>
 
@@ -791,29 +1415,361 @@
     </div>
   </main>
 
+  <!-- MODAL: PENCARI REKOMENDASI PENDARATAN OTOMATIS (SMART LANDING FINDER) -->
+  <div class="modal-backdrop" id="smartFinderModal" onclick="closeSmartFinderModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <div>
+          <div class="guide-badge">
+            <span>⚡</span> Automated Decision Matrix • NASA JPL Horizons & LOLA DEM
+          </div>
+          <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin-top: 4px;">
+            Rekomendasi Tanggal, Waktu & Lokasi Pendaratan Optimal
+          </h2>
+          <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+            Sistem menganalisis kombinasi 3 lokasi pendaratan dan durasi 336 jam untuk menemukan titik dengan batas aman cakrawala, iluminasi maksimum, dan koneksi DTE stabil:
+          </p>
+        </div>
+        <button class="modal-close-btn" onclick="closeSmartFinderModal()">✕</button>
+      </div>
+
+      <div class="rec-options-list">
+        <!-- OPSI 1: PRIMARY -->
+        <div class="rec-card best">
+          <div>
+            <div class="rec-badge-tag badge-primary-rec">⭐ REKOMENDASI UTAMA • GOLDEN SOLAR WINDOW</div>
+            <div class="rec-title">Site Alpha — Mons Mouton Crest (Dataran Tinggi Utama)</div>
+            <div class="rec-time">
+              <span>📅</span> Waktu Terbaik: <strong>14 November 2026, 12:00 UTC</strong> (+0 Jam Operasi)
+            </div>
+            <div class="rec-specs-grid">
+              <span class="rec-spec-pill">📐 Lereng: <strong>0.08°</strong> (Sangat Datar &lt; 10°)</span>
+              <span class="rec-spec-pill">☀️ Surya: <strong>100% Aktif</strong> (168 Jam Cahaya Maksimal)</span>
+              <span class="rec-spec-pill">📡 Bumi DTE: <strong>+6.8°</strong> (Clearance Bibir Kawah Aman)</span>
+              <span class="rec-spec-pill" style="color: var(--emerald-safe); background: var(--emerald-bg);">🏆 Skor MCDA: <strong>92 / 100 (SANGAT AMAN)</strong></span>
+            </div>
+          </div>
+          <div>
+            <button class="btn-apply-rec" onclick="applyRecommendation('ALPHA', 0, 'Site Alpha (Mons Mouton Crest)', '14 Nov 2026 12:00 UTC')">
+              <span>📍</span> Lihat Tempat & Visualisasikan
+            </button>
+          </div>
+        </div>
+
+        <!-- OPSI 2: PEAK DTE -->
+        <div class="rec-card">
+          <div>
+            <div class="rec-badge-tag badge-sec-rec">📡 KONEKTIVITAS BUMI MAKSIMAL • PEAK EARTH LINK</div>
+            <div class="rec-title">Site Beta — Plateau North Rim (Tebing Utara)</div>
+            <div class="rec-time">
+              <span>📅</span> Waktu Terbaik: <strong>17 November 2026, 06:00 UTC</strong> (+66 Jam Operasi)
+            </div>
+            <div class="rec-specs-grid">
+              <span class="rec-spec-pill">📐 Lereng: <strong>0.06°</strong> (Paling Datar)</span>
+              <span class="rec-spec-pill">☀️ Surya: <strong>95% Aktif</strong> (Bebas Bayangan)</span>
+              <span class="rec-spec-pill">📡 Bumi DTE: <strong>+8.4°</strong> (Elevasi Terjernih Tanpa Halangan)</span>
+              <span class="rec-spec-pill" style="color: var(--emerald-safe); background: var(--emerald-bg);">🏆 Skor MCDA: <strong>88 / 100 (AMAN)</strong></span>
+            </div>
+          </div>
+          <div>
+            <button class="btn-apply-rec" onclick="applyRecommendation('BETA', 66, 'Site Beta (Plateau North Rim)', '17 Nov 2026 06:00 UTC')">
+              <span>📍</span> Lihat Tempat & Visualisasikan
+            </button>
+          </div>
+        </div>
+
+        <!-- OPSI 3: CONTINGENCY -->
+        <div class="rec-card">
+          <div>
+            <div class="rec-badge-tag badge-sec-rec">🛡️ CADANGAN KONTINJENSI • SHIELDED BASIN</div>
+            <div class="rec-title">Site Gamma — West Basin Ridge (Punggung Cekungan Barat)</div>
+            <div class="rec-time">
+              <span>📅</span> Waktu Terbaik: <strong>21 November 2026, 18:00 UTC</strong> (+174 Jam Operasi)
+            </div>
+            <div class="rec-specs-grid">
+              <span class="rec-spec-pill">📐 Lereng: <strong>0.17°</strong> (Stabil &lt; 10°)</span>
+              <span class="rec-spec-pill">☀️ Surya: <strong>82% Aktif</strong></span>
+              <span class="rec-spec-pill">📡 Bumi DTE: <strong>+4.5°</strong> di atas rintangan</span>
+              <span class="rec-spec-pill" style="color: var(--amber-warn); background: var(--amber-bg);">🏆 Skor MCDA: <strong>79 / 100 (LAYAK - KONTINJENSI)</strong></span>
+            </div>
+          </div>
+          <div>
+            <button class="btn-apply-rec" onclick="applyRecommendation('GAMMA', 174, 'Site Gamma (West Basin Ridge)', '21 Nov 2026 18:00 UTC')">
+              <span>📍</span> Lihat Tempat & Visualisasikan
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING TOAST NOTIFICATION -->
+  <div class="notification-toast" id="notificationToast">
+    <span style="font-size: 16px;">🎯</span>
+    <span id="toastMessage">Lokasi & waktu berhasil disinkronkan!</span>
+  </div>
+
   <!-- JAVASCRIPT SYSTEM ENGINE -->
   <script>
     let currentSite = "ALPHA";
     let timelineData = [];
+    let currentMapMode = "dem";
+    let moonGlobeAnimId = null;
+
+    // Toast Function
+    function showToast(msg) {
+      const toast = document.getElementById("notificationToast");
+      const toastMsg = document.getElementById("toastMessage");
+      if (toast && toastMsg) {
+        toastMsg.textContent = msg;
+        toast.classList.add("show");
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 4000);
+      }
+    }
+
+    // Smart Finder Modal Handlers
+    function openSmartFinderModal() {
+      const modal = document.getElementById("smartFinderModal");
+      if (modal) modal.classList.add("active");
+    }
+
+    function closeSmartFinderModal(e) {
+      if (e && e.target && e.target.id !== "smartFinderModal" && !e.target.classList.contains("modal-close-btn")) return;
+      const modal = document.getElementById("smartFinderModal");
+      if (modal) modal.classList.remove("active");
+    }
+
+    // Apply Recommendation Action
+    function applyRecommendation(siteKey, hourOffset, siteName, dateStr) {
+      closeSmartFinderModal();
+      switchView('console');
+      selectSite(siteKey);
+
+      // Set timeline slider
+      const slider = document.getElementById("timeline-slider");
+      if (slider) {
+        slider.value = hourOffset;
+        updateEvaluationFromSlider();
+      }
+
+      // Animate pin pulse
+      const pin = document.getElementById(`pin-${siteKey}`);
+      if (pin) {
+        pin.classList.add("highlight-pulse");
+        setTimeout(() => {
+          pin.classList.remove("highlight-pulse");
+        }, 4500);
+      }
+
+      // Re-render globe if active
+      if (currentMapMode === 'globe') {
+        renderMoonGlobe();
+      }
+
+      showToast(`🎯 Rekomendasi Terpilih: ${siteName} • ${dateStr}`);
+
+      // Scroll to map
+      const mapBox = document.getElementById("map-frame-box");
+      if (mapBox) {
+        mapBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    // Map View Toggle (DEM vs 3D Moon Globe)
+    function setMapView(mode) {
+      currentMapMode = mode;
+      const demContainer = document.getElementById("dem-view-container");
+      const globeContainer = document.getElementById("globe-view-container");
+      const btnDem = document.getElementById("btn-view-dem");
+      const btnGlobe = document.getElementById("btn-view-globe");
+      const capLeft = document.getElementById("map-caption-left");
+      const capRight = document.getElementById("map-caption-right");
+
+      if (mode === 'dem') {
+        demContainer.style.display = "block";
+        globeContainer.style.display = "none";
+        btnDem.classList.add("active");
+        btnGlobe.classList.remove("active");
+        capLeft.textContent = "Resolusi: 250 meter / piksel";
+        capRight.textContent = "Kutub Selatan Bulan (-84.9°S, 33.3°W)";
+      } else {
+        demContainer.style.display = "none";
+        globeContainer.style.display = "block";
+        btnDem.classList.remove("active");
+        btnGlobe.classList.add("active");
+        capLeft.textContent = "Perspektif: Orthographic South Pole";
+        capRight.textContent = "Mons Mouton Beacon (-84.9°S, 33.3°W)";
+        renderMoonGlobe();
+      }
+    }
+
+    // 3D Canvas Moon Globe Renderer
+    function renderMoonGlobe() {
+      const canvas = document.getElementById("moonGlobeCanvas");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      canvas.width = canvas.parentElement.clientWidth || 450;
+      canvas.height = canvas.parentElement.clientHeight || 340;
+
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const R = Math.min(w, h) * 0.38;
+
+      // Clear dark space
+      ctx.fillStyle = "#030712";
+      ctx.fillRect(0, 0, w, h);
+
+      // Starfield dots
+      ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+      for (let i = 0; i < 40; i++) {
+        const sx = (Math.sin(i * 12.3) * 0.5 + 0.5) * w;
+        const sy = (Math.cos(i * 34.5) * 0.5 + 0.5) * h;
+        ctx.fillRect(sx, sy, 1.5, 1.5);
+      }
+
+      // 1. Moon Base Sphere (Radial Gradient 3D lighting)
+      const grad = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.3, R * 0.1, cx, cy, R);
+      grad.addColorStop(0, "#f1f5f9");
+      grad.addColorStop(0.5, "#cbd5e1");
+      grad.addColorStop(0.85, "#64748b");
+      grad.addColorStop(1, "#1e293b");
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Clip inside Moon for crater procedural shading
+      ctx.clip();
+
+      // Procedural craters
+      const craters = [
+        { x: cx - R * 0.2, y: cy + R * 0.3, r: R * 0.16 },
+        { x: cx + R * 0.3, y: cy - R * 0.1, r: R * 0.22 },
+        { x: cx - R * 0.4, y: cy - R * 0.3, r: R * 0.14 },
+        { x: cx + R * 0.1, y: cy + R * 0.5, r: R * 0.12 },
+        { x: cx, y: cy, r: R * 0.08 } // Pole crater (Shackleton)
+      ];
+
+      for (const cr of craters) {
+        ctx.beginPath();
+        ctx.arc(cr.x, cr.y, cr.r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(30, 41, 59, 0.35)";
+        ctx.fill();
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+
+      // South Pole Coordinate Grid Parallels (-70°, -80°, -85°)
+      ctx.strokeStyle = "rgba(56, 189, 248, 0.4)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 4]);
+
+      // Parallels
+      [0.2, 0.45, 0.75].forEach(scale => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, R * scale, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      // Meridian lines
+      for (let a = 0; a < Math.PI * 2; a += Math.PI / 4) {
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(a) * R, cy + Math.sin(a) * R);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      ctx.restore();
+
+      // South Pole Axis marker (+)
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(cx - 8, cy); ctx.lineTo(cx + 8, cy);
+      ctx.moveTo(cx, cy - 8); ctx.lineTo(cx, cy + 8);
+      ctx.stroke();
+
+      ctx.font = "bold 9px monospace";
+      ctx.fillStyle = "#38bdf8";
+      ctx.fillText("SOUTH POLE (90°S)", cx + 12, cy - 6);
+
+      // Mons Mouton Coordinate Beacon (-84.9°S, 33.3°W)
+      // Radius from pole corresponds to (90 - 84.9) = 5.1°
+      const polarDist = R * 0.32;
+      const polarAngle = (-33.3 - 90) * (Math.PI / 180);
+      const bx = cx + Math.cos(polarAngle) * polarDist;
+      const by = cy + Math.sin(polarAngle) * polarDist;
+
+      // Beacon Target Ping Circle
+      const time = performance.now() * 0.003;
+      const pingR = 8 + (Math.sin(time) * 4);
+
+      ctx.beginPath();
+      ctx.arc(bx, by, pingR, 0, Math.PI * 2);
+      ctx.strokeStyle = "#facc15";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(bx, by, 4, 0, Math.PI * 2);
+      ctx.fillStyle = "#2563eb";
+      ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Laser line to info badge
+      ctx.strokeStyle = "#facc15";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(bx, by);
+      ctx.lineTo(bx + 40, by - 35);
+      ctx.lineTo(bx + 110, by - 35);
+      ctx.stroke();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 11px sans-serif";
+      ctx.fillText("MONS MOUTON", bx + 45, by - 40);
+
+      ctx.fillStyle = "#38bdf8";
+      ctx.font = "10px monospace";
+      ctx.fillText(`-84.9°S, 33.3°W (${currentSite})`, bx + 45, by - 24);
+    }
 
     // 1. Tab View Switcher
     function switchView(viewName) {
       const consoleView = document.getElementById("view-console");
       const testbedView = document.getElementById("view-testbed");
+      const guideView = document.getElementById("view-guide");
       const btnConsole = document.getElementById("tab-btn-console");
       const btnTestbed = document.getElementById("tab-btn-testbed");
+      const btnGuide = document.getElementById("tab-btn-guide");
+
+      // Hide all views first
+      consoleView.style.display = "none";
+      testbedView.classList.remove("active");
+      guideView.style.display = "none";
+      btnConsole.classList.remove("active");
+      btnTestbed.classList.remove("active");
+      btnGuide.classList.remove("active");
 
       if (viewName === 'console') {
         consoleView.style.display = "grid";
-        testbedView.classList.remove("active");
         btnConsole.classList.add("active");
-        btnTestbed.classList.remove("active");
-      } else {
-        consoleView.style.display = "none";
+      } else if (viewName === 'testbed') {
         testbedView.classList.add("active");
-        btnConsole.classList.remove("active");
         btnTestbed.classList.add("active");
         if (!testbedInitialized) initCockpitEngine();
+      } else if (viewName === 'guide') {
+        guideView.style.display = "flex";
+        btnGuide.classList.add("active");
       }
     }
 
