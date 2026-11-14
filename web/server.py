@@ -215,6 +215,14 @@ class LaunchSimHandler(BaseApiHandler):
             self.write_json({"status": "ERROR", "message": str(e)}, 500)
 
 
+class NoCacheStaticFileHandler(tornado.web.StaticFileHandler):
+    """Menonaktifkan cache browser untuk menjamin perubahan index.html langsung muncul."""
+    def set_extra_headers(self, path):
+        self.set_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        self.set_header("Pragma", "no-cache")
+        self.set_header("Expires", "0")
+
+
 def make_app():
     web_dir = os.path.dirname(os.path.abspath(__file__))
     data_dir = os.path.join(BASE_DIR, "data")
@@ -227,7 +235,7 @@ def make_app():
         (r"/api/trajectory", TrajectoryHandler),
         (r"/api/launch_sim", LaunchSimHandler),
         (r"/data/(.*)", tornado.web.StaticFileHandler, {"path": data_dir}),
-        (r"/(.*)", tornado.web.StaticFileHandler, {"path": web_dir, "default_filename": "index.html"}),
+        (r"/(.*)", NoCacheStaticFileHandler, {"path": web_dir, "default_filename": "index.html"}),
     ])
 
 

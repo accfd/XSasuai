@@ -71,6 +71,8 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
       box-shadow: var(--shadow-sm);
     }
 
@@ -110,7 +112,8 @@
     .header-actions {
       display: flex;
       align-items: center;
-      gap: 14px;
+      flex-wrap: wrap;
+      gap: 10px;
     }
 
     .api-status-chip {
@@ -838,6 +841,71 @@
     }
 
     /* SMART FINDER MODAL & 3D MOON GLOBE STYLES */
+    /* CALLOUT BANNER FOR SMART FINDER */
+    .smart-finder-callout {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border: 1.5px solid #93c5fa;
+      border-radius: var(--radius-md);
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 1px 3px rgba(37, 99, 235, 0.08);
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+
+    .callout-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .callout-badge {
+      font-size: 10px;
+      font-weight: 800;
+      color: #1d4ed8;
+      letter-spacing: 0.6px;
+    }
+
+    .callout-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #1e3a8a;
+    }
+
+    .callout-desc {
+      font-size: 11px;
+      color: #2563eb;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .btn-finder-hero {
+      background: #2563eb;
+      color: #ffffff;
+      border: none;
+      font-weight: 800;
+      font-size: 12px;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+      transition: all 0.15s ease;
+      letter-spacing: 0.4px;
+    }
+
+    .btn-finder-hero:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+    }
+
     .btn-finder-trigger {
       background: linear-gradient(135deg, #2563eb, #1d4ed8);
       color: #ffffff;
@@ -1241,13 +1309,23 @@
     <div class="bento-card bento-full">
       <div class="card-header">
         <span class="card-title">📍 Kandidat Lokasi Pendaratan Mons Mouton</span>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <button class="btn-finder-trigger" onclick="openSmartFinderModal()">
-            <span>⚡</span> Cari Rekomendasi Optimal
-          </button>
-          <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Pilih salah satu situs untuk evaluasi</span>
-        </div>
+        <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Pilih salah satu situs untuk evaluasi komprehensif</span>
       </div>
+
+      <!-- SMART FINDER CALLOUT BANNER (SANGAT MENCOLOK) -->
+      <div class="smart-finder-callout">
+        <div class="callout-left">
+          <div class="callout-badge">⚡ FITUR REKOMENDASI PENDARATAN OTOMATIS (MCDA)</div>
+          <div class="callout-title">Cari Tanggal, Waktu & Posisi Pendaratan Paling Tepat</div>
+          <div class="callout-desc">
+            Sistem otomatis memindai seluruh durasi misi 336 jam untuk mencari kombinasi aman dengan pencahayaan surya 100%, lereng &lt; 10°, dan sinyal Bumi stabil.
+          </div>
+        </div>
+        <button class="btn-finder-hero" onclick="openSmartFinderModal()">
+          <span>⚡</span> CARI TANGGAL & POSISI OPTIMAL
+        </button>
+      </div>
+
       <div class="sites-row" id="sites-grid">
         <!-- Injected via JavaScript -->
       </div>
