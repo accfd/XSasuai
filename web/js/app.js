@@ -1537,6 +1537,78 @@
       const haloMesh = new THREE.Mesh(haloGeo, haloMat);
       horizonMeshGroup.add(haloMesh);
 
+      // Helper: Canvas Text Sprite for Aerospace 3D Annotations
+      function createHorizonTextSprite(text, bgColor, borderColor) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 512;
+        canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+        
+        ctx.fillStyle = bgColor || "rgba(15, 23, 42, 0.85)";
+        ctx.strokeStyle = borderColor || "#38bdf8";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(10, 10, 492, 108, 16);
+        } else {
+          ctx.rect(10, 10, 492, 108);
+        }
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#ffffff";
+        ctx.font = "bold 30px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, 256, 64);
+
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.minFilter = THREE.LinearFilter;
+        const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+        const sprite = new THREE.Sprite(mat);
+        sprite.scale.set(5.5, 1.38, 1);
+        return sprite;
+      }
+
+      // Sprite 1: Posisi Wahana di Mons Mouton Crest
+      const landerSprite = createHorizonTextSprite("📍 Posisi Kita: Mons Mouton (+5.920 m)", "rgba(16, 185, 129, 0.9)", "#10b981");
+      landerSprite.position.set(0, 5.3, 0);
+      horizonMeshGroup.add(landerSprite);
+
+      // Line leader to lander
+      const landerLineGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 4.4, 0),
+        new THREE.Vector3(0, 4.7, 0)
+      ]);
+      const landerLineMat = new THREE.LineBasicMaterial({ color: 0x10b981, linewidth: 2 });
+      horizonMeshGroup.add(new THREE.Line(landerLineGeo, landerLineMat));
+
+      // Sprite 2: Puncak Tebing Kawah
+      const rimSprite = createHorizonTextSprite("⛰️ Dinding Tebing Kawah (-2.10°)", "rgba(225, 29, 72, 0.85)", "#f43f5e");
+      rimSprite.position.set(9.2, 4.2, 0);
+      horizonMeshGroup.add(rimSprite);
+
+      // Sprite 3: Klirens Bebas Halangan Sinyal ke Bumi
+      const clearanceSprite = createHorizonTextSprite("✓ Klirens Sinyal +12.35° [BEBAS RINTANGAN]", "rgba(14, 116, 144, 0.95)", "#38bdf8");
+      clearanceSprite.position.set(9.2, 6.4, 0);
+      horizonMeshGroup.add(clearanceSprite);
+
+      // Vertical measurement bracket between rim and beam
+      const beamHeightAtRim = 3.6 + 0.9 + Math.tan(beamAngleRad) * 9.2;
+      const bracketGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(9.2, 3.4, 0),
+        new THREE.Vector3(9.2, beamHeightAtRim, 0)
+      ]);
+      const bracketMat = new THREE.LineDashedMaterial({
+        color: 0x38bdf8,
+        dashSize: 0.3,
+        gapSize: 0.2,
+        linewidth: 2
+      });
+      const bracketLine = new THREE.Line(bracketGeo, bracketMat);
+      bracketLine.computeLineDistances();
+      horizonMeshGroup.add(bracketLine);
+
       // 7. Earth Sphere at the end of the beam
       const earthGeo = new THREE.SphereGeometry(1.2, 24, 24);
       const earthMat = new THREE.MeshStandardMaterial({
