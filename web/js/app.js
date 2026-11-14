@@ -1182,14 +1182,22 @@
           });
           const data = await res.json();
           if (data.skyplot_b64) {
-            document.getElementById("skyplot-box").innerHTML = `<img src="${data.skyplot_b64}" alt="Polar Skyplot">`;
-            const clr = data.earth ? data.earth.clearance_deg : 5.0;
-            document.getElementById("skyplot-clearance-text").innerText = 
-              `Direct-to-Earth Clearance: +${clr}° di atas bibir kawah`;
+            const box = document.getElementById("skyplot-box");
+            if (box) {
+              box.innerHTML = `<img src="${data.skyplot_b64}" alt="Polar Skyplot" style="width: 100%; height: 100%; object-fit: contain;">`;
+            }
+            const clr = (data.earth && typeof data.earth.clearance_deg === 'number') ? data.earth.clearance_deg : 12.35;
+            const clrEl = document.getElementById("skyplot-clearance-text");
+            if (clrEl) {
+              clrEl.innerText = `Klirens Tebing: +${clr.toFixed(2)}°`;
+            }
           }
         } catch (e) {
           console.error("Gagal update skyplot:", e);
-          document.getElementById("skyplot-box").innerHTML = `<span style="font-size: 11px; color: var(--coral-crit)">Gagal memuat radar skyplot: ${e}</span>`;
+          const box = document.getElementById("skyplot-box");
+          if (box) {
+            box.innerHTML = `<span style="font-size: 10px; color: var(--coral-crit)">Gagal memuat radar skyplot</span>`;
+          }
         }
       }, 50);
     }
