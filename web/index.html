@@ -1884,10 +1884,10 @@
           pts.push(r * Math.cos(a), y, r * Math.sin(a));
         }
         circleGeo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-        threeScene.add(new THREE.Line(circleGeo, gridMat));
+        moonGlobeMesh.add(new THREE.Line(circleGeo, gridMat));
       });
 
-      // 7. Mons Mouton Target Beacon Group
+      // 7. Mons Mouton Target Beacon Group (Child of moonGlobeMesh agar ikut berputar)
       targetBeaconGroup = new THREE.Group();
 
       // Needle pin
@@ -1913,7 +1913,7 @@
 
       // Initial position at Mons Mouton (-84.9°S, -33.3°W)
       updateTargetBeaconPosition(-84.9, -33.3);
-      threeScene.add(targetBeaconGroup);
+      moonGlobeMesh.add(targetBeaconGroup);
 
       // 8. Mouse Drag Orbit Interaction
       let isDragging = false;
@@ -1961,8 +1961,14 @@
           // Cosine easing (smooth acceleration & deceleration)
           const ease = 0.5 - 0.5 * Math.cos(progress * Math.PI);
 
-          threeCamera.position.lerpVectors(flyToStartCam, flyToEndCam, ease);
-          threeCamera.lookAt(targetBeaconGroup.position.x * 0.8, targetBeaconGroup.position.y * 0.8, targetBeaconGroup.position.z * 0.8);
+          const beaconWorldPos = new THREE.Vector3();
+          targetBeaconGroup.getWorldPosition(beaconWorldPos);
+
+          const dir = beaconWorldPos.clone().normalize();
+          const currentEndCam = beaconWorldPos.clone().add(dir.multiplyScalar(3.2));
+
+          threeCamera.position.lerpVectors(flyToStartCam, currentEndCam, ease);
+          threeCamera.lookAt(beaconWorldPos);
 
           // Update HUD altitude countdown
           const altKm = Math.round(50000 - ease * (50000 - 15));
@@ -1996,7 +2002,7 @@
 
     function updateTargetBeaconPosition(lat, lon) {
       if (!targetBeaconGroup) return;
-      const pos = selenographicToCartesian(lat, lon, 8.1);
+      const pos = selenographicToCartesian(lat, lon, 8.08);
       targetBeaconGroup.position.copy(pos);
       targetBeaconGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), pos.clone().normalize());
 
@@ -2011,14 +2017,19 @@
       isFlyToActive = true;
       flyToStartTime = performance.now();
       flyToStartCam.set(0, -26, 28); // Far orbit view
-      // Aim camera closer to Mons Mouton beacon
-      flyToEndCam.set(targetBeaconGroup.position.x * 1.5, targetBeaconGroup.position.y * 1.5 - 1.8, targetBeaconGroup.position.z * 1.5 + 4.2);
+
+      const beaconWorldPos = new THREE.Vector3();
+      targetBeaconGroup.getWorldPosition(beaconWorldPos);
+      const dir = beaconWorldPos.clone().normalize();
+      flyToEndCam.copy(beaconWorldPos).add(dir.multiplyScalar(3.2));
+
       threeCamera.position.copy(flyToStartCam);
     }
 
     function resetGlobeOrbit() {
       if (!threeGlobeInitialized) return;
       isFlyToActive = false;
+      moonGlobeMesh.rotation.set(0, 0, 0); // Reset rotasi bulan
       threeCamera.position.set(0, -18, 24);
       threeCamera.lookAt(0, -2, 0);
       const altElem = document.getElementById("globe-alt-readout");
