@@ -2241,6 +2241,8 @@
       homeMoonRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       homeMoonRenderer.setSize(w, h);
       homeMoonRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      homeMoonRenderer.domElement.style.display = "block";
+      homeMoonRenderer.domElement.style.margin = "0 auto";
       container.appendChild(homeMoonRenderer.domElement);
 
       // 3. Realistic Soft Lunar Lighting
@@ -2378,7 +2380,6 @@
           tantanganHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }
-    }
     }
 
     function toggleHomeGlobeRotation() {
