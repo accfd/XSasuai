@@ -1422,13 +1422,7 @@
         </p>
 
         <!-- PURE CINEMATIC 3D MOON (TRANSPARENT BACKGROUND & FLOATING) -->
-        <div style="background: transparent; border: none; margin: 0 auto 12px; overflow: visible; position: relative; height: 330px; cursor: pointer; filter: drop-shadow(0 20px 28px rgba(15, 23, 42, 0.22));" id="homeMoonContainer" title="Klik Bulan untuk Membuka Analisis &amp; Tantangan">
-          <!-- Loading indicator -->
-          <div id="homeMoonLoading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--artemis-blue); font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; z-index: 5;">
-            <div class="spinner" style="width: 18px; height: 18px; border: 2px solid rgba(37, 99, 235, 0.2); border-top-color: var(--artemis-blue); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
-            Memuat Model 3D Bulan...
-          </div>
-        </div>
+        <div style="background: transparent; border: none; margin: 0 auto 12px; overflow: visible; position: relative; height: 330px; cursor: pointer; filter: drop-shadow(0 20px 28px rgba(15, 23, 42, 0.22));" id="homeMoonContainer" title="Klik Bulan untuk Membuka Analisis &amp; Tantangan"></div>
 
         <!-- Tombol Interaktif Petunjuk Klik Bulan -->
         <div id="homeMoonCtaPill" onclick="revealHomeChallenges()" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(37, 99, 235, 0.08); border: 1.5px solid rgba(37, 99, 235, 0.28); color: var(--artemis-blue); padding: 10px 24px; border-radius: 999px; font-size: 13.5px; font-weight: 800; cursor: pointer; transition: all 0.25s ease; margin-bottom: 24px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 18px rgba(37, 99, 235, 0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(37, 99, 235, 0.12)';">
@@ -2257,14 +2251,11 @@
       sunLight.position.set(22, 12, 20);
       homeMoonScene.add(sunLight);
 
-      // 4. Lunar Sphere with NASA Texture (Pure Floating Moon)
+      // 4. Lunar Sphere with NASA Texture (Pure Floating Moon - Instant Display)
       const moonGeo = new THREE.SphereGeometry(7.5, 64, 64);
-      const textureLoader = new THREE.TextureLoader();
-      const moonTexture = textureLoader.load('/data/moon_1024.jpg', () => {
-        const loadingElem = document.getElementById("homeMoonLoading");
-        if (loadingElem) loadingElem.style.display = "none";
-      });
+      const moonTexture = new THREE.TextureLoader().load('/data/moon_1024.jpg');
       const moonMat = new THREE.MeshStandardMaterial({
+        color: 0xd4d4d8,
         map: moonTexture,
         roughness: 0.88,
         metalness: 0.02
@@ -2999,20 +2990,18 @@
         if (homeView) homeView.style.display = "grid";
         if (btnHome) btnHome.classList.add("active");
         try { history.pushState(null, '', '/'); } catch(e){}
-        setTimeout(() => {
-          if (!homeMoonInitialized) {
-            initHomeMoonGlobe();
-          } else if (homeMoonRenderer && homeMoonCamera) {
-            const container = document.getElementById("homeMoonContainer");
-            if (container) {
-              const nw = container.clientWidth || 900;
-              const nh = container.clientHeight || 320;
-              homeMoonCamera.aspect = nw / nh;
-              homeMoonCamera.updateProjectionMatrix();
-              homeMoonRenderer.setSize(nw, nh);
-            }
+        if (!homeMoonInitialized) {
+          initHomeMoonGlobe();
+        } else if (homeMoonRenderer && homeMoonCamera) {
+          const container = document.getElementById("homeMoonContainer");
+          if (container) {
+            const nw = container.clientWidth || 900;
+            const nh = container.clientHeight || 330;
+            homeMoonCamera.aspect = nw / nh;
+            homeMoonCamera.updateProjectionMatrix();
+            homeMoonRenderer.setSize(nw, nh);
           }
-        }, 50);
+        }
       } else if (viewName === 'rekomendasi') {
         if (recView) recView.style.display = "grid";
         if (btnRec) btnRec.classList.add("active");
@@ -3411,30 +3400,36 @@
       requestAnimationFrame(loop);
     }
 
-    // 6. Inisialisasi
-    document.getElementById("timeline-slider").oninput = updateEvaluationFromSlider;
+    // 6. Inisialisasi Tampilan Seketika (Instant Render First Paint)
+    const timelineSlider = document.getElementById("timeline-slider");
+    if (timelineSlider) timelineSlider.oninput = updateEvaluationFromSlider;
 
+    // Rute awal dieksekusi langsung tanpa menunggu panggilan API
+    const initialPath = window.location.pathname.toLowerCase();
+    if (initialPath.includes('rekomendasi')) {
+      switchView('rekomendasi');
+    } else if (initialPath.includes('visualisasi')) {
+      switchView('visualisasi');
+    } else if (initialPath.includes('simulasi')) {
+      switchView('simulasi');
+    } else {
+      switchView('home');
+      initHomeMoonGlobe();
+    }
+
+    // Background Async Data Loader (tidak memblokir render 3D Bulan di awal)
     (async () => {
-      // Inisialisasi zoom & pan interaktif 2D DEM
-      initDemInteractions();
-      // Panggil skyplot dan trajektori langsung agar tidak menunggu timeline
-      debounceSkyplotUpdate("2026-11-14 12:00");
-      document.getElementById("btn-recalc-pdi").click();
-      await loadSites();
-      await loadTimeline();
-      updateEvaluationFromSlider();
-      // Inisialisasi rute tampilan berdasarkan URL saat ini
-      const path = window.location.pathname.toLowerCase();
-      if (path.includes('rekomendasi')) {
-        switchView('rekomendasi');
-      } else if (path.includes('visualisasi')) {
-        switchView('visualisasi');
-      } else if (path.includes('simulasi')) {
-        switchView('simulasi');
-      } else {
-        switchView('home');
+      try {
+        initDemInteractions();
+        debounceSkyplotUpdate("2026-11-14 12:00");
+        const recalcBtn = document.getElementById("btn-recalc-pdi");
+        if (recalcBtn) recalcBtn.click();
+        await loadSites();
+        await loadTimeline();
+        updateEvaluationFromSlider();
+      } catch (err) {
+        console.warn("Background data loader warning:", err);
       }
-
     })();
   </script>
 </body>
