@@ -1,44 +1,83 @@
+# -*- coding: utf-8 -*-
+# solar_earth_horizon_planner.py — Horizon Skyline, Sun & Earth DTE Window Planner
+# =====================================================================
+# Proyek  : Lunar Landing Site Navigator
+# Event   : NASA Space Apps Challenge 2026
+# Target  : Mons Mouton, Kutub Selatan Bulan (~84.5°S)
+# Deskripsi: Modul 2 — Evaluasi profil cakrawala 360°, posisi riil
+#            Matahari & Bumi (NASA JPL Horizons Ephemeris), serta
+#            penentuan jendela pendaratan emas (Golden Landing Window).
+#            Terintegrasi penuh dengan constants.py, mission_state.py,
+#            dan horizons_api.py.
+# =====================================================================
+
 import os
 import sys
 import math
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from typing import Optional, Tuple
+
 import numpy as np
 from PIL import Image
+
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QSlider, QLabel, QFrame, QGridLayout, QDateEdit,
-    QScrollArea
+    QScrollArea, QStatusBar
 )
-from PyQt6.QtCore import Qt, QTimer, QRectF, QPointF, QDate
+from PyQt6.QtCore import Qt, QTimer, QRectF, QPointF, QDate, QThread, pyqtSignal
 from PyQt6.QtGui import (
     QPainter, QColor, QPen, QFont, QBrush, QLinearGradient, QPolygonF
+)
+
+from constants import (
+    SITES_CONFIG,
+    LUNAR_SYNODIC_DAYS,
+    MISSION_EPOCH,
+    R_MOON_M,
+    RES_PIXEL_M,
+    DEM_CANDIDATES,
+    day_offset_to_date,
+    date_to_day_offset,
+    date_to_absolute_day,
+)
+from mission_state import (
+    load_state,
+    save_state,
+    update_from_horizon_planner,
+    update_from_terrain_scan,
+)
+from horizons_api import (
+    fetch_mission_window_data_safe,
+    get_position_safe,
+    get_sun_position_approx,
+    get_earth_position_approx,
+    is_api_available,
+    clear_cache,
 )
 
 # =====================================================================
 # TEMA VISUAL CYBERPUNK MISI BULAN
 # =====================================================================
-BG_DARK      = QColor(10, 14, 23)
-PANEL_BG     = QColor(15, 23, 38)
-BORDER_COL   = QColor(30, 48, 77)
-CYAN         = QColor(0, 240, 255)
-BLUE         = QColor(56, 189, 248)
-GREEN        = QColor(16, 185, 129)
-YELLOW       = QColor(250, 204, 21)
-ORANGE       = QColor(251, 146, 60)
-RED          = QColor(239, 68, 68)
-WHITE        = QColor(248, 250, 252)
-GRAY         = QColor(148, 163, 184)
-DARK_GRAY    = QColor(35, 45, 60)
+BG_DARK    = QColor(10, 14, 23)
+PANEL_BG   = QColor(15, 23, 38)
+BORDER_COL = QColor(30, 48, 77)
+CYAN       = QColor(0, 240, 255)
+BLUE       = QColor(56, 189, 248)
+GREEN      = QColor(16, 185, 129)
+YELLOW     = QColor(250, 204, 21)
+ORANGE     = QColor(251, 146, 60)
+RED        = QColor(239, 68, 68)
+WHITE      = QColor(248, 250, 252)
+GRAY       = QColor(148, 163, 184)
+DARK_GRAY  = QColor(35, 45, 60)
+
 
 # =====================================================================
 # MODEL ELEVASI DEM & RAYCASTING CAKRAWALA 360 DERAJAT
 # =====================================================================
-def load_lunar_dem():
-    candidates = [
-        os.path.join("data", "quickmap-lroc.png"),
-        os.path.join("data", "mons_mouton_illum", "mons_mouton_illum.png")
-    ]
-    for path in candidates:
+def load_lunar_dem() -> np.ndarray:
+    for path in DEM_CANDIDATES:
         if os.path.exists(path):
             try:
                 img = Image.open(path).convert("L")
@@ -52,51 +91,19 @@ def load_lunar_dem():
     x = np.linspace(-3, 3, 400)
     y = np.linspace(-3, 3, 400)
     xx, yy = np.meshgrid(x, y)
-    elev = 5000.0 + 800.0 * np.exp(-(xx**2 + yy**2)/2.0) - 400.0 * np.sin(xx*2)
+    elev = 5000.0 + 800.0 * np.exp(-(xx**2 + yy**2) / 2.0) - 400.0 * np.sin(xx * 2)
     return elev
 
 DEM_ELEV = load_lunar_dem()
-R_MOON_M = 1737400.0
-RES_PIXEL_M = 250.0
 
-SITES_CONFIG = {
-    "ALPHA": {
-        "name": "Site Alpha (Mons Mouton Crest)",
-        "short": "ALPHA",
-        "tag": "SITUS UTAMA (PRIMARY)",
-        "coord": (380, 750),
-        "elev": 5920,
-        "slope": 0.08,
-        "desc": "Puncak Dataran Tinggi | Rintangan Terendah | Iluminasi Maksimal",
-        "color": GREEN
-    },
-    "BETA": {
-        "name": "Site Beta (Plateau North Rim)",
-        "short": "BETA",
-        "tag": "SITUS SEKUNDER (RUNNER-UP)",
-        "coord": (260, 890),
-        "elev": 5640,
-        "slope": 0.06,
-        "desc": "Tepi Dinding Utara | Terbuka Bebas ke Arah Bumi | Garis DTE Bersih",
-        "color": CYAN
-    },
-    "GAMMA": {
-        "name": "Site Gamma (West Basin Ridge)",
-        "short": "GAMMA",
-        "tag": "SITUS CADANGAN (CONTINGENCY)",
-        "coord": (510, 520),
-        "elev": 5410,
-        "slope": 0.17,
-        "desc": "Punggung Kawah Barat | Dekat Deposito Volatil Es | Ternaungi Parsial",
-        "color": YELLOW
-    }
-}
 
-def compute_horizon_mask(r0, c0, elev_grid, num_azimuths=360, max_dist_km=25.0):
+def compute_horizon_mask(r0: int, c0: int, elev_grid: np.ndarray,
+                         num_azimuths: int = 360,
+                         max_dist_km: float = 25.0) -> np.ndarray:
     rows, cols = elev_grid.shape
     r0 = int(np.clip(r0, 0, rows - 1))
     c0 = int(np.clip(c0, 0, cols - 1))
-    z0 = float(elev_grid[r0, c0]) + 2.5 # Tinggi antena wahana 2.5m di atas permukaan
+    z0 = float(elev_grid[r0, c0]) + 2.5  # Antena pendarat 2.5m di atas tanah
 
     max_steps = int((max_dist_km * 1000.0) / RES_PIXEL_M)
     dists_m = np.arange(1, max_steps + 1) * RES_PIXEL_M
@@ -119,45 +126,22 @@ def compute_horizon_mask(r0, c0, elev_grid, num_azimuths=360, max_dist_km=25.0):
 
 SITE_HORIZONS = {}
 for k, v in SITES_CONFIG.items():
-    r, c = v["coord"]
+    r, c = v["pixel_coord"]
     SITE_HORIZONS[k] = compute_horizon_mask(r, c, DEM_ELEV)
 
+
 # =====================================================================
-# SINKRONISASI KALENDER RIIL MISI NASA 2026 KE SIKLUS BULAN
+# HITUNG STATISTIK SIKLUS PER SITUS
 # =====================================================================
-LUNAR_SYNODIC_DAYS = 29.53059
-# Tanggal Referensi Fase Bulan Baru Misi NASA 2026: 10 Oktober 2026 12:00 UTC
-MISSION_EPOCH = datetime(2026, 10, 10, 12, 0, 0)
-
-def day_offset_to_date(day_val):
-    return MISSION_EPOCH + timedelta(days=float(day_val))
-
-def date_to_day_offset(dt):
-    delta_days = (dt - MISSION_EPOCH).total_seconds() / 86400.0
-    return delta_days % LUNAR_SYNODIC_DAYS
-
-def get_sun_position(day_val):
-    az_sun = (day_val / LUNAR_SYNODIC_DAYS * 360.0) % 360.0
-    el_sun = 1.54 * math.sin(2.0 * math.pi * (day_val / LUNAR_SYNODIC_DAYS))
-    return az_sun, el_sun
-
-def get_earth_position(day_val):
-    d_anom = day_val / 27.55455
-    d_nodal = day_val / 27.21222
-    az_earth = (0.0 + 7.2 * math.sin(2.0 * math.pi * d_anom)) % 360.0
-    el_earth = 4.5 + 1.8 * math.cos(2.0 * math.pi * d_nodal)
-    return az_earth, el_earth
-
-# Hitung statistik jendela untuk 1 siklus penuh
-def get_site_cycle_stats(site_key):
+def get_site_cycle_stats(site_key: str) -> dict:
     horizon = SITE_HORIZONS[site_key]
     samples = 296
     days = np.linspace(0.0, LUNAR_SYNODIC_DAYS, samples)
     s_win = np.zeros(samples, dtype=bool)
     e_win = np.zeros(samples, dtype=bool)
     for i, d in enumerate(days):
-        az_s, el_s = get_sun_position(d)
-        az_e, el_e = get_earth_position(d)
+        az_s, el_s = get_sun_position_approx(d)
+        az_e, el_e = get_earth_position_approx(d)
         s_win[i] = (el_s >= horizon[int(az_s) % 360])
         e_win[i] = (el_e >= horizon[int(az_e) % 360])
     tot_h = LUNAR_SYNODIC_DAYS * 24.0
@@ -175,6 +159,30 @@ def get_site_cycle_stats(site_key):
     }
 
 SITE_STATS = {k: get_site_cycle_stats(k) for k in SITES_CONFIG}
+
+
+# =====================================================================
+# QTHREAD ASYNC WORKER UNTUK FETCH DATA NASA JPL HORIZONS
+# =====================================================================
+class JPLFetchWorker(QThread):
+    data_ready = pyqtSignal(dict)
+    fetch_failed = pyqtSignal(str)
+
+    def __init__(self, site_key: str, start_dt: datetime, end_dt: datetime, parent=None):
+        super().__init__(parent)
+        self.site_key = site_key
+        self.start_dt = start_dt
+        self.end_dt = end_dt
+
+    def run(self):
+        try:
+            data = fetch_mission_window_data_safe(
+                self.site_key, self.start_dt, self.end_dt, step_hours=1
+            )
+            self.data_ready.emit(data)
+        except Exception as e:
+            self.fetch_failed.emit(str(e))
+
 
 # =====================================================================
 # WIDGET 1: PANORAMA CAKRAWALA LOKAL 360 DERAJAT
@@ -196,8 +204,8 @@ class HorizonPanoramaWidget(QWidget):
 
         site = SITES_CONFIG[app.active_site]
         horizon = SITE_HORIZONS[app.active_site]
-        az_sun, el_sun = get_sun_position(app.current_day)
-        az_earth, el_earth = get_earth_position(app.current_day)
+        az_sun, el_sun, _ = app.get_current_sun_pos()
+        az_earth, el_earth, _ = app.get_current_earth_pos()
 
         idx_sun = int(az_sun) % 360
         idx_earth = int(az_earth) % 360
@@ -297,8 +305,9 @@ class HorizonPanoramaWidget(QWidget):
         status_dte_txt = "BUMI [DTE LINK OK]" if earth_visible else "BUMI [TERHALANG BUKIT]"
         painter.drawText(int(sx_earth + 12), int(sy_earth + 12), f"{status_dte_txt} (Az:{az_earth:.1f}°, El:{el_earth:+.2f}°)")
 
+
 # =====================================================================
-# WIDGET 2: TIMELINE JENDELA DAYA & KOMUNIKASI (DENGAN TANGGAL KALENDER)
+# WIDGET 2: TIMELINE JENDELA DAYA & KOMUNIKASI
 # =====================================================================
 class MissionTimelineWidget(QWidget):
     def __init__(self, parent=None):
@@ -361,7 +370,6 @@ class MissionTimelineWidget(QWidget):
         painter.drawLine(bar_left, y_axis, bar_left + bar_width, y_axis)
 
         painter.setFont(QFont("Segoe UI", 7))
-        # Tampilkan 6 penanda tanggal kalender sepanjang siklus
         for day_tick in [0, 5, 10, 15, 20, 25, 29]:
             tx = int(bar_left + (day_tick / LUNAR_SYNODIC_DAYS) * bar_width)
             if tx <= bar_left + bar_width:
@@ -377,22 +385,35 @@ class MissionTimelineWidget(QWidget):
         tri = QPolygonF([QPointF(cur_x - 5, y_solar - 8), QPointF(cur_x + 5, y_solar - 8), QPointF(cur_x, y_solar)])
         painter.drawPolygon(tri)
 
+
 # =====================================================================
-# WINDOW UTAMA APLIKASI
+# WINDOW / WIDGET UTAMA APLIKASI
 # =====================================================================
 class LunarSolarEarthPlannerApp(QMainWindow):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, parent=None):
+        super().__init__(parent)
         self.setWindowTitle("NASA Space Apps 2026 — Lunar Landing Date & Location Comparison Suite")
-        self.resize(1140, 880)
+        self.resize(1160, 920)
         self.setStyleSheet(f"background-color: {BG_DARK.name()}; color: {WHITE.name()}; font-family: 'Segoe UI', Arial;")
 
-        self.active_site = "ALPHA"
-        self.current_day = 4.2  # Nilai hari awal
+        # Load shared mission state
+        self.state = load_state()
+        self.active_site = self.state.selected_site if self.state.selected_site in SITES_CONFIG else "ALPHA"
+        self.current_day = self.state.lunar_day_offset if self.state.lunar_day_offset > 0 else 4.2
         self.is_playing = False
         self._updating_widgets = False
 
+        # Internal ephemeris data storage
+        self._sun_data = []
+        self._earth_data = []
+        self.mission_ephem_data = None
+        self.api_source_mode = "unknown"
+        self.jpl_worker = None
+
         self.init_ui()
+
+        # Prefetch real ephemeris from NASA JPL Horizons via background thread
+        self.refresh_ephemeris_data()
 
         self.anim_timer = QTimer(self)
         self.anim_timer.timeout.connect(self.advance_time)
@@ -410,26 +431,33 @@ class LunarSolarEarthPlannerApp(QMainWindow):
         root_layout.setSpacing(10)
 
         # -------------------------------------------------------------
-        # TOP HEADER DENGAN DATE PICKER KALENDER RIIL
+        # 1. TOP HEADER DENGAN STATUS NASA API & DATE PICKER
         # -------------------------------------------------------------
         header = QFrame()
         header.setStyleSheet(f"background-color: {PANEL_BG.name()}; border: 1px solid {BORDER_COL.name()}; border-radius: 6px;")
         h_layout = QHBoxLayout(header)
         h_layout.setContentsMargins(16, 8, 16, 8)
 
+        title_box = QVBoxLayout()
         title_lbl = QLabel(
             "<span style='color:#00f0ff; font-weight:bold; font-size:15px;'>AUTONOMOUS LUNAR MISSION PLANNER: DATE & SITE EVALUATION</span><br>"
             "<span style='color:#94a3b8; font-size:11px;'>NASA Space Apps Challenge 2026 | Target: Mons Mouton High Plateau (-84.5°S)</span>"
         )
-        h_layout.addWidget(title_lbl, stretch=2)
+        title_box.addWidget(title_lbl)
+
+        # Status badge NASA JPL API
+        self.lbl_api_badge = QLabel("<span style='color:#facc15; font-size:10px;'>⏳ MENYAMBUNG KE NASA JPL HORIZONS...</span>")
+        title_box.addWidget(self.lbl_api_badge)
+        h_layout.addLayout(title_box, stretch=3)
 
         # Kontrol Tanggal Kalender Riil
         cal_box = QHBoxLayout()
-        cal_box.addWidget(QLabel("<b style='color:#f8fafc;'>📅 TANGGAL PENDARATAN:</b>"))
+        cal_box.addWidget(QLabel("<b style='color:#f8fafc;'>📅 TANGGAL:</b>"))
 
         self.date_picker = QDateEdit()
         self.date_picker.setCalendarPopup(True)
         self.date_picker.setDisplayFormat("dd MMMM yyyy")
+
         init_date = day_offset_to_date(self.current_day)
         self.date_picker.setDate(QDate(init_date.year, init_date.month, init_date.day))
         self.date_picker.setMinimumDate(QDate(2026, 10, 10))
@@ -445,15 +473,43 @@ class LunarSolarEarthPlannerApp(QMainWindow):
         self.btn_golden = QPushButton("🎯 CARI TANGGAL TERBAIK")
         self.btn_golden.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_golden.setStyleSheet("background-color:#f59e0b; color:#04060a; font-weight:bold; padding:6px 12px; border-radius:4px;")
-        self.btn_golden.setToolTip("Otomatis cari tanggal pendaratan dengan durasi sinar matahari dan sinyal Bumi 100% aktif terpanjang")
+        self.btn_golden.setToolTip("Cari tanggal pendaratan optimal & simpan ke Mission State")
         self.btn_golden.clicked.connect(self.find_golden_window)
         cal_box.addWidget(self.btn_golden)
 
-        h_layout.addLayout(cal_box, stretch=2)
+        # Tombol Refresh JPL
+        self.btn_refresh_jpl = QPushButton("📡 REFRESH DATA JPL")
+        self.btn_refresh_jpl.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_refresh_jpl.setStyleSheet("background-color:#1e293b; color:#00f0ff; border: 1px solid #00f0ff; font-weight:bold; padding:6px 10px; border-radius:4px;")
+        self.btn_refresh_jpl.setToolTip("Perbarui cache data efemeris langsung dari NASA JPL Horizons API")
+        self.btn_refresh_jpl.clicked.connect(self.on_refresh_jpl_clicked)
+        cal_box.addWidget(self.btn_refresh_jpl)
+
+        h_layout.addLayout(cal_box, stretch=3)
         root_layout.addWidget(header)
 
         # -------------------------------------------------------------
-        # BANNER STATUS REKOMENDASI TANGGAL AKTIF
+        # 2. STATUS PANEL: MISSION STATE SUMMARY (SHARED STATE INFO)
+        # -------------------------------------------------------------
+        self.status_panel = QFrame()
+        self.status_panel.setStyleSheet(f"background-color: #131c2e; border: 1px solid {BORDER_COL.name()}; border-radius: 6px; padding: 6px;")
+        sp_lay = QHBoxLayout(self.status_panel)
+        sp_lay.setContentsMargins(12, 4, 12, 4)
+
+        self.lbl_shared_state_info = QLabel()
+        self.lbl_shared_state_info.setFont(QFont("Segoe UI", 9))
+        self.lbl_shared_state_info.setStyleSheet("color: #e2e8f0;")
+        sp_lay.addWidget(self.lbl_shared_state_info)
+
+        self.lbl_toast = QLabel()
+        self.lbl_toast.setFont(QFont("Segoe UI", 9, QFont.Weight.Bold))
+        self.lbl_toast.setStyleSheet("color: #10b981;")
+        sp_lay.addWidget(self.lbl_toast, alignment=Qt.AlignmentFlag.AlignRight)
+
+        root_layout.addWidget(self.status_panel)
+
+        # -------------------------------------------------------------
+        # 3. BANNER STATUS REKOMENDASI TANGGAL AKTIF
         # -------------------------------------------------------------
         self.banner_frame = QFrame()
         self.banner_frame.setStyleSheet("background-color: #0b1a2e; border: 1px solid #00f0ff; border-radius: 6px; padding: 2px;")
@@ -465,19 +521,19 @@ class LunarSolarEarthPlannerApp(QMainWindow):
         root_layout.addWidget(self.banner_frame)
 
         # -------------------------------------------------------------
-        # WIDGET 1: 360 PANORAMA HORIZON
+        # 4. WIDGET 1: 360 PANORAMA HORIZON
         # -------------------------------------------------------------
         self.horizon_widget = HorizonPanoramaWidget(self)
         root_layout.addWidget(self.horizon_widget, stretch=4)
 
         # -------------------------------------------------------------
-        # WIDGET 2: TIMELINE JENDELA DAYA & KOMUNIKASI
+        # 5. WIDGET 2: TIMELINE JENDELA DAYA & KOMUNIKASI
         # -------------------------------------------------------------
         self.timeline_widget = MissionTimelineWidget(self)
         root_layout.addWidget(self.timeline_widget, stretch=3)
 
         # -------------------------------------------------------------
-        # KONTROL WAKTU (SLIDER HARI & PLAY ANIMATION)
+        # 6. KONTROL WAKTU (SLIDER HARI & PLAY ANIMATION)
         # -------------------------------------------------------------
         ctrl_frame = QFrame()
         ctrl_frame.setStyleSheet(f"background-color: {PANEL_BG.name()}; border: 1px solid {BORDER_COL.name()}; border-radius: 6px;")
@@ -509,7 +565,7 @@ class LunarSolarEarthPlannerApp(QMainWindow):
         root_layout.addWidget(ctrl_frame)
 
         # -------------------------------------------------------------
-        # KARTU KOMPARASI BERDAMPINGAN: SITE ALPHA VS BETA VS GAMMA
+        # 7. KARTU KOMPARASI BERDAMPINGAN: SITE ALPHA VS BETA VS GAMMA
         # -------------------------------------------------------------
         cmp_title = QLabel("<b style='color:#f8fafc; font-size:12px;'>⚡ KOMPARASI LOKASI PENDARATAN BERDAMPINGAN (QUICK SITE COMPARISON MATRIX)</b>")
         root_layout.addWidget(cmp_title)
@@ -527,9 +583,75 @@ class LunarSolarEarthPlannerApp(QMainWindow):
 
         root_layout.addWidget(cards_frame)
 
+        # Status Bar
+        self.setStatusBar(QStatusBar())
+        self.statusBar().setStyleSheet(f"background-color: {PANEL_BG.name()}; color: {GRAY.name()}; font-size: 11px;")
+        self.statusBar().showMessage("Sistem siap. Silakan tentukan tanggal pendaratan dan situs target.")
+
         self.update_all_views()
 
-    def create_site_card(self, key):
+    # =================================================================
+    # FETCH ASINKRON JPL HORIZONS MENGGUNAKAN QTHREAD
+    # =================================================================
+    def refresh_ephemeris_data(self):
+        target_dt = day_offset_to_date(self.current_day)
+        start_dt = target_dt - timedelta(days=2)
+        end_dt = target_dt + timedelta(days=3)
+
+        self.lbl_api_badge.setText("<span style='color:#facc15; font-size:10px;'>⏳ MENGAMBIL DATA POSISI NASA JPL HORIZONS...</span>")
+
+        # Jalankan fetch dalam thread latar belakang
+        self.jpl_worker = JPLFetchWorker(self.active_site, start_dt, end_dt, self)
+        self.jpl_worker.data_ready.connect(self.on_jpl_data_received)
+        self.jpl_worker.fetch_failed.connect(self.on_jpl_data_failed)
+        self.jpl_worker.start()
+
+    def on_jpl_data_received(self, data: dict):
+        self.mission_ephem_data = data
+        self._sun_data = data.get("sun", [])
+        self._earth_data = data.get("earth", [])
+        self.api_source_mode = data.get("source", "jpl_live")
+
+        if self.api_source_mode == "jpl_live":
+            self.lbl_api_badge.setText("<span style='color:#10b981; font-weight:bold; font-size:10px;'>🛰️ DATA NASA JPL HORIZONS: LIVE & ACCURATE</span>")
+        else:
+            self.lbl_api_badge.setText("<span style='color:#f59e0b; font-weight:bold; font-size:10px;'>⚠️ MODE OFFLINE — ESTIMASI APROKSIMASI SINUSOIDAL</span>")
+
+        self.update_all_views()
+
+    def on_jpl_data_failed(self, error_msg: str):
+        self.api_source_mode = "approx_fallback"
+        self.lbl_api_badge.setText("<span style='color:#f59e0b; font-weight:bold; font-size:10px;'>⚠️ MODE OFFLINE — ESTIMASI APROKSIMASI SINUSOIDAL</span>")
+        self.update_all_views()
+
+    def on_refresh_jpl_clicked(self):
+        clear_cache()
+        self.show_toast("🔄 Cache dibersihkan. Mengunduh data efemeris baru dari NASA...")
+        self.refresh_ephemeris_data()
+
+    def show_toast(self, message: str, duration_ms: int = 4000):
+        self.lbl_toast.setText(message)
+        self.statusBar().showMessage(message, duration_ms)
+        QTimer.singleShot(duration_ms, lambda: self.lbl_toast.setText(""))
+
+    # =================================================================
+    # POSISI SUN & EARTH DENGAN FALLBACK APROKSIMASI
+    # =================================================================
+    def get_position_at_day(self, body: str, day_val: float) -> Tuple[float, float, str]:
+        cur_dt = day_offset_to_date(day_val)
+        pos = get_position_safe(body, self.active_site, cur_dt, self.mission_ephem_data, day_val)
+        return pos["az"], pos["el"], pos.get("source", "")
+
+    def get_current_sun_pos(self) -> Tuple[float, float, str]:
+        return self.get_position_at_day("sun", self.current_day)
+
+    def get_current_earth_pos(self) -> Tuple[float, float, str]:
+        return self.get_position_at_day("earth", self.current_day)
+
+    # =================================================================
+    # KARTU KOMPARASI SITUS
+    # =================================================================
+    def create_site_card(self, key: str) -> QFrame:
         site = SITES_CONFIG[key]
         stats = SITE_STATS[key]
 
@@ -543,7 +665,7 @@ class LunarSolarEarthPlannerApp(QMainWindow):
 
         # Header Card
         h_box = QHBoxLayout()
-        name_lbl = QLabel(f"<b style='font-size:13px; color:{site['color'].name()};'>{site['name']}</b>")
+        name_lbl = QLabel(f"<b style='font-size:13px; color:{site['color_hex']};'>{site['name']}</b>")
         h_box.addWidget(name_lbl)
         tag_lbl = QLabel(f"<span style='font-size:9px; background:#1e293b; color:#94a3b8; padding:2px 6px; border-radius:3px;'>{site['tag']}</span>")
         h_box.addWidget(tag_lbl)
@@ -566,7 +688,7 @@ class LunarSolarEarthPlannerApp(QMainWindow):
             f"<span style='color:#94a3b8; font-size:10px;'>"
             f"• Total Daya Surya : <b style='color:#facc15;'>{stats['solar_hours']:.0f} Jam ({stats['solar_pct']:.0f}%)</b><br>"
             f"• Jendela Sinyal DTE : <b style='color:#00f0ff;'>{stats['dte_hours']:.0f} Jam ({stats['dte_pct']:.0f}%)</b><br>"
-            f"• Rintangan Tertinggi: <b>{stats['max_obstacle']:+.1f}°</b> | Kemiringan: <b>{site['slope']}°</b>"
+            f"• Rintangan Tertinggi: <b>{stats['max_obstacle']:+.1f}°</b> | Kemiringan: <b>{site['slope_deg']}°</b>"
             f"</span>"
         )
         layout.addWidget(lbl_metrics)
@@ -580,17 +702,25 @@ class LunarSolarEarthPlannerApp(QMainWindow):
 
         return card
 
-    def select_site(self, key):
+    def select_site(self, key: str):
         self.active_site = key
+        # Persist ke shared mission state
+        update_from_terrain_scan(key)
+        self.state = load_state()
+        self.show_toast(f"📍 Situs aktif diubah ke: {SITES_CONFIG[key]['name']}")
+        self.refresh_ephemeris_data()
         self.update_all_views()
 
-    def on_slider_change(self, val):
+    # =================================================================
+    # KONTROL KALENDER & SLIDER
+    # =================================================================
+    def on_slider_change(self, val: int):
         if self._updating_widgets: return
         self.current_day = val / 10.0
         self.sync_date_picker_from_day()
         self.update_all_views()
 
-    def on_date_picker_changed(self, qdate):
+    def on_date_picker_changed(self, qdate: QDate):
         if self._updating_widgets: return
         dt = datetime(qdate.year(), qdate.month(), qdate.day(), 12, 0, 0)
         day_val = date_to_day_offset(dt)
@@ -598,6 +728,7 @@ class LunarSolarEarthPlannerApp(QMainWindow):
         self._updating_widgets = True
         self.slider.setValue(int(self.current_day * 10))
         self._updating_widgets = False
+        self.refresh_ephemeris_data()
         self.update_all_views()
 
     def sync_date_picker_from_day(self):
@@ -621,17 +752,19 @@ class LunarSolarEarthPlannerApp(QMainWindow):
         new_val = (self.slider.value() + 1) % 296
         self.slider.setValue(new_val)
 
+    # =================================================================
+    # PENCARIAN TANGGAL TERBAIK (GOLDEN WINDOW FINDER)
+    # =================================================================
     def find_golden_window(self):
         # Cari tanggal di mana Site Alpha mendapatkan penyinaran matahari & koneksi DTE terbaik
         best_day = 0.0
         max_score = -1e9
         for d in np.linspace(0, LUNAR_SYNODIC_DAYS, 296):
-            az_s, el_s = get_sun_position(d)
-            az_e, el_e = get_earth_position(d)
+            az_s, el_s = get_sun_position_approx(d)
+            az_e, el_e = get_earth_position_approx(d)
             h_alpha = SITE_HORIZONS["ALPHA"]
             s_vis = el_s >= h_alpha[int(az_s) % 360]
             e_vis = el_e >= h_alpha[int(az_e) % 360]
-            # Skor tinggi jika keduanya terlihat dan elevasi matahari maksimal
             score = (100.0 if s_vis else -100.0) + (100.0 if e_vis else -100.0) + el_s * 10.0
             if score > max_score:
                 max_score = score
@@ -642,8 +775,35 @@ class LunarSolarEarthPlannerApp(QMainWindow):
         self.slider.setValue(int(best_day * 10))
         self._updating_widgets = False
         self.sync_date_picker_from_day()
+        self.refresh_ephemeris_data()
         self.update_all_views()
 
+        # Update Shared Mission State
+        dt_chosen = day_offset_to_date(self.current_day)
+        az_s, el_s, _ = self.get_current_sun_pos()
+        az_e, el_e, _ = self.get_current_earth_pos()
+        h_active = SITE_HORIZONS[self.active_site]
+        s_ok = el_s >= h_active[int(az_s) % 360]
+        e_ok = el_e >= h_active[int(az_e) % 360]
+
+        update_from_horizon_planner(
+            landing_date=dt_chosen.strftime("%Y-%m-%d"),
+            landing_time_utc=dt_chosen.strftime("%H:%M"),
+            lunar_day_offset=self.current_day,
+            sun_az=az_s,
+            sun_el=el_s,
+            earth_az=az_e,
+            earth_el=el_e,
+            solar_ok=s_ok,
+            dte_ok=e_ok,
+        )
+
+        self.state = load_state()
+        self.show_toast(f"✅ Tanggal misi tersimpan: {dt_chosen.strftime('%d %B %Y')} → Diteruskan ke Modul Trajektori!")
+
+    # =================================================================
+    # REFRESH SEMUA TAMPILAN
+    # =================================================================
     def update_all_views(self):
         dt_current = day_offset_to_date(self.current_day)
         self.lbl_time_hud.setText(
@@ -651,8 +811,17 @@ class LunarSolarEarthPlannerApp(QMainWindow):
             f"Fase Siklus: Hari {self.current_day:04.1f} ({self.current_day*24.0:05.1f} Jam)"
         )
 
-        az_s, el_s = get_sun_position(self.current_day)
-        az_e, el_e = get_earth_position(self.current_day)
+        az_s, el_s, _ = self.get_current_sun_pos()
+        az_e, el_e, _ = self.get_current_earth_pos()
+
+        # Update panel info status misi saat ini
+        sol_badge = "<span style='color:#10b981;'>☀️ PANEL SURYA AKTIF</span>" if el_s >= 0 else "<span style='color:#ef4444;'>🌑 BAYANGAN KELAP</b>"
+        dte_badge = "<span style='color:#00f0ff;'>📡 DTE BEBAS HAMBATAN</span>" if el_e >= 0 else "<span style='color:#ef4444;'>⚠️ SINYAL TERHALANG</b>"
+        self.lbl_shared_state_info.setText(
+            f"<b>STATUS MISI SAAT INI:</b> Target <b>{self.active_site}</b> | "
+            f"Matahari (Az:{az_s:.1f}°, El:{el_s:+.2f}°) • {sol_badge} | "
+            f"Bumi (Az:{az_e:.1f}°, El:{el_e:+.2f}°) • {dte_badge}"
+        )
 
         # Evaluasi kondisi per situs untuk tanggal ini
         site_evals = {}
@@ -662,7 +831,7 @@ class LunarSolarEarthPlannerApp(QMainWindow):
             e_ok = el_e >= h[int(az_e) % 360]
             site_evals[k] = {"sun": s_ok, "dte": e_ok}
 
-        # Tentukan Pemenang Rekomendasi di Tanggal Ini
+        # Tentukan Rekomendasi di Tanggal Ini
         best_pick = "ALPHA"
         if site_evals["ALPHA"]["sun"] and site_evals["ALPHA"]["dte"]:
             best_pick = "ALPHA"
@@ -674,10 +843,11 @@ class LunarSolarEarthPlannerApp(QMainWindow):
             best_pick = "ALPHA" if site_evals["ALPHA"]["dte"] else "BETA"
 
         best_site_info = SITES_CONFIG[best_pick]
+        src_tag = "🛰️ JPL Live" if self.api_source_mode == "jpl_live" else "⚠️ Aproksimasi"
         self.lbl_banner.setText(
-            f"🏆 <b>REKOMENDASI SISTEM PADA TANGGAL INI ({dt_current.strftime('%d %b %Y')}):</b> "
-            f"Pendaratan paling aman adalah di <b style='color:{best_site_info['color'].name()};'>{best_site_info['name']}</b>. "
-            f"Daya surya dan konektivitas DTE berada pada titik paling menguntungkan."
+            f"🏆 <b>REKOMENDASI SISTEM ({dt_current.strftime('%d %b %Y')}):</b> "
+            f"Tapak terbaik: <b style='color:{best_site_info['color_hex']};'>{best_site_info['name']}</b>. "
+            f"Daya surya & DTE optimal. [{src_tag}]"
         )
 
         # Update Tampilan Kartu Komparasi
@@ -686,7 +856,7 @@ class LunarSolarEarthPlannerApp(QMainWindow):
             site = SITES_CONFIG[key]
             eval_info = site_evals[key]
 
-            border_c = site['color'].name() if is_active else "#1e304d"
+            border_c = site['color_hex'] if is_active else "#1e304d"
             bg_c = "#142036" if is_active else PANEL_BG.name()
             card.setStyleSheet(f"background-color: {bg_c}; border: 2px solid {border_c}; border-radius: 6px;")
 
@@ -694,13 +864,13 @@ class LunarSolarEarthPlannerApp(QMainWindow):
             if lbl_st:
                 s_txt = "<span style='color:#10b981; font-weight:bold;'>☀️ DAYA AKTIF</span>" if eval_info["sun"] else "<span style='color:#ef4444; font-weight:bold;'>🌑 BAYANGAN</span>"
                 e_txt = "<span style='color:#00f0ff; font-weight:bold;'>📡 DTE ONLINE</span>" if eval_info["dte"] else "<span style='color:#ef4444; font-weight:bold;'>⚠️ TERHALANG</span>"
-                lbl_st.setText(f"Status Tanggal Ini: {s_txt} | {e_txt}")
+                lbl_st.setText(f"Status: {s_txt} | {e_txt}")
 
             btn_s = card.findChild(QPushButton, "btn_sel")
             if btn_s:
                 if is_active:
                     btn_s.setText("✓ SEDANG AKTIF")
-                    btn_s.setStyleSheet(f"background-color:{site['color'].name()}; color:#04060a; font-weight:bold; padding:4px 8px; border-radius:4px;")
+                    btn_s.setStyleSheet(f"background-color:{site['color_hex']}; color:#04060a; font-weight:bold; padding:4px 8px; border-radius:4px;")
                 else:
                     btn_s.setText(f"PILIH {key}")
                     btn_s.setStyleSheet("background-color:#1e293b; color:#94a3b8; font-weight:bold; padding:4px 8px; border-radius:4px;")
@@ -708,14 +878,22 @@ class LunarSolarEarthPlannerApp(QMainWindow):
         self.horizon_widget.update()
         self.timeline_widget.update()
 
+
 # =====================================================================
 # TITIK MASUK UTAMA
 # =====================================================================
 def main():
-    app = QApplication(sys.argv)
+    app = QApplication.instance()
+    owns_app = False
+    if app is None:
+        app = QApplication(sys.argv)
+        owns_app = True
     window = LunarSolarEarthPlannerApp()
     window.show()
-    sys.exit(app.exec())
+    if owns_app:
+        sys.exit(app.exec())
+    return window
+
 
 if __name__ == "__main__":
     main()

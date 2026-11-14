@@ -510,6 +510,13 @@ def jump_to_site(idx):
         ax_3d.set_xlim3d([c - span, c + span])
         ax_3d.set_ylim3d([r - span, r + span])
         ax_3d.set_zlim3d([site_z - 300, site_z + 1800])
+    try:
+        from mission_state import update_from_terrain_scan
+        _keys = ["ALPHA", "BETA", "GAMMA"]
+        if 0 <= idx < len(_keys):
+            update_from_terrain_scan(_keys[idx], float(slope_deg[r, c]), float(elevation_m[r, c]))
+    except Exception:
+        pass
     fig.canvas.draw_idle()
 
 b_alpha.on_clicked(lambda e: jump_to_site(0))

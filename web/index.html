@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XSasuai — Lunar Landing Site Navigator | Artemis Mission Operations</title>
+  <style>
+    /* =====================================================================
+       CLEAN INDUSTRIAL AEROSPACE AESTHETIC (BENTO GRID - NASA/LINEAR STYLE)
+       Target Persona: Artemis Mission Director / Flight Operations Planner
+       ===================================================================== */
+    :root {
+      --bg-app: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-subtle: #f1f5f9;
+      --bg-selected: #eff6ff;
+
+      --border-light: #e2e8f0;
+      --border-subtle: #cbd5e1;
+      --border-active: #2563eb;
+
+      --text-primary: #0f172a;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
+
+      --artemis-blue: #2563eb;
+      --artemis-blue-hover: #1d4ed8;
+      --sky-cyan: #0284c7;
+      --emerald-safe: #059669;
+      --emerald-bg: #ecfdf5;
+      --emerald-border: #a7f3d0;
+
+      --amber-warn: #d97706;
+      --amber-bg: #fffbeb;
+      --coral-crit: #dc2626;
+      --coral-bg: #fef2f2;
+
+      --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-pill: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-app);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 16px 24px;
+      gap: 16px;
+    }
+
+    /* 1. COMPACT HEADER BAR */
+    header {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .artemis-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-info h1 {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-primary);
+      letter-spacing: -0.2px;
+    }
+
+    .brand-info p {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .api-status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      padding: 4px 10px;
+      background: var(--bg-subtle);
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-light);
+    }
+
+    .dot-online {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--emerald-safe);
+    }
+
+    .mission-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      background: var(--emerald-bg);
+      color: var(--emerald-safe);
+      border: 1px solid var(--emerald-border);
+    }
+
+    /* Segmented Tab Switcher */
+    .segmented-tabs {
+      display: inline-flex;
+      background: var(--bg-subtle);
+      padding: 3px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-light);
+    }
+
+    .tab-btn {
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn.active {
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    }
+
+    /* 2. BENTO CONTAINER */
+    .bento-container {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 16px;
+    }
+
+    .bento-full {
+      grid-column: 1 / -1;
+    }
+
+    .bento-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* BENTO 1: SITES (3 HORIZONTAL CARDS) */
+    .sites-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .site-item {
+      background: #ffffff;
+      border: 1.5px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .site-item:hover {
+      border-color: var(--border-subtle);
+      box-shadow: var(--shadow-md);
+    }
+
+    .site-item.active {
+      border-color: var(--artemis-blue);
+      background: var(--bg-selected);
+    }
+
+    .site-tag {
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--artemis-blue);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .site-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    .site-metrics {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .metric-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .metric-lbl {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .badge-slope-safe {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: var(--emerald-bg);
+      color: var(--emerald-safe);
+      border: 1px solid var(--emerald-border);
+    }
+
+    .mcda-progress-bg {
+      height: 4px;
+      background: var(--border-light);
+      border-radius: var(--radius-pill);
+      overflow: hidden;
+    }
+
+    .mcda-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #2563eb);
+      border-radius: var(--radius-pill);
+    }
+
+    /* BENTO 2: TOPOGRAPHY & SKY-PLOT */
+    .dem-map-frame {
+      position: relative;
+      width: 100%;
+      height: 340px;
+      background: #0f172a;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dem-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: contrast(110%) brightness(95%);
+    }
+
+    /* Pin target di atas peta */
+    .map-pin {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.2s ease;
+      z-index: 10;
+    }
+
+    .map-pin:hover {
+      transform: translate(-50%, -50%) scale(1.15);
+    }
+
+    .pin-circle {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid var(--artemis-blue);
+      box-shadow: 0 0 10px rgba(37, 99, 235, 0.8);
+    }
+
+    .map-pin.active .pin-circle {
+      border-color: #10b981;
+      background: #10b981;
+      box-shadow: 0 0 14px #10b981;
+    }
+
+    .pin-label {
+      background: rgba(15, 23, 42, 0.85);
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 4px;
+      white-space: nowrap;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .radar-frame {
+      width: 100%;
+      height: 340px;
+      background: var(--bg-surface);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .radar-frame img {
+      max-height: 100%;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .frame-caption {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--artemis-blue);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2px;
+    }
+
+    /* BENTO 3: TIMELINE SCRUBBER */
+    .timeline-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .clean-slider {
+      flex: 1;
+      height: 6px;
+      border-radius: var(--radius-pill);
+      background: var(--border-light);
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    .clean-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--artemis-blue);
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+      cursor: grab;
+      transition: transform 0.1s ease;
+    }
+
+    .clean-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .time-readout-pill {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--artemis-blue);
+      background: var(--bg-selected);
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      border: 1px solid #bfdbfe;
+      white-space: nowrap;
+    }
+
+    .timeline-scale {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-dim);
+      padding: 0 4px;
+    }
+
+    .tiles-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .data-tile {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+    }
+
+    .data-tile .tile-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .data-tile .tile-val {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    /* BENTO 4: DESCENT GUIDANCE */
+    .guidance-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .btn-recalc {
+      background: var(--artemis-blue);
+      color: #ffffff;
+      border: none;
+      font-weight: 700;
+      font-size: 12px;
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease;
+    }
+
+    .btn-recalc:hover {
+      background: var(--artemis-blue-hover);
+    }
+
+    .chart-container {
+      width: 100%;
+      height: 180px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chart-container img {
+      max-height: 100%;
+      width: 100%;
+      object-fit: contain;
+    }
+
+    /* VIEW 2: FLIGHT TESTBED TAB (SEPARATE VIEW) */
+    #view-testbed {
+      display: none;
+    }
+
+    #view-testbed.active {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .testbed-canvas-box {
+      width: 100%;
+      height: 540px;
+      background: #020617;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      position: relative;
+      border: 1px solid var(--border-light);
+    }
+
+    #cockpitCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .testbed-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      box-shadow: var(--shadow-sm);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .kbd-tag {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-subtle);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: var(--artemis-blue);
+    }
+
+    .spinner {
+      border: 2.5px solid var(--border-light);
+      border-top: 2.5px solid var(--artemis-blue);
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. COMPACT HEADER BAR -->
+  <header>
+    <div class="brand-group">
+      <div class="artemis-mark">XS</div>
+      <div class="brand-info">
+        <h1>XSASUAI — Lunar Landing Site Navigator</h1>
+        <p>Artemis Operations • Mons Mouton, Lunar South Pole (-84.9°S, 33.3°W)</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="api-status-chip">
+        <span class="dot-online"></span> NASA JPL: ONLINE
+      </div>
+      <div class="mission-status-pill" id="global-status-pill">
+        <span>✓</span> MISSION STATUS: GO (SAFE)
+      </div>
+      <div class="segmented-tabs">
+        <button class="tab-btn active" id="tab-btn-console" onclick="switchView('console')">
+          <span>📊</span> Mission Console
+        </button>
+        <button class="tab-btn" id="tab-btn-testbed" onclick="switchView('testbed')">
+          <span>🕹️</span> Flight Testbed
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- VIEW 1: MISSION CONSOLE (DEFAULT) -->
+  <main id="view-console" class="bento-container">
+
+    <!-- BENTO 1: SITES (3 HORIZONTAL CARDS) -->
+    <div class="bento-card bento-full">
+      <div class="card-header">
+        <span class="card-title">📍 Kandidat Lokasi Pendaratan Mons Mouton</span>
+        <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Pilih salah satu situs untuk evaluasi komprehensif</span>
+      </div>
+      <div class="sites-row" id="sites-grid">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+
+    <!-- BENTO 2A: TOPOGRAFI MONS MOUTON (CITRA ASLI SATELIT) -->
+    <div class="bento-card">
+      <div class="card-header">
+        <span class="card-title">🗺️ Topografi LROC LOLA DEM Mons Mouton</span>
+        <span class="badge-slope-safe" id="lbl-active-coords">-84.9°S, -33.3°W</span>
+      </div>
+      <div class="dem-map-frame">
+        <img src="/data/quickmap-lroc.png" alt="Mons Mouton LOLA DEM" class="dem-img" onerror="this.src='/data/mons_mouton_illum/mons_mouton_illum.png'">
+        <!-- Pin Interaktif -->
+        <div class="map-pin active" id="pin-ALPHA" style="top: 38%; left: 75%;" onclick="selectSite('ALPHA')">
+          <div class="pin-circle"></div>
+          <div class="pin-label">Site Alpha (5,920m)</div>
+        </div>
+        <div class="map-pin" id="pin-BETA" style="top: 26%; left: 89%;" onclick="selectSite('BETA')">
+          <div class="pin-circle"></div>
+          <div class="pin-label">Site Beta (5,640m)</div>
+        </div>
+        <div class="map-pin" id="pin-GAMMA" style="top: 51%; left: 52%;" onclick="selectSite('GAMMA')">
+          <div class="pin-circle"></div>
+          <div class="pin-label">Site Gamma (5,410m)</div>
+        </div>
+      </div>
+      <div class="frame-caption">
+        <span>Resolusi: 250 meter / piksel</span>
+        <span>Kutub Selatan Bulan</span>
+      </div>
+    </div>
+
+    <!-- BENTO 2B: 360° POLAR HORIZON SKY-PLOT -->
+    <div class="bento-card">
+      <div class="card-header">
+        <span class="card-title">🌐 360° Polar Horizon Sky-Plot (Rintangan Kawah)</span>
+        <span id="skyplot-badge" style="font-size: 11px; font-weight: 700; color: var(--emerald-safe);">Direct Line-of-Sight</span>
+      </div>
+      <div class="radar-frame" id="skyplot-box">
+        <div class="spinner"></div>
+      </div>
+      <div class="frame-caption">
+        <span id="skyplot-clearance-text">Direct-to-Earth Clearance: +6.8° di atas bibir kawah</span>
+        <span>Matahari: Terang Bebas Bayangan</span>
+      </div>
+    </div>
+
+    <!-- BENTO 3: TIMELINE SCRUBBER 14-HARI -->
+    <div class="bento-card bento-full">
+      <div class="card-header">
+        <span class="card-title">⏱ Timeline Misi 14-Hari (0 - 336 Jam) — Evaluasi Surya & Sinyal Bumi</span>
+        <div class="time-readout-pill" id="timeline-time-badge">
+          2026-11-14 12:00 UTC (+0h)
+        </div>
+      </div>
+
+      <div class="timeline-controls">
+        <div class="slider-row">
+          <input type="range" min="0" max="336" value="0" step="3" class="clean-slider" id="timeline-slider">
+        </div>
+        <div class="timeline-scale">
+          <span>0h (Awal Misi)</span>
+          <span>84h (Hari 3.5)</span>
+          <span>168h (Puncak Penyinaran)</span>
+          <span>252h (Hari 10.5)</span>
+          <span>336h (Akhir Jendela)</span>
+        </div>
+      </div>
+
+      <div class="tiles-grid">
+        <div class="data-tile">
+          <div class="tile-lbl">Matahari (Azimuth / Elevasi)</div>
+          <div class="tile-val" id="tile-sun" style="color: #b45309;">45.0° / +2.1°</div>
+        </div>
+        <div class="data-tile">
+          <div class="tile-lbl">Bumi DTE (Azimuth / Elevasi)</div>
+          <div class="tile-val" id="tile-earth" style="color: #0284c7;">12.5° / +6.8°</div>
+        </div>
+        <div class="data-tile">
+          <div class="tile-lbl">Suplai Daya Panel Surya</div>
+          <div class="tile-val" id="tile-solar" style="color: var(--emerald-safe);">100% ACTIVE</div>
+        </div>
+        <div class="data-tile">
+          <div class="tile-lbl">Jalur Komunikasi Bumi</div>
+          <div class="tile-val" id="tile-dte" style="color: var(--emerald-safe);">DIRECT LINE-OF-SIGHT</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BENTO 4: DESCENT GUIDANCE & PDI RK45 -->
+    <div class="bento-card bento-full">
+      <div class="card-header">
+        <span class="card-title">🚀 Powered Descent Initiation (PDI) Solver (RK45 & J2 Gravitasi)</span>
+        <button class="btn-recalc" id="btn-recalc-pdi">
+          <span>⚡</span> Hitung Trajektori RK45
+        </button>
+      </div>
+
+      <div class="guidance-grid">
+        <div class="data-tile">
+          <div class="tile-lbl">Total Delta-V Dibutuhkan</div>
+          <div class="tile-val" id="m-dv" style="color: var(--artemis-blue);">1,715.4 m/s</div>
+        </div>
+        <div class="data-tile">
+          <div class="tile-lbl">Propelan Sisa (Margin)</div>
+          <div class="tile-val" id="m-prop" style="color: var(--emerald-safe);">84.6 kg (24.2%)</div>
+        </div>
+        <div class="data-tile">
+          <div class="tile-lbl">Vz Touchdown (Vertikal)</div>
+          <div class="tile-val" id="m-vz" style="color: var(--emerald-safe);">1.15 m/s (&le; 2.0 m/s)</div>
+        </div>
+        <div class="data-tile">
+          <div class="tile-lbl">Jarak Bebas Tebing Kawah</div>
+          <div class="tile-val" id="m-clearance" style="color: var(--emerald-safe);">&gt; 180 m (Aman)</div>
+        </div>
+      </div>
+
+      <div class="chart-container" id="pdi-chart-box">
+        <span style="color: var(--text-dim); font-size: 12px;">Profil deselerasi pendaratan akan tampil di sini</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- VIEW 2: DEDICATED FLIGHT TESTBED TAB (SEPARATE VIEW) -->
+  <main id="view-testbed">
+    <div class="testbed-canvas-box">
+      <canvas id="cockpitCanvas"></canvas>
+    </div>
+
+    <div class="testbed-bar">
+      <div>
+        Kendali Pendaratan: 
+        <span class="kbd-tag">SPACE / W</span> Main Engine &nbsp;•&nbsp; 
+        <span class="kbd-tag">A / D</span> RCS Roll &nbsp;•&nbsp; 
+        <span class="kbd-tag">R</span> Reset Posisi
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <button class="tab-btn" id="btn-sim-reset" style="background: var(--bg-subtle);">
+          ↺ Reset Posisi
+        </button>
+        <button class="tab-btn" id="btn-sim-auto" style="background: var(--bg-selected); color: var(--artemis-blue);">
+          🤖 Autopilot Descent
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- JAVASCRIPT SYSTEM ENGINE -->
+  <script>
+    let currentSite = "ALPHA";
+    let timelineData = [];
+
+    // 1. Tab View Switcher
+    function switchView(viewName) {
+      const consoleView = document.getElementById("view-console");
+      const testbedView = document.getElementById("view-testbed");
+      const btnConsole = document.getElementById("tab-btn-console");
+      const btnTestbed = document.getElementById("tab-btn-testbed");
+
+      if (viewName === 'console') {
+        consoleView.style.display = "grid";
+        testbedView.classList.remove("active");
+        btnConsole.classList.add("active");
+        btnTestbed.classList.remove("active");
+      } else {
+        consoleView.style.display = "none";
+        testbedView.classList.add("active");
+        btnConsole.classList.remove("active");
+        btnTestbed.classList.add("active");
+        if (!testbedInitialized) initCockpitEngine();
+      }
+    }
+
+    // 2. Load Sites
+    async function loadSites() {
+      try {
+        const res = await fetch("/api/sites");
+        const data = await res.json();
+        const grid = document.getElementById("sites-grid");
+        grid.innerHTML = "";
+
+        for (const [key, site] of Object.entries(data.sites)) {
+          const item = document.createElement("div");
+          item.className = `site-item ${key === currentSite ? 'active' : ''}`;
+          item.id = `card-${key}`;
+          item.onclick = () => selectSite(key);
+          item.innerHTML = `
+            <div class="site-tag">${site.tag}</div>
+            <div class="site-name">${site.name}</div>
+            <div class="site-metrics">
+              <div class="metric-group">
+                <span class="metric-val">${site.slope_deg}°</span>
+                <span class="metric-lbl">Slope</span>
+              </div>
+              <span class="badge-slope-safe">Slope &lt; 10°</span>
+              <div class="metric-group" style="text-align: right;">
+                <span class="metric-val">${site.elev_m} m</span>
+                <span class="metric-lbl">Plateau</span>
+              </div>
+            </div>
+            <div class="mcda-progress-bg">
+              <div class="mcda-progress-fill" style="width: ${key === 'ALPHA' ? 88 : (key === 'BETA' ? 82 : 68)}%;"></div>
+            </div>
+          `;
+          grid.appendChild(item);
+        }
+      } catch (e) {
+        console.error("Gagal load sites:", e);
+      }
+    }
+
+    async function selectSite(siteKey) {
+      currentSite = siteKey;
+
+      // Update Card Visual
+      document.querySelectorAll(".site-item").forEach(el => el.classList.remove("active"));
+      const activeCard = document.getElementById(`card-${siteKey}`);
+      if (activeCard) activeCard.classList.add("active");
+
+      // Update Map Pin Visual
+      document.querySelectorAll(".map-pin").forEach(el => el.classList.remove("active"));
+      const activePin = document.getElementById(`pin-${siteKey}`);
+      if (activePin) activePin.classList.add("active");
+
+      await fetch("/api/select_site", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ site_key: siteKey })
+      });
+
+      await loadTimeline();
+      updateEvaluationFromSlider();
+      document.getElementById("btn-recalc-pdi").click();
+    }
+
+    // 3. Timeline Scrubber
+    async function loadTimeline() {
+      try {
+        const res = await fetch(`/api/timeline?site=${currentSite}&hours=336&step=3`);
+        const data = await res.json();
+        timelineData = data.timeline || [];
+      } catch (e) {
+        console.error("Gagal load timeline:", e);
+      }
+    }
+
+    function updateEvaluationFromSlider() {
+      const slider = document.getElementById("timeline-slider");
+      const hourOffset = parseInt(slider.value);
+
+      let pt = timelineData.find(d => d.hour_offset >= hourOffset) || timelineData[0];
+      if (!pt) return;
+
+      document.getElementById("timeline-time-badge").innerText = `${pt.datetime_utc} UTC (+${hourOffset}h)`;
+      document.getElementById("tile-sun").innerText = `${pt.sun_az}° / ${pt.sun_el}°`;
+      document.getElementById("tile-earth").innerText = `${pt.earth_az}° / ${pt.earth_el}°`;
+
+      const solarTile = document.getElementById("tile-solar");
+      solarTile.innerText = pt.solar_ok ? "100% ACTIVE" : "0% SHADOWED";
+      solarTile.style.color = pt.solar_ok ? "var(--emerald-safe)" : "var(--coral-crit)";
+
+      const dteTile = document.getElementById("tile-dte");
+      dteTile.innerText = pt.dte_ok ? "DIRECT LINE-OF-SIGHT" : "BLOCKED BY CRATER";
+      dteTile.style.color = pt.dte_ok ? "var(--emerald-safe)" : "var(--coral-crit)";
+
+      // Update Global Status Pill
+      const pill = document.getElementById("global-status-pill");
+      if (pt.status === "OPTIMAL") {
+        pill.style.background = "var(--emerald-bg)";
+        pill.style.color = "var(--emerald-safe)";
+        pill.style.borderColor = "var(--emerald-border)";
+        pill.innerHTML = `<span>✓</span> MISSION STATUS: GO (SAFE)`;
+      } else if (pt.status === "ACCEPTABLE") {
+        pill.style.background = "var(--amber-bg)";
+        pill.style.color = "var(--amber-warn)";
+        pill.style.borderColor = "#fde68a";
+        pill.innerHTML = `<span>⚠</span> MISSION STATUS: MARGINAL`;
+      } else {
+        pill.style.background = "var(--coral-bg)";
+        pill.style.color = "var(--coral-crit)";
+        pill.style.borderColor = "#fecaca";
+        pill.innerHTML = `<span>✗</span> MISSION STATUS: NO-GO`;
+      }
+
+      debounceSkyplotUpdate(pt.datetime_utc);
+    }
+
+    let skyplotTimeout = null;
+    function debounceSkyplotUpdate(dtStr) {
+      if (skyplotTimeout) clearTimeout(skyplotTimeout);
+      skyplotTimeout = setTimeout(async () => {
+        try {
+          const [date, time] = dtStr.split(" ");
+          const res = await fetch("/api/evaluate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ site: currentSite, date, time })
+          });
+          const data = await res.json();
+          if (data.skyplot_b64) {
+            document.getElementById("skyplot-box").innerHTML = `<img src="${data.skyplot_b64}" alt="Polar Skyplot">`;
+            const clr = data.earth ? data.earth.clearance_deg : 5.0;
+            document.getElementById("skyplot-clearance-text").innerText = 
+              `Direct-to-Earth Clearance: +${clr}° di atas bibir kawah`;
+          }
+        } catch (e) {
+          console.error("Gagal update skyplot:", e);
+        }
+      }, 150);
+    }
+
+    // 4. Trajectory PDI Calculation
+    document.getElementById("btn-recalc-pdi").onclick = async () => {
+      const box = document.getElementById("pdi-chart-box");
+      box.innerHTML = `<div class="spinner"></div>`;
+
+      try {
+        const res = await fetch("/api/trajectory", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ site: currentSite })
+        });
+        const traj = await res.json();
+
+        document.getElementById("m-dv").innerText = `${traj.total_delta_v_ms} m/s`;
+        document.getElementById("m-prop").innerText = `${traj.prop_remaining_kg} kg (${traj.prop_margin_pct}%)`;
+        document.getElementById("m-vz").innerText = `${traj.touchdown_vz_ms} m/s (Aman)`;
+
+        if (traj.chart_b64) {
+          box.innerHTML = `<img src="${traj.chart_b64}" alt="Trajectory Chart">`;
+        }
+      } catch (e) {
+        box.innerHTML = `<span style="color: var(--coral-crit); font-size: 12px;">Kalkulasi gagal: ${e}</span>`;
+      }
+    };
+
+    // 5. Dedicated Cockpit Testbed Engine
+    let testbedInitialized = false;
+    function initCockpitEngine() {
+      testbedInitialized = true;
+      const canvas = document.getElementById("cockpitCanvas");
+      const ctx = canvas.getContext("2d");
+
+      function resize() {
+        canvas.width = canvas.parentElement.clientWidth;
+        canvas.height = canvas.parentElement.clientHeight;
+      }
+      resize();
+      window.addEventListener("resize", resize);
+
+      let lander = { x: 0, y: 380, vx: 12, vy: -6, angle: 0, fuel: 350.0, status: "FLYING" };
+      let keys = {};
+      window.addEventListener("keydown", (e) => { keys[e.code] = true; });
+      window.addEventListener("keyup", (e) => { keys[e.code] = false; });
+
+      document.getElementById("btn-sim-reset").onclick = () => {
+        lander = { x: 0, y: 380, vx: 12, vy: -6, angle: 0, fuel: 350.0, status: "FLYING" };
+      };
+
+      let autopilot = false;
+      document.getElementById("btn-sim-auto").onclick = () => {
+        autopilot = !autopilot;
+        document.getElementById("btn-sim-auto").style.background = autopilot ? "#bbf7d0" : "var(--bg-selected)";
+      };
+
+      let particles = [];
+
+      function update(dt) {
+        if (lander.status !== "FLYING") return;
+
+        let throttle = 0;
+        let roll = 0;
+
+        if (autopilot) {
+          const vyErr = -1.2 - lander.vy;
+          throttle = Math.min(1.0, Math.max(0.0, (1.62 + vyErr * 0.9) / 3.0));
+          lander.angle += (0 - lander.angle) * 0.12;
+        } else {
+          if (keys["Space"] || keys["KeyW"] || keys["ArrowUp"]) throttle = 1.0;
+          if (keys["KeyA"] || keys["ArrowLeft"]) roll = -1.5;
+          if (keys["KeyD"] || keys["ArrowRight"]) roll = 1.5;
+        }
+
+        lander.angle += roll * dt;
+        const totalM = 450 + lander.fuel;
+
+        if (lander.fuel > 0 && throttle > 0) {
+          const appliedT = throttle * 3200;
+          const ax = (appliedT / totalM) * Math.sin(lander.angle);
+          const ay = (appliedT / totalM) * Math.cos(lander.angle) - 1.62;
+
+          lander.vx += ax * dt;
+          lander.vy += ay * dt;
+          lander.fuel = Math.max(0, lander.fuel - (appliedT / (310 * 9.81)) * dt);
+
+          for (let p = 0; p < 3; p++) {
+            particles.push({
+              x: lander.x - Math.sin(lander.angle) * 15,
+              y: lander.y - Math.cos(lander.angle) * 15,
+              vx: -Math.sin(lander.angle) * 35 + (Math.random() - 0.5) * 8,
+              vy: -Math.cos(lander.angle) * 35 + (Math.random() - 0.5) * 8,
+              life: 0.25
+            });
+          }
+        } else {
+          lander.vy -= 1.62 * dt;
+        }
+
+        lander.x += lander.vx * dt;
+        lander.y += lander.vy * dt;
+
+        if (lander.y <= 0) {
+          lander.y = 0;
+          const safeVz = Math.abs(lander.vy) <= 2.0;
+          const safeVh = Math.abs(lander.vx) <= 0.8;
+          const safeAng = Math.abs(lander.angle) <= 0.15;
+          lander.status = (safeVz && safeVh && safeAng) ? "TOUCHDOWN SUCCESS (GO)" : "CRASHED (HARD TOUCHDOWN)";
+        }
+      }
+
+      function draw() {
+        ctx.fillStyle = "#030712";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const w = canvas.width;
+        const h = canvas.height;
+        const groundY = h - 70;
+
+        // Vector Terrain Grid
+        ctx.strokeStyle = "rgba(56, 189, 248, 0.2)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        for (let x = -w; x <= w * 2; x += 36) {
+          const scrX = x - (lander.x * 0.8) % 36;
+          ctx.moveTo(scrX, groundY);
+          ctx.lineTo(scrX - 45, h);
+        }
+        ctx.stroke();
+
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, groundY);
+        ctx.lineTo(w, groundY);
+        ctx.stroke();
+
+        // Particles
+        ctx.fillStyle = "#facc15";
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const pt = particles[i];
+          pt.life -= 0.03;
+          pt.x += pt.vx * 0.03;
+          pt.y += pt.vy * 0.03;
+          ctx.beginPath();
+          ctx.arc(w / 2 + (pt.x - lander.x), groundY - pt.y, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+          if (pt.life <= 0) particles.splice(i, 1);
+        }
+
+        // Spacecraft
+        ctx.save();
+        ctx.translate(w / 2, groundY - lander.y);
+        ctx.rotate(-lander.angle);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.strokeStyle = "#0284c7";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(-16, -18, 32, 28, [4]);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#38bdf8";
+        ctx.beginPath();
+        ctx.arc(0, -8, 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = "#cbd5e1";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(-12, 10); ctx.lineTo(-24, 22);
+        ctx.moveTo(12, 10);  ctx.lineTo(24, 22);
+        ctx.stroke();
+        ctx.restore();
+
+        // HUD Avionics
+        ctx.font = "bold 13px monospace";
+        ctx.fillStyle = "#38bdf8";
+        ctx.fillText(`ALTITUDE : ${lander.y.toFixed(1)} m`, 20, 30);
+        ctx.fillStyle = Math.abs(lander.vy) <= 2.0 ? "#10b981" : "#ef4444";
+        ctx.fillText(`V-VERT   : ${lander.vy.toFixed(2)} m/s`, 20, 52);
+        ctx.fillStyle = "#facc15";
+        ctx.fillText(`FUEL     : ${lander.fuel.toFixed(1)} kg (${((lander.fuel/350)*100).toFixed(0)}%)`, 20, 74);
+
+        if (lander.status !== "FLYING") {
+          ctx.font = "bold 20px sans-serif";
+          ctx.fillStyle = lander.status.includes("SUCCESS") ? "#10b981" : "#ef4444";
+          ctx.textAlign = "center";
+          ctx.fillText(lander.status, w / 2, h / 2 - 20);
+          ctx.textAlign = "left";
+        }
+      }
+
+      let last = performance.now();
+      function loop(now) {
+        const dt = Math.min(0.05, (now - last) / 1000);
+        last = now;
+        update(dt);
+        draw();
+        requestAnimationFrame(loop);
+      }
+      requestAnimationFrame(loop);
+    }
+
+    // 6. Inisialisasi
+    document.getElementById("timeline-slider").oninput = updateEvaluationFromSlider;
+
+    (async () => {
+      await loadSites();
+      await loadTimeline();
+      updateEvaluationFromSlider();
+      document.getElementById("btn-recalc-pdi").click();
+    })();
+  </script>
+</body>
+</html>

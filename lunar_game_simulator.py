@@ -1,3 +1,11 @@
+# -*- coding: utf-8 -*-
+# lunar_game_simulator.py — 3D Pinpoint Autonomous Flight Testbed
+# =====================================================================
+# Proyek  : Lunar Landing Site Navigator
+# Event   : NASA Space Apps Challenge 2026
+# Target  : Mons Mouton, Kutub Selatan Bulan
+# =====================================================================
+
 import os
 import glob
 import sys
@@ -7,113 +15,50 @@ import pygame
 import numpy as np
 from PIL import Image
 
-# =====================================================================
-# 1. INISIALISASI ENGINE GRAFIS & DISPLAY
-# =====================================================================
-pygame.init()
-WIDTH, HEIGHT = 1040, 720
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("NASA Space Apps - Apollo 11 Architecture (CSM Columbia & LM Eagle)")
-clock = pygame.time.Clock()
+from constants import (
+    SITES_CONFIG,
+    G_MOON,
+    DRY_MASS,
+    PROP_MASS_INIT,
+    MAX_THRUST,
+    MIN_THRUST,
+    ISP,
+    G0,
+    DT,
+    MAX_TIME,
+)
+from mission_state import load_state
 
-SPACE_BLACK   = (4, 6, 10)
-WHITE         = (245, 245, 245)
-LUNAR_GRID    = (60, 65, 78)
-LUNAR_RIDGE   = (125, 130, 145)
-PAD_GREEN     = (46, 204, 113)
-WARNING_RED   = (231, 76, 60)
-HUD_CYAN      = (52, 152, 219)
-GOLD_FOIL     = (218, 165, 32)
-CSM_SILVER    = (195, 205, 220)
-ORANGE_FIRE   = (255, 140, 0)
-
-font_large = pygame.font.SysFont("monospace", 20, bold=True)
-font_med   = pygame.font.SysFont("monospace", 12, bold=True)
-font_small = pygame.font.SysFont("monospace", 11)
-
-# =====================================================================
-# 2. SINKRONISASI KOORDINAT 3 SITUS PENDARATAN HASIL MCDA
-# =====================================================================
+# SITES dictionary generated from constants.py
 SITES = {
-    "ALPHA": {
-        "name": "Site Alpha (Mons Mouton Base)",
-        "pos": np.array([0.0, 0.0, 0.0]),
-        "color": (46, 204, 113),
-        "desc": "Elev: 5922m | Slope: 0.08° | LOS: 100%"
-    },
-    "BETA": {
-        "name": "Site Beta (Plateau North)",
-        "pos": np.array([600.0, 400.0, 0.0]), 
-        "color": (0, 229, 255),
-        "desc": "Elev: 6000m | Slope: 0.06° | LOS: 100%"
-    },
-    "GAMMA": {
-        "name": "Site Gamma (Ridge West)",
-        "pos": np.array([-500.0, -800.0, 0.0]), 
-        "color": (241, 196, 15),
-        "desc": "Elev: 5875m | Slope: 0.17° | LOS: 100%"
+    k: {
+        "name": v["name"],
+        "short": v["short"],
+        "pos": v["coord_3d"],
+        "color": (
+            int(v["color_hex"][1:3], 16),
+            int(v["color_hex"][3:5], 16),
+            int(v["color_hex"][5:7], 16),
+        ),
+        "desc": v["desc"],
     }
+    for k, v in SITES_CONFIG.items()
 }
-active_site_key = "ALPHA"
 
-# =====================================================================
-# 3. GENERASI MEDAN TOPOGRAFI 3D (VERSI OPTIMASI RINGAN)
-# =====================================================================
-dem_candidates = glob.glob("data/**/*.png", recursive=True)
-dem_path = None
-for f in dem_candidates:
-    fname = os.path.basename(f).lower()
-    if "illum" not in fname and not fname.endswith(".vrt"):
-        dem_path = f
-        break
+SPACE_BLACK = (4, 6, 10)
+WHITE = (245, 245, 245)
+LUNAR_GRID = (60, 65, 78)
+LUNAR_RIDGE = (125, 130, 145)
+PAD_GREEN = (46, 204, 113)
+WARNING_RED = (231, 76, 60)
+HUD_CYAN = (52, 152, 219)
+GOLD_FOIL = (218, 165, 32)
+CSM_SILVER = (195, 205, 220)
+ORANGE_FIRE = (255, 140, 0)
 
-GRID_SIZE = 18           # OPTIMASI: Diturunkan ke 18 agar CPU ringan
-TERRAIN_SPAN = 2500.0    
-PAD_RADIUS = 55.0
+WIDTH, HEIGHT = 1040, 720
+FOV = 600.0
 
-terrain_verts = np.zeros((GRID_SIZE, GRID_SIZE, 3), dtype=np.float32)
-xs = np.linspace(-TERRAIN_SPAN / 2, TERRAIN_SPAN / 2, GRID_SIZE)
-ys = np.linspace(-TERRAIN_SPAN / 2, TERRAIN_SPAN / 2, GRID_SIZE)
-
-if dem_path and os.path.exists(dem_path):
-    try:
-        raw_dem = Image.open(dem_path).convert("L")
-        raw_dem = raw_dem.resize((GRID_SIZE, GRID_SIZE))
-        dem_arr = np.array(raw_dem, dtype=np.float32)
-        dem_norm = (dem_arr - np.min(dem_arr)) / (np.ptp(dem_arr) + 1e-5)
-        raw_z = (dem_norm - 0.5) * 120.0 
-    except Exception:
-        raw_z = np.zeros((GRID_SIZE, GRID_SIZE), dtype=np.float32)
-else:
-    raw_z = np.zeros((GRID_SIZE, GRID_SIZE), dtype=np.float32)
-
-for i in range(GRID_SIZE):
-    for j in range(GRID_SIZE):
-        x, y = xs[i], ys[j]
-        min_dist_pad = min(math.hypot(x - s["pos"][0], y - s["pos"][1]) for s in SITES.values())
-        if min_dist_pad < PAD_RADIUS:
-            z = 0.0
-        elif min_dist_pad < PAD_RADIUS + 60.0:
-            z = raw_z[i, j] * ((min_dist_pad - PAD_RADIUS) / 60.0)
-        else:
-            z = raw_z[i, j]
-        terrain_verts[i, j] = [x, y, z]
-
-stars_3d = []
-for _ in range(40):      # OPTIMASI: Bintang dikurangi jadi 40
-    theta = random.uniform(0, 2 * math.pi)
-    phi = random.uniform(0.1, math.pi / 2)
-    r = 3500.0
-    stars_3d.append(np.array([
-        r * math.sin(phi) * math.cos(theta),
-        r * math.sin(phi) * math.sin(theta),
-        r * math.cos(phi)
-    ]))
-
-# =====================================================================
-# 4. ENGINE PROYEKSI PERSPEKTIF KAMERA 3D
-# =====================================================================
-FOV = 600.0 
 
 def project_3d(pt, cam_pos, cam_target):
     f = cam_target - cam_pos
@@ -134,7 +79,7 @@ def project_3d(pt, cam_pos, cam_target):
 
     v = pt - cam_pos
     z_cam = np.dot(v, f)
-    if z_cam <= 2.0: 
+    if z_cam <= 2.0:
         return None
 
     x_cam = np.dot(v, r)
@@ -144,8 +89,9 @@ def project_3d(pt, cam_pos, cam_target):
     sy = int((-y_cam / z_cam) * FOV + HEIGHT / 2)
     return (sx, sy, z_cam)
 
+
 # =====================================================================
-# 5. APOLLO CSM "COLUMBIA" 
+# CSM & LM VEHICLE MODELS
 # =====================================================================
 class CSM_Columbia:
     def __init__(self):
@@ -153,13 +99,13 @@ class CSM_Columbia:
 
     def reset(self):
         self.orbit_angle = -math.pi * 0.75
-        self.orbit_radius = 800.0 
+        self.orbit_radius = 800.0
         self.orbit_speed = 0.003
         self.altitude = 650.0
         self.pos = np.array([
             self.orbit_radius * math.cos(self.orbit_angle),
             self.orbit_radius * math.sin(self.orbit_angle),
-            self.altitude
+            self.altitude,
         ], dtype=np.float64)
         self.yaw = 0.0
 
@@ -172,30 +118,32 @@ class CSM_Columbia:
 
     def draw(self, surface, cam_pos, cam_target):
         rad_y = math.radians(self.yaw)
-        Rz = np.array([[math.cos(rad_y), -math.sin(rad_y), 0],
-                       [math.sin(rad_y),  math.cos(rad_y), 0],
-                       [0, 0, 1]])
+        Rz = np.array([
+            [math.cos(rad_y), -math.sin(rad_y), 0],
+            [math.sin(rad_y),  math.cos(rad_y), 0],
+            [0, 0, 1],
+        ])
 
         angles = np.linspace(0, 2 * math.pi, 8)[:-1]
         r_sm = 6.8
         l_sm = 18.0
         front_sm = [np.array([r_sm * math.cos(a), r_sm * math.sin(a), 0.0]) for a in angles]
-        rear_sm  = [np.array([r_sm * math.cos(a), r_sm * math.sin(a), -l_sm]) for a in angles]
+        rear_sm = [np.array([r_sm * math.cos(a), r_sm * math.sin(a), -l_sm]) for a in angles]
         cm_apex = np.array([0.0, 0.0, 9.5])
         r_noz = 3.8
         noz_pts = [np.array([r_noz * math.cos(a), r_noz * math.sin(a), -l_sm - 6.0]) for a in angles]
 
         p_front = [project_3d(self.pos + np.dot(Rz, pt), cam_pos, cam_target) for pt in front_sm]
-        p_rear  = [project_3d(self.pos + np.dot(Rz, pt), cam_pos, cam_target) for pt in rear_sm]
-        p_apex  = project_3d(self.pos + np.dot(Rz, cm_apex), cam_pos, cam_target)
-        p_noz   = [project_3d(self.pos + np.dot(Rz, pt), cam_pos, cam_target) for pt in noz_pts]
+        p_rear = [project_3d(self.pos + np.dot(Rz, pt), cam_pos, cam_target) for pt in rear_sm]
+        p_apex = project_3d(self.pos + np.dot(Rz, cm_apex), cam_pos, cam_target)
+        p_noz = [project_3d(self.pos + np.dot(Rz, pt), cam_pos, cam_target) for pt in noz_pts]
 
         n = len(angles)
         for i in range(n):
             if p_front[i] and p_front[(i + 1) % n]:
-                pygame.draw.line(surface, CSM_SILVER, (p_front[i][0], p_front[i][1]), (p_front[(i+1)%n][0], p_front[(i+1)%n][1]), 2)
+                pygame.draw.line(surface, CSM_SILVER, (p_front[i][0], p_front[i][1]), (p_front[(i + 1) % n][0], p_front[(i + 1) % n][1]), 2)
             if p_rear[i] and p_rear[(i + 1) % n]:
-                pygame.draw.line(surface, (140, 150, 170), (p_rear[i][0], p_rear[i][1]), (p_rear[(i+1)%n][0], p_rear[(i+1)%n][1]), 2)
+                pygame.draw.line(surface, (140, 150, 170), (p_rear[i][0], p_rear[i][1]), (p_rear[(i + 1) % n][0], p_rear[(i + 1) % n][1]), 2)
             if p_front[i] and p_rear[i]:
                 pygame.draw.line(surface, CSM_SILVER, (p_front[i][0], p_front[i][1]), (p_rear[i][0], p_rear[i][1]), 2)
             if p_apex and p_front[i]:
@@ -203,9 +151,7 @@ class CSM_Columbia:
             if p_rear[i] and p_noz[i]:
                 pygame.draw.line(surface, (100, 105, 120), (p_rear[i][0], p_rear[i][1]), (p_noz[i][0], p_noz[i][1]), 1)
 
-# =====================================================================
-# 6. APOLLO LUNAR MODULE (LM "EAGLE")
-# =====================================================================
+
 class LM_Eagle:
     def __init__(self):
         self.reset()
@@ -282,29 +228,34 @@ class LM_Eagle:
         self.fuel = max(0.0, self.fuel - 0.025)
 
         p_offset = self.pos + np.array([0.0, 0.0, -4.2])
-        # OPTIMASI: Batasi maksimal 30 partikel agar rendering GPU/CPU ringan
         if len(self.particles) < 30:
             for _ in range(2):
                 p_vel = np.array([
                     -tx * 5.0 + random.uniform(-0.4, 0.4),
                     -ty * 5.0 + random.uniform(-0.4, 0.4),
-                    -tz * 9.0 + random.uniform(-0.4, 0.4)
+                    -tz * 9.0 + random.uniform(-0.4, 0.4),
                 ])
                 self.particles.append([p_offset.copy(), p_vel, random.randint(4, 8)])
 
-    def update(self, keys, target_coord):
-        if self.state != "FLYING": return
+    def update(self, keys, target_coord, pad_radius):
+        if self.state != "FLYING":
+            return
 
         g_moon = 0.075
 
         if self.autopilot:
             self.execute_gnc_autopilot(target_coord)
         else:
-            if keys[pygame.K_LEFT]:  self.roll = max(-30.0, self.roll - 2.0)
-            if keys[pygame.K_RIGHT]: self.roll = min(30.0, self.roll + 2.0)
-            if keys[pygame.K_UP]:    self.pitch = max(-30.0, self.pitch - 2.0)
-            if keys[pygame.K_DOWN]:  self.pitch = min(30.0, self.pitch + 2.0)
-            if keys[pygame.K_SPACE] and self.fuel > 0: self.apply_thrust(power=0.18)
+            if keys[pygame.K_LEFT]:
+                self.roll = max(-30.0, self.roll - 2.0)
+            if keys[pygame.K_RIGHT]:
+                self.roll = min(30.0, self.roll + 2.0)
+            if keys[pygame.K_UP]:
+                self.pitch = max(-30.0, self.pitch - 2.0)
+            if keys[pygame.K_DOWN]:
+                self.pitch = min(30.0, self.pitch + 2.0)
+            if keys[pygame.K_SPACE] and self.fuel > 0:
+                self.apply_thrust(power=0.18)
 
         self.vel[2] -= g_moon
         self.pos += self.vel
@@ -314,25 +265,27 @@ class LM_Eagle:
             p[2] -= 1
         self.particles = [p for p in self.particles if p[2] > 0]
 
-        self.check_collision(target_coord)
+        self.check_collision(target_coord, pad_radius)
 
-    def check_collision(self, target_coord):
+    def check_collision(self, target_coord, pad_radius):
         dist_to_target = math.hypot(self.pos[0] - target_coord[0], self.pos[1] - target_coord[1])
-        ground_z = 0.0 if dist_to_target <= PAD_RADIUS else 12.0
+        ground_z = 0.0 if dist_to_target <= pad_radius else 12.0
 
         if self.pos[2] <= ground_z:
             self.pos[2] = ground_z
             v_total = np.linalg.norm(self.vel) * 2.5
             tilt = math.hypot(self.roll, self.pitch)
 
-            if dist_to_target <= PAD_RADIUS:
+            if dist_to_target <= pad_radius:
                 if v_total <= 2.5 and tilt <= 12.0:
                     self.state = "SUCCESS"
                     self.status_msg = f"CONTACT LIGHT! HOUSTON, EAGLE HAS LANDED! (V={v_total:.2f} m/s | Dev={dist_to_target:.1f}m)"
                 else:
                     self.state = "CRASHED"
-                    if v_total > 2.5: self.status_msg = f"HARD IMPACT! Touchdown={v_total:.2f} m/s (>2.5)"
-                    else: self.status_msg = f"LM EAGLE TERGULING! Inklinasi={tilt:.1f}° (>12°)"
+                    if v_total > 2.5:
+                        self.status_msg = f"HARD IMPACT! Touchdown={v_total:.2f} m/s (>2.5)"
+                    else:
+                        self.status_msg = f"LM EAGLE TERGULING! Inklinasi={tilt:.1f}° (>12°)"
             else:
                 self.state = "CRASHED"
                 self.status_msg = f"CRASH! Mendarat di luar zona aman helipad ({dist_to_target:.1f} m)"
@@ -361,10 +314,10 @@ class LM_Eagle:
         proj_d_bot = [project_3d(self.pos + np.dot(R, pt), cam_pos, cam_target) for pt in d_bot]
 
         for i in range(8):
-            if proj_d_top[i] and proj_d_top[(i+1)%8]:
-                pygame.draw.line(surface, GOLD_FOIL, (proj_d_top[i][0], proj_d_top[i][1]), (proj_d_top[(i+1)%8][0], proj_d_top[(i+1)%8][1]), 2)
-            if proj_d_bot[i] and proj_d_bot[(i+1)%8]:
-                pygame.draw.line(surface, (160, 120, 20), (proj_d_bot[i][0], proj_d_bot[i][1]), (proj_d_bot[(i+1)%8][0], proj_d_bot[(i+1)%8][1]), 2)
+            if proj_d_top[i] and proj_d_top[(i + 1) % 8]:
+                pygame.draw.line(surface, GOLD_FOIL, (proj_d_top[i][0], proj_d_top[i][1]), (proj_d_top[(i + 1) % 8][0], proj_d_top[(i + 1) % 8][1]), 2)
+            if proj_d_bot[i] and proj_d_bot[(i + 1) % 8]:
+                pygame.draw.line(surface, (160, 120, 20), (proj_d_bot[i][0], proj_d_bot[i][1]), (proj_d_bot[(i + 1) % 8][0], proj_d_bot[(i + 1) % 8][1]), 2)
             if proj_d_top[i] and proj_d_bot[i]:
                 pygame.draw.line(surface, GOLD_FOIL, (proj_d_top[i][0], proj_d_top[i][1]), (proj_d_bot[i][0], proj_d_bot[i][1]), 2)
 
@@ -374,12 +327,18 @@ class LM_Eagle:
         ]
         proj_asc = [project_3d(self.pos + np.dot(R, np.array(pt)), cam_pos, cam_target) for pt in ascent_nodes]
 
-        edges_asc = [(0,1),(1,2),(2,3),(3,0), (4,5),(5,6),(6,7),(7,4), (0,4),(1,5),(2,6),(3,7), (4,8),(5,8),(6,8),(7,8)]
+        edges_asc = [
+            (0, 1), (1, 2), (2, 3), (3, 0),
+            (4, 5), (5, 6), (6, 7), (7, 4),
+            (0, 4), (1, 5), (2, 6), (3, 7),
+            (4, 8), (5, 8), (6, 8), (7, 8)
+        ]
         for e1, e2 in edges_asc:
             p1, p2 = proj_asc[e1], proj_asc[e2]
-            if p1 and p2: pygame.draw.line(surface, (230, 235, 245), (p1[0], p1[1]), (p2[0], p2[1]), 2)
+            if p1 and p2:
+                pygame.draw.line(surface, (230, 235, 245), (p1[0], p1[1]), (p2[0], p2[1]), 2)
 
-        leg_angles = [math.pi/4, 3*math.pi/4, 5*math.pi/4, 7*math.pi/4]
+        leg_angles = [math.pi / 4, 3 * math.pi / 4, 5 * math.pi / 4, 7 * math.pi / 4]
         for la in leg_angles:
             hip = np.array([r_oct * math.cos(la), r_oct * math.sin(la), -h_oct * 0.5])
             foot = np.array([(r_oct + 6.0) * math.cos(la), (r_oct + 6.0) * math.sin(la), -h_oct - 4.5])
@@ -389,223 +348,316 @@ class LM_Eagle:
                 pygame.draw.line(surface, (200, 205, 220), (p_hip[0], p_hip[1]), (p_foot[0], p_foot[1]), 3)
                 pygame.draw.circle(surface, GOLD_FOIL, (p_foot[0], p_foot[1]), 4)
 
+
 # =====================================================================
-# 7. MANAJER MISI UTAMA
+# PYGAME SIMULATOR CLASS
 # =====================================================================
-columbia = CSM_Columbia()
-eagle = LM_Eagle()
+class PygameSimulator:
+    def __init__(self, site_key=None):
+        self.state = load_state()
+        self.active_site_key = site_key or self.state.selected_site or "ALPHA"
+        if self.active_site_key not in SITES:
+            self.active_site_key = "ALPHA"
 
-camera_modes = ["CHASE (EAGLE)", "TARGET (SURFACE)", "ORBIT (PANORAMA)"]
-camera_idx = 0
-running = True
+        self.grid_size = 18
+        self.terrain_span = 2500.0
+        self.pad_radius = 55.0
+        self.camera_modes = ["CHASE (EAGLE)", "TARGET (SURFACE)", "ORBIT (PANORAMA)"]
+        self.camera_idx = 0
+        self.running = False
 
-def reset_mission():
-    columbia.reset()
-    eagle.reset(columbia.pos + np.array([0.0, 0.0, 11.5]))
-    eagle.state = "DOCKED"
+    def build_terrain_and_stars(self):
+        dem_candidates = glob.glob("data/**/*.png", recursive=True)
+        dem_path = None
+        for f in dem_candidates:
+            fname = os.path.basename(f).lower()
+            if "illum" not in fname and not fname.endswith(".vrt"):
+                dem_path = f
+                break
 
-reset_mission()
+        self.terrain_verts = np.zeros((self.grid_size, self.grid_size, 3), dtype=np.float32)
+        xs = np.linspace(-self.terrain_span / 2, self.terrain_span / 2, self.grid_size)
+        ys = np.linspace(-self.terrain_span / 2, self.terrain_span / 2, self.grid_size)
 
-while running:
-    clock.tick(60)
-    target_info = SITES[active_site_key]
-    target_coord = target_info["pos"]
+        if dem_path and os.path.exists(dem_path):
+            try:
+                raw_dem = Image.open(dem_path).convert("L")
+                raw_dem = raw_dem.resize((self.grid_size, self.grid_size))
+                dem_arr = np.array(raw_dem, dtype=np.float32)
+                dem_norm = (dem_arr - np.min(dem_arr)) / (np.ptp(dem_arr) + 1e-5)
+                raw_z = (dem_norm - 0.5) * 120.0
+            except Exception:
+                raw_z = np.zeros((self.grid_size, self.grid_size), dtype=np.float32)
+        else:
+            raw_z = np.zeros((self.grid_size, self.grid_size), dtype=np.float32)
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE: running = False
-            elif event.key == pygame.K_r: reset_mission()
-            elif event.key == pygame.K_1: active_site_key = "ALPHA"
-            elif event.key == pygame.K_2: active_site_key = "BETA"
-            elif event.key == pygame.K_3: active_site_key = "GAMMA"
-            elif event.key == pygame.K_c: camera_idx = (camera_idx + 1) % len(camera_modes)
-            elif event.key == pygame.K_a and eagle.state == "FLYING": eagle.autopilot = not eagle.autopilot
-            elif event.key == pygame.K_SPACE:
-                if eagle.state == "DOCKED":
-                    eagle.state = "FLYING"
-                    eagle.vel = np.array([
-                        (target_coord[0] - eagle.pos[0]) * 0.005,
-                        (target_coord[1] - eagle.pos[1]) * 0.005,
-                        -0.65
-                    ])
+        for i in range(self.grid_size):
+            for j in range(self.grid_size):
+                x, y = xs[i], ys[j]
+                min_dist_pad = min(math.hypot(x - s["pos"][0], y - s["pos"][1]) for s in SITES.values())
+                if min_dist_pad < self.pad_radius:
+                    z = 0.0
+                elif min_dist_pad < self.pad_radius + 60.0:
+                    z = raw_z[i, j] * ((min_dist_pad - self.pad_radius) / 60.0)
+                else:
+                    z = raw_z[i, j]
+                self.terrain_verts[i, j] = [x, y, z]
 
-    keys = pygame.key.get_pressed()
-    columbia.update_orbit()
+        self.stars_3d = []
+        for _ in range(40):
+            theta = random.uniform(0, 2 * math.pi)
+            phi = random.uniform(0.1, math.pi / 2)
+            r = 3500.0
+            self.stars_3d.append(np.array([
+                r * math.sin(phi) * math.cos(theta),
+                r * math.sin(phi) * math.sin(theta),
+                r * math.cos(phi),
+            ]))
 
-    if eagle.state == "DOCKED":
-        eagle.pos = columbia.pos + np.array([0.0, 0.0, 11.5])
-        eagle.vel = np.zeros(3)
-    elif eagle.state == "FLYING":
-        eagle.update(keys, target_coord)
+    def run(self):
+        pygame.init()
+        screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        pygame.display.set_caption("NASA Space Apps - 3D Autonomous Pinpoint Landing Simulator")
+        clock = pygame.time.Clock()
 
-    # Kamera 3D Dinamis
-    current_cam = camera_modes[camera_idx]
-    if current_cam == "CHASE (EAGLE)":
-        focus_pos = eagle.pos if eagle.state != "DOCKED" else columbia.pos
-        cam_offset = np.array([-115.0, -115.0, 60.0])
-        cam_pos = focus_pos + cam_offset
-        cam_target = focus_pos + np.array([0.0, 0.0, -15.0])
-    elif current_cam == "TARGET (SURFACE)":
-        cam_pos = target_coord + np.array([90.0, 90.0, 25.0])
-        cam_target = eagle.pos
-    elif current_cam == "ORBIT (PANORAMA)":
-        cam_pos = np.array([-700.0, -700.0, 950.0])
-        cam_target = target_coord
+        font_large = pygame.font.SysFont("monospace", 20, bold=True)
+        font_med = pygame.font.SysFont("monospace", 12, bold=True)
+        font_small = pygame.font.SysFont("monospace", 11)
 
-    screen.fill(SPACE_BLACK)
+        self.build_terrain_and_stars()
 
-    for s in stars_3d:
-        p_star = project_3d(s, cam_pos, cam_target)
-        if p_star: pygame.draw.circle(screen, (200, 205, 220), (p_star[0], p_star[1]), 1)
+        columbia = CSM_Columbia()
+        eagle = LM_Eagle()
 
-    for i in range(GRID_SIZE):
-        for j in range(GRID_SIZE):
-            p1 = project_3d(terrain_verts[i, j], cam_pos, cam_target)
-            if not p1: continue
+        def reset_mission():
+            columbia.reset()
+            eagle.reset(columbia.pos + np.array([0.0, 0.0, 11.5]))
+            eagle.state = "DOCKED"
 
-            if i + 1 < GRID_SIZE:
-                p2 = project_3d(terrain_verts[i + 1, j], cam_pos, cam_target)
-                if p2:
-                    col = LUNAR_RIDGE if terrain_verts[i, j][2] > 25 else LUNAR_GRID
-                    pygame.draw.line(screen, col, (p1[0], p1[1]), (p2[0], p2[1]), 1)
+        reset_mission()
+        self.running = True
 
-            if j + 1 < GRID_SIZE:
-                p3 = project_3d(terrain_verts[i, j + 1], cam_pos, cam_target)
-                if p3:
-                    col = LUNAR_RIDGE if terrain_verts[i, j][2] > 25 else LUNAR_GRID
-                    pygame.draw.line(screen, col, (p1[0], p1[1]), (p3[0], p3[1]), 1)
+        while self.running:
+            clock.tick(60)
+            target_info = SITES[self.active_site_key]
+            target_coord = target_info["pos"]
 
-    for s_key, s_data in SITES.items():
-        center = s_data["pos"]
-        pad_pts = []
-        is_active = (s_key == active_site_key)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.running = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        self.running = False
+                    elif event.key == pygame.K_r:
+                        reset_mission()
+                    elif event.key == pygame.K_1:
+                        self.active_site_key = "ALPHA"
+                    elif event.key == pygame.K_2:
+                        self.active_site_key = "BETA"
+                    elif event.key == pygame.K_3:
+                        self.active_site_key = "GAMMA"
+                    elif event.key == pygame.K_c:
+                        self.camera_idx = (self.camera_idx + 1) % len(self.camera_modes)
+                    elif event.key == pygame.K_a and eagle.state == "FLYING":
+                        eagle.autopilot = not eagle.autopilot
+                    elif event.key == pygame.K_SPACE:
+                        if eagle.state == "DOCKED":
+                            eagle.state = "FLYING"
+                            eagle.vel = np.array([
+                                (target_coord[0] - eagle.pos[0]) * 0.005,
+                                (target_coord[1] - eagle.pos[1]) * 0.005,
+                                -0.65,
+                            ])
 
-        for ang in range(0, 360, 24):
-            rad = math.radians(ang)
-            px = center[0] + PAD_RADIUS * math.cos(rad)
-            py = center[1] + PAD_RADIUS * math.sin(rad)
-            proj = project_3d(np.array([px, py, 0.0]), cam_pos, cam_target)
-            if proj: pad_pts.append((proj[0], proj[1]))
+            keys = pygame.key.get_pressed()
+            columbia.update_orbit()
 
-        if len(pad_pts) > 2:
-            fill_col = (18, 55, 35) if is_active else (25, 30, 42)
-            edge_col = s_data["color"] if is_active else (80, 90, 110)
-            pygame.draw.polygon(screen, fill_col, pad_pts)
-            pygame.draw.lines(screen, edge_col, True, pad_pts, 3 if is_active else 1)
+            if eagle.state == "DOCKED":
+                eagle.pos = columbia.pos + np.array([0.0, 0.0, 11.5])
+                eagle.vel = np.zeros(3)
+            elif eagle.state == "FLYING":
+                eagle.update(keys, target_coord, self.pad_radius)
 
-        cx1 = project_3d(center + np.array([-20.0, 0.0, 0.0]), cam_pos, cam_target)
-        cx2 = project_3d(center + np.array([20.0, 0.0, 0.0]), cam_pos, cam_target)
-        cy1 = project_3d(center + np.array([0.0, -20.0, 0.0]), cam_pos, cam_target)
-        cy2 = project_3d(center + np.array([0.0, 20.0, 0.0]), cam_pos, cam_target)
-        ch_col = s_data["color"] if is_active else (100, 110, 130)
-        if cx1 and cx2: pygame.draw.line(screen, ch_col, (cx1[0], cx1[1]), (cx2[0], cx2[1]), 2)
-        if cy1 and cy2: pygame.draw.line(screen, ch_col, (cy1[0], cy1[1]), (cy2[0], cy2[1]), 2)
+            current_cam = self.camera_modes[self.camera_idx]
+            if current_cam == "CHASE (EAGLE)":
+                focus_pos = eagle.pos if eagle.state != "DOCKED" else columbia.pos
+                cam_offset = np.array([-115.0, -115.0, 60.0])
+                cam_pos = focus_pos + cam_offset
+                cam_target = focus_pos + np.array([0.0, 0.0, -15.0])
+            elif current_cam == "TARGET (SURFACE)":
+                cam_pos = target_coord + np.array([90.0, 90.0, 25.0])
+                cam_target = eagle.pos
+            elif current_cam == "ORBIT (PANORAMA)":
+                cam_pos = np.array([-700.0, -700.0, 950.0])
+                cam_target = target_coord
 
-        lbl_p = project_3d(center + np.array([0.0, 0.0, 16.0]), cam_pos, cam_target)
-        if lbl_p:
-            lbl_surf = font_small.render(f"SITE {s_key} {'[TARGET LOCK]' if is_active else ''}", True, s_data["color"])
-            screen.blit(lbl_surf, lbl_surf.get_rect(center=(lbl_p[0], lbl_p[1])))
+            screen.fill(SPACE_BLACK)
 
-    if eagle.state in ["DOCKED", "FLYING"]:
-        l_from = project_3d(eagle.pos, cam_pos, cam_target)
-        l_to = project_3d(target_coord, cam_pos, cam_target)
-        if l_from and l_to:
-            pygame.draw.line(screen, target_info["color"], (l_from[0], l_from[1]), (l_to[0], l_to[1]), 1)
+            for s in self.stars_3d:
+                p_star = project_3d(s, cam_pos, cam_target)
+                if p_star:
+                    pygame.draw.circle(screen, (200, 205, 220), (p_star[0], p_star[1]), 1)
 
-    columbia.draw(screen, cam_pos, cam_target)
-    eagle.draw(screen, cam_pos, cam_target)
+            for i in range(self.grid_size):
+                for j in range(self.grid_size):
+                    p1 = project_3d(self.terrain_verts[i, j], cam_pos, cam_target)
+                    if not p1:
+                        continue
 
-    p_col_txt = project_3d(columbia.pos + np.array([0.0, 0.0, 18.0]), cam_pos, cam_target)
-    if p_col_txt:
-        txt_csm = font_small.render("CSM COLUMBIA [IN ORBIT]", True, CSM_SILVER)
-        screen.blit(txt_csm, txt_csm.get_rect(center=(p_col_txt[0], p_col_txt[1])))
+                    if i + 1 < self.grid_size:
+                        p2 = project_3d(self.terrain_verts[i + 1, j], cam_pos, cam_target)
+                        if p2:
+                            col = LUNAR_RIDGE if self.terrain_verts[i, j][2] > 25 else LUNAR_GRID
+                            pygame.draw.line(screen, col, (p1[0], p1[1]), (p2[0], p2[1]), 1)
 
-    # =====================================================================
-    # 8. HUD INSTRUMEN AVIONIK APOLLO 11
-    # =====================================================================
-    phase_bg = pygame.Surface((WIDTH - 30, 36), pygame.SRCALPHA)
-    phase_bg.fill((8, 12, 22, 230))
-    screen.blit(phase_bg, (15, 12))
-    pygame.draw.rect(screen, HUD_CYAN, (15, 12, WIDTH - 30, 36), 1)
+                    if j + 1 < self.grid_size:
+                        p3 = project_3d(self.terrain_verts[i, j + 1], cam_pos, cam_target)
+                        if p3:
+                            col = LUNAR_RIDGE if self.terrain_verts[i, j][2] > 25 else LUNAR_GRID
+                            pygame.draw.line(screen, col, (p1[0], p1[1]), (p3[0], p3[1]), 1)
 
-    if eagle.state == "DOCKED":
-        blink = (pygame.time.get_ticks() // 450) % 2 == 0
-        phase_str = "APOLLO 11: COLUMBIA & EAGLE IN ORBIT | TEKAN [SPASI] UNTUK UNDOCKING" if blink else "PILIH TARGET SITUS [1/2/3] | LALU TEKAN [SPASI] UNTUK MEMULAI PENDARATAN"
-        phase_col = GOLD_FOIL
-    elif eagle.state == "FLYING":
-        phase_str = f"POWERED DESCENT (PDI) -> EAGLE MENUNJUK {target_info['name'].upper()}"
-        phase_col = PAD_GREEN
-    elif eagle.state == "SUCCESS":
-        phase_str = "THE EAGLE HAS LANDED | PINPOINT TOUCHDOWN SUCCESS"
-        phase_col = PAD_GREEN
-    else:
-        phase_str = "MISSION ABORT: HARD IMPACT DETECTED"
-        phase_col = WARNING_RED
+            for s_key, s_data in SITES.items():
+                center = s_data["pos"]
+                pad_pts = []
+                is_active = (s_key == self.active_site_key)
 
-    txt_ph = font_med.render(phase_str, True, phase_col)
-    screen.blit(txt_ph, txt_ph.get_rect(center=(WIDTH // 2, 30)))
+                for ang in range(0, 360, 24):
+                    rad = math.radians(ang)
+                    px = center[0] + self.pad_radius * math.cos(rad)
+                    py = center[1] + self.pad_radius * math.sin(rad)
+                    proj = project_3d(np.array([px, py, 0.0]), cam_pos, cam_target)
+                    if proj:
+                        pad_pts.append((proj[0], proj[1]))
 
-    site_box = pygame.Surface((310, 96), pygame.SRCALPHA)
-    site_box.fill((8, 12, 22, 215))
-    screen.blit(site_box, (15, 56))
-    pygame.draw.rect(screen, HUD_CYAN, (15, 56, 310, 96), 1)
+                if len(pad_pts) > 2:
+                    fill_col = (18, 55, 35) if is_active else (25, 30, 42)
+                    edge_col = s_data["color"] if is_active else (80, 90, 110)
+                    pygame.draw.polygon(screen, fill_col, pad_pts)
+                    pygame.draw.lines(screen, edge_col, True, pad_pts, 3 if is_active else 1)
 
-    screen.blit(font_med.render("APOLLO 11 TARGET SITE (1/2/3):", True, WHITE), (25, 64))
-    for idx_k, (k_s, v_s) in enumerate(SITES.items()):
-        is_cur = (k_s == active_site_key)
-        prefix = "► [*] " if is_cur else "  [ ] "
-        col_s = v_s["color"] if is_cur else (140, 150, 165)
-        t_site = font_small.render(f"{prefix}[{idx_k+1}] {v_s['name']}", True, col_s)
-        screen.blit(t_site, (25, 86 + idx_k * 18))
+                cx1 = project_3d(center + np.array([-20.0, 0.0, 0.0]), cam_pos, cam_target)
+                cx2 = project_3d(center + np.array([20.0, 0.0, 0.0]), cam_pos, cam_target)
+                cy1 = project_3d(center + np.array([0.0, -20.0, 0.0]), cam_pos, cam_target)
+                cy2 = project_3d(center + np.array([0.0, 20.0, 0.0]), cam_pos, cam_target)
+                ch_col = s_data["color"] if is_active else (100, 110, 130)
+                if cx1 and cx2:
+                    pygame.draw.line(screen, ch_col, (cx1[0], cx1[1]), (cx2[0], cx2[1]), 2)
+                if cy1 and cy2:
+                    pygame.draw.line(screen, ch_col, (cy1[0], cy1[1]), (cy2[0], cy2[1]), 2)
 
-    vz_ms = abs(eagle.vel[2]) * 2.5
-    vh_ms = math.hypot(eagle.vel[0], eagle.vel[1]) * 2.5
-    dist_xy = math.hypot(eagle.pos[0] - target_coord[0], eagle.pos[1] - target_coord[1])
-    tilt_deg = math.hypot(eagle.roll, eagle.pitch)
+                lbl_p = project_3d(center + np.array([0.0, 0.0, 16.0]), cam_pos, cam_target)
+                if lbl_p:
+                    lbl_surf = font_small.render(f"SITE {s_key} {'[TARGET LOCK]' if is_active else ''}", True, s_data["color"])
+                    screen.blit(lbl_surf, lbl_surf.get_rect(center=(lbl_p[0], lbl_p[1])))
 
-    hud_bg = pygame.Surface((350, 220), pygame.SRCALPHA)
-    hud_bg.fill((8, 12, 22, 220))
-    screen.blit(hud_bg, (15, HEIGHT - 235))
-    pygame.draw.rect(screen, HUD_CYAN, (15, HEIGHT - 235, 350, 220), 1)
+            if eagle.state in ["DOCKED", "FLYING"]:
+                l_from = project_3d(eagle.pos, cam_pos, cam_target)
+                l_to = project_3d(target_coord, cam_pos, cam_target)
+                if l_from and l_to:
+                    pygame.draw.line(screen, target_info["color"], (l_from[0], l_from[1]), (l_to[0], l_to[1]), 1)
 
-    st_mode = "[ AUTONOMOUS GNC ]" if eagle.autopilot else "[ MANUAL AGC PILOT ]"
-    st_col = PAD_GREEN if eagle.autopilot else GOLD_FOIL
-    screen.blit(font_med.render(f"LM EAGLE GUIDANCE: {st_mode}", True, st_col), (25, HEIGHT - 225))
+            columbia.draw(screen, cam_pos, cam_target)
+            eagle.draw(screen, cam_pos, cam_target)
 
-    screen.blit(font_small.render(f"TARGET   : {target_info['name']}", True, target_info["color"]), (25, HEIGHT - 202))
-    screen.blit(font_small.render(f"ALTITUDE : {eagle.pos[2]:6.1f} m", True, WHITE), (25, HEIGHT - 182))
+            p_col_txt = project_3d(columbia.pos + np.array([0.0, 0.0, 18.0]), cam_pos, cam_target)
+            if p_col_txt:
+                txt_csm = font_small.render("CSM COLUMBIA [IN ORBIT]", True, CSM_SILVER)
+                screen.blit(txt_csm, txt_csm.get_rect(center=(p_col_txt[0], p_col_txt[1])))
 
-    vz_col = PAD_GREEN if vz_ms <= 2.0 else WARNING_RED
-    screen.blit(font_small.render(f"DESCENT  : {vz_ms:6.2f} m/s (MAX SAFE: <2.0 m/s)", True, vz_col), (25, HEIGHT - 162))
-    screen.blit(font_small.render(f"HORZ SPD : {vh_ms:6.2f} m/s", True, WHITE), (25, HEIGHT - 142))
-    screen.blit(font_small.render(f"DEVIATION: {dist_xy:6.2f} m (TARGET X: <1.0 m)", True, WHITE), (25, HEIGHT - 122))
-    screen.blit(font_small.render(f"ATTITUDE : {tilt_deg:6.1f}° (P:{eagle.pitch:.1f}° R:{eagle.roll:.1f}°)", True, WHITE), (25, HEIGHT - 102))
+            # HUD Top Bar
+            phase_bg = pygame.Surface((WIDTH - 30, 36), pygame.SRCALPHA)
+            phase_bg.fill((8, 12, 22, 230))
+            screen.blit(phase_bg, (15, 12))
+            pygame.draw.rect(screen, HUD_CYAN, (15, 12, WIDTH - 30, 36), 1)
 
-    fuel_col = PAD_GREEN if eagle.fuel > 30 else WARNING_RED
-    screen.blit(font_small.render(f"DPS FUEL : {eagle.fuel:5.1f}%", True, WHITE), (25, HEIGHT - 82))
-    pygame.draw.rect(screen, (50, 55, 65), (120, HEIGHT - 80, 225, 10))
-    pygame.draw.rect(screen, fuel_col, (120, HEIGHT - 80, int(2.25 * eagle.fuel), 10))
+            if eagle.state == "DOCKED":
+                blink = (pygame.time.get_ticks() // 450) % 2 == 0
+                phase_str = "APOLLO 11: COLUMBIA & EAGLE IN ORBIT | TEKAN [SPASI] UNTUK UNDOCKING" if blink else "PILIH TARGET SITUS [1/2/3] | LALU TEKAN [SPASI] UNTUK MEMULAI PENDARATAN"
+                phase_col = GOLD_FOIL
+            elif eagle.state == "FLYING":
+                phase_str = f"POWERED DESCENT (PDI) -> EAGLE MENUNJUK {target_info['name'].upper()}"
+                phase_col = PAD_GREEN
+            elif eagle.state == "SUCCESS":
+                phase_str = "THE EAGLE HAS LANDED | PINPOINT TOUCHDOWN SUCCESS"
+                phase_col = PAD_GREEN
+            else:
+                phase_str = "MISSION ABORT: HARD IMPACT DETECTED"
+                phase_col = WARNING_RED
 
-    screen.blit(font_small.render("CAMERA   : " + current_cam + " (PRESS 'C')", True, HUD_CYAN), (25, HEIGHT - 58))
-    screen.blit(font_small.render("COMMANDS : [SPACE] UNDOCK | [A] AUTO | [R] RESET", True, HUD_CYAN), (25, HEIGHT - 38))
+            txt_ph = font_med.render(phase_str, True, phase_col)
+            screen.blit(txt_ph, txt_ph.get_rect(center=(WIDTH // 2, 30)))
 
-    if eagle.state in ["SUCCESS", "CRASHED"]:
-        res_color = PAD_GREEN if eagle.state == "SUCCESS" else WARNING_RED
-        text_status = font_large.render(eagle.status_msg, True, res_color)
-        text_sub = font_med.render("TEKAN 'R' UNTUK MENGULANG DARI ORBIT COLUMBIA", True, WHITE)
+            # HUD Mission Context Box (from mission_state)
+            site_box = pygame.Surface((340, 110), pygame.SRCALPHA)
+            site_box.fill((8, 12, 22, 215))
+            screen.blit(site_box, (15, 56))
+            pygame.draw.rect(screen, HUD_CYAN, (15, 56, 340, 110), 1)
 
-        banner = pygame.Surface((WIDTH, 105), pygame.SRCALPHA)
-        banner.fill((6, 9, 15, 245))
-        screen.blit(banner, (0, HEIGHT // 2 - 52))
-        pygame.draw.line(screen, res_color, (0, HEIGHT // 2 - 52), (WIDTH, HEIGHT // 2 - 52), 2)
-        pygame.draw.line(screen, res_color, (0, HEIGHT // 2 + 53), (WIDTH, HEIGHT // 2 + 53), 2)
+            sol_str = "AKTIF" if self.state.solar_ok else "BAYANGAN"
+            dte_str = "ONLINE" if self.state.dte_ok else "TERHALANG"
+            screen.blit(font_med.render(f"MISSION PLAN: {self.state.landing_date} | SOL:{sol_str} DTE:{dte_str}", True, (250, 204, 21)), (25, 64))
 
-        screen.blit(text_status, text_status.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 15)))
-        screen.blit(text_sub, text_sub.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 22)))
+            for idx_k, (k_s, v_s) in enumerate(SITES.items()):
+                is_cur = (k_s == self.active_site_key)
+                prefix = "► [*] " if is_cur else "  [ ] "
+                col_s = v_s["color"] if is_cur else (140, 150, 165)
+                t_site = font_small.render(f"{prefix}[{idx_k+1}] {v_s['name']}", True, col_s)
+                screen.blit(t_site, (25, 84 + idx_k * 18))
 
-    pygame.display.flip()
+            vz_ms = abs(eagle.vel[2]) * 2.5
+            vh_ms = math.hypot(eagle.vel[0], eagle.vel[1]) * 2.5
+            dist_xy = math.hypot(eagle.pos[0] - target_coord[0], eagle.pos[1] - target_coord[1])
+            tilt_deg = math.hypot(eagle.roll, eagle.pitch)
 
-pygame.quit()
-sys.exit()
+            hud_bg = pygame.Surface((350, 220), pygame.SRCALPHA)
+            hud_bg.fill((8, 12, 22, 220))
+            screen.blit(hud_bg, (15, HEIGHT - 235))
+            pygame.draw.rect(screen, HUD_CYAN, (15, HEIGHT - 235, 350, 220), 1)
+
+            st_mode = "[ AUTONOMOUS GNC ]" if eagle.autopilot else "[ MANUAL AGC PILOT ]"
+            st_col = PAD_GREEN if eagle.autopilot else GOLD_FOIL
+            screen.blit(font_med.render(f"LM EAGLE GUIDANCE: {st_mode}", True, st_col), (25, HEIGHT - 225))
+
+            screen.blit(font_small.render(f"TARGET   : {target_info['name']}", True, target_info["color"]), (25, HEIGHT - 202))
+            screen.blit(font_small.render(f"ALTITUDE : {eagle.pos[2]:6.1f} m", True, WHITE), (25, HEIGHT - 182))
+
+            vz_col = PAD_GREEN if vz_ms <= 2.0 else WARNING_RED
+            screen.blit(font_small.render(f"DESCENT  : {vz_ms:6.2f} m/s (MAX SAFE: <2.0 m/s)", True, vz_col), (25, HEIGHT - 162))
+            screen.blit(font_small.render(f"HORZ SPD : {vh_ms:6.2f} m/s", True, WHITE), (25, HEIGHT - 142))
+            screen.blit(font_small.render(f"DEVIATION: {dist_xy:6.2f} m (TARGET X: <1.0 m)", True, WHITE), (25, HEIGHT - 122))
+            screen.blit(font_small.render(f"ATTITUDE : {tilt_deg:6.1f}° (P:{eagle.pitch:.1f}° R:{eagle.roll:.1f}°)", True, WHITE), (25, HEIGHT - 102))
+
+            fuel_col = PAD_GREEN if eagle.fuel > 30 else WARNING_RED
+            screen.blit(font_small.render(f"DPS FUEL : {eagle.fuel:5.1f}%", True, WHITE), (25, HEIGHT - 82))
+            pygame.draw.rect(screen, (50, 55, 65), (120, HEIGHT - 80, 225, 10))
+            pygame.draw.rect(screen, fuel_col, (120, HEIGHT - 80, int(2.25 * eagle.fuel), 10))
+
+            screen.blit(font_small.render("CAMERA   : " + current_cam + " (PRESS 'C')", True, HUD_CYAN), (25, HEIGHT - 58))
+            screen.blit(font_small.render("COMMANDS : [SPACE] UNDOCK | [A] AUTO | [R] RESET | [ESC] EXIT", True, HUD_CYAN), (25, HEIGHT - 38))
+
+            if eagle.state in ["SUCCESS", "CRASHED"]:
+                res_color = PAD_GREEN if eagle.state == "SUCCESS" else WARNING_RED
+                text_status = font_large.render(eagle.status_msg, True, res_color)
+                text_sub = font_med.render("TEKAN 'R' UNTUK MENGULANG DARI ORBIT COLUMBIA", True, WHITE)
+
+                banner = pygame.Surface((WIDTH, 105), pygame.SRCALPHA)
+                banner.fill((6, 9, 15, 245))
+                screen.blit(banner, (0, HEIGHT // 2 - 52))
+                pygame.draw.line(screen, res_color, (0, HEIGHT // 2 - 52), (WIDTH, HEIGHT // 2 - 52), 2)
+                pygame.draw.line(screen, res_color, (0, HEIGHT // 2 + 53), (WIDTH, HEIGHT // 2 + 53), 2)
+
+                screen.blit(text_status, text_status.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 15)))
+                screen.blit(text_sub, text_sub.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 22)))
+
+            pygame.display.flip()
+
+        pygame.quit()
+
+
+def launch_game(site_key=None):
+    sim = PygameSimulator(site_key)
+    sim.run()
+
+
+if __name__ == "__main__":
+    launch_game()

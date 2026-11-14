@@ -5,3 +5,5 @@ pillow>=9.5.0
 pygame>=2.5.0
 PyQt6>=6.5.0
 pyqtgraph>=0.13.0
+requests>=2.28.0
+tornado>=6.0.0
