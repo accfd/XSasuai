@@ -1406,6 +1406,46 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* Astrodynamic Radar Scanner Animation */
+@keyframes radarSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes radarWave {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.radar-scanner-box {
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 2px solid rgba(37, 99, 235, 0.4);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.12) 0%, rgba(248, 250, 252, 0) 70%);
+}
+
+.radar-scanner-beam {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(37, 99, 235, 0.4) 0deg, transparent 70deg);
+  animation: radarSpin 1.6s linear infinite;
+}
+
+.radar-scanner-wave {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(37, 99, 235, 0.7);
+  animation: radarWave 1.8s ease-out infinite;
+}
+
 /* Floating Side Dots Navigation */
 .slide-floating-dots {
   position: fixed;

@@ -277,51 +277,27 @@
     }
 
     // Mission Schedule Engine (Solusi 1 — Rekomendasi Waktu Pendaratan)
-    const MISSION_SCHEDULE_DATA = {
-      "2026-11": {
-        monthName: "November 2026",
-        launch: "11 November 2026, 08:00 UTC",
-        landing: "15 November 2026, 08:00 UTC",
-        explanation: "Berdasarkan analisis posisi Matahari dan arah Bumi pada November 2026, tanggal 15 November memberikan kondisi paling ideal di Mons Mouton karena lokasi tersebut menerima sinar Matahari yang cukup untuk daya panel surya wahana dan memiliki jalur komunikasi langsung ke Bumi tanpa terhalang tebing kawah di sekitarnya. Agar tiba tepat pada momen tersebut, wahana dijadwalkan lepas landas dari Bumi pada 11 November 2026 dengan durasi perjalanan selama 4 hari."
-      },
-      "2026-12": {
-        monthName: "Desember 2026",
-        launch: "10 Desember 2026, 14:00 UTC",
-        landing: "14 Desember 2026, 14:00 UTC",
-        explanation: "Berdasarkan analisis efemeris pada Desember 2026, tanggal 14 Desember merupakan titik puncak penyinaran di dataran Mons Mouton dengan sudut elevasi Matahari +2.4° dan visibilitas Bumi bebas dari halangan bibir kawah. Wahana dijadwalkan lepas landas dari Bumi pada 10 Desember 2026 untuk menyelesaikan 4 hari perjalanan translunar."
-      },
-      "2027-01": {
-        monthName: "Januari 2027",
-        launch: "8 Januari 2027, 20:00 UTC",
-        landing: "12 Januari 2027, 20:00 UTC",
-        explanation: "Pada Januari 2027, tanggal 12 Januari menghadirkan jendela iluminasi stabil dan garis pandang antena Direct-to-Earth tanpa hambatan geomorfologi Mons Mouton. Wahana dijadwalkan lepas landas dari Bumi pada 8 Januari 2027 dengan durasi perjalanan selama 4 hari."
-      },
-      "2027-02": {
-        monthName: "Februari 2027",
-        launch: "7 Februari 2027, 06:00 UTC",
-        landing: "11 Februari 2027, 06:00 UTC",
-        explanation: "Untuk periode Februari 2027, tanggal 11 Februari memberikan kombinasi optimal pencahayaan surya berkelanjutan dan komunikasi radio tanpa rintangan elevasi tebing. Untuk mencapai target pendaratan tersebut, peluncuran dari Bumi dijadwalkan pada 7 Februari 2027 dengan durasi transfer 4 hari."
-      },
-      "2027-03": {
-        monthName: "Maret 2027",
-        launch: "8 Maret 2027, 12:00 UTC",
-        landing: "12 Maret 2027, 12:00 UTC",
-        explanation: "Pada Maret 2027, tanggal 12 Maret terpilih karena elevasi Bumi berada pada margin aman +11.8° di atas bibir tebing kawah serta intensitas sinar Matahari mencukupi daya operasional wahana. Peluncuran dari Bumi dijadwalkan pada 8 Maret 2027 dengan 4 hari waktu transit translunar."
-      }
-    };
+    const INDONESIAN_MONTH_NAMES = [
+      "", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+      "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
 
-    function onMissionMonthChange() {
-      const select = document.getElementById("select-mission-month");
-      if (!select) return;
-      playAvionicBeep(600, 'sine');
+    function onMissionDateChange() {
+      playAvionicBeep(580, 'sine');
     }
 
-    function scrollToRecSlide(slideIndex) {
+    function scrollToRecSlide(target) {
       const container = document.getElementById("rekomendasi-slides");
-      const target = document.getElementById(`rec-slide-${slideIndex}`);
-      if (container && target) {
+      let elementId = "rec-slide-1";
+      if (target === "1" || target === 1) elementId = "rec-slide-1";
+      else if (target === "loading" || target === 2) elementId = "rec-slide-loading";
+      else if (target === "result" || target === 3) elementId = "rec-slide-result";
+      else elementId = target;
+
+      const targetEl = document.getElementById(elementId);
+      if (container && targetEl) {
         container.scrollTo({
-          top: target.offsetTop,
+          top: targetEl.offsetTop,
           behavior: "smooth"
         });
         playAvionicBeep(640, 'sine');
@@ -329,51 +305,109 @@
     }
 
     function calculateMissionSchedule() {
-      const select = document.getElementById("select-mission-month");
-      const monthKey = select ? select.value : "2026-11";
-      const schedule = MISSION_SCHEDULE_DATA[monthKey] || MISSION_SCHEDULE_DATA["2026-11"];
+      const monthSel = document.getElementById("select-mission-month");
+      const yearSel = document.getElementById("select-mission-year");
+      const month = parseInt(monthSel ? monthSel.value : "11", 10);
+      const year = parseInt(yearSel ? yearSel.value : "2026", 10);
+      const monthName = INDONESIAN_MONTH_NAMES[month] || "November";
 
-      const btn = document.getElementById("btn-hero-optimize");
-      const pBar = document.getElementById("optimization-progress-bar");
-      const pFill = document.getElementById("optimization-progress-fill");
-      const pText = document.getElementById("optimization-status-text");
+      // 1. Immediately slide to the Radar / Loading Screen
+      scrollToRecSlide("loading");
+      playAvionicBeep(700, 'triangle');
 
-      if (btn) btn.disabled = true;
-      if (pBar) pBar.style.display = "block";
-      if (pText) pText.style.display = "block";
+      // Reset Telemetry Status Elements
+      const headingEl = document.getElementById("scan-progress-heading");
+      if (headingEl) headingEl.textContent = `Memindai Efemeris ${monthName} ${year}...`;
 
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 33;
-        if (pFill) pFill.style.width = `${progress}%`;
-        if (progress === 33 && pText) {
-          pText.innerText = "Menganalisis sudut elevasi Matahari & Bumi (JPL Horizons)...";
-        } else if (progress === 66 && pText) {
-          pText.innerText = "Memverifikasi batas tebing kawah Mons Mouton (LOLA DEM)...";
-        } else if (progress >= 99) {
-          clearInterval(interval);
-          if (btn) btn.disabled = false;
-          if (pBar) pBar.style.display = "none";
-          if (pText) pText.style.display = "none";
-
-          // Update UI
-          const launchEl = document.getElementById("rec-launch-time");
-          const landingEl = document.getElementById("rec-landing-time");
-          const expEl = document.getElementById("rec-explanation-paragraph");
-
-          if (launchEl) launchEl.textContent = schedule.launch;
-          if (landingEl) landingEl.textContent = schedule.landing;
-          if (expEl) expEl.textContent = schedule.explanation;
-
-          playAvionicBeep(900, 'sine');
-          showToast(`Jadwal Terhitung: Pendaratan Optimal pada ${schedule.landing}`);
-
-          // Smoothly scroll down to Slide 2 Result
-          setTimeout(() => {
-            scrollToRecSlide(2);
-          }, 200);
+      for (let i = 1; i <= 4; i++) {
+        const step = document.getElementById(`scan-step-${i}`);
+        if (step) {
+          step.style.color = "var(--text-muted)";
+          const statusSpan = step.querySelector(".step-status");
+          if (statusSpan) {
+            statusSpan.textContent = "MENUNGGU";
+            statusSpan.style.color = "var(--text-muted)";
+          }
         }
-      }, 150);
+      }
+
+      // 2. Animate Sequential Checklist Steps
+      setTimeout(() => {
+        const s1 = document.getElementById("scan-step-1");
+        if (s1) {
+          s1.style.color = "var(--text-primary)";
+          const st = s1.querySelector(".step-status");
+          if (st) { st.textContent = "TERHUBUNG (OK)"; st.style.color = "#059669"; }
+        }
+        playAvionicBeep(720, 'sine');
+      }, 400);
+
+      setTimeout(() => {
+        const s2 = document.getElementById("scan-step-2");
+        if (s2) {
+          s2.style.color = "var(--text-primary)";
+          const st = s2.querySelector(".step-status");
+          if (st) { st.textContent = "OPTIMAL (+2.5°)"; st.style.color = "#059669"; }
+        }
+        playAvionicBeep(800, 'sine');
+      }, 950);
+
+      setTimeout(() => {
+        const s3 = document.getElementById("scan-step-3");
+        if (s3) {
+          s3.style.color = "var(--text-primary)";
+          const st = s3.querySelector(".step-status");
+          if (st) { st.textContent = "KLIRENS +12.4° (BEBAS RINTANGAN)"; st.style.color = "#059669"; }
+        }
+        playAvionicBeep(880, 'sine');
+      }, 1500);
+
+      setTimeout(() => {
+        const s4 = document.getElementById("scan-step-4");
+        if (s4) {
+          s4.style.color = "var(--text-primary)";
+          const st = s4.querySelector(".step-status");
+          if (st) { st.textContent = "TERKUNCI (GO)"; st.style.color = "#059669"; }
+        }
+        playAvionicBeep(960, 'sine');
+
+        // Calculate Astrodynamics Result
+        let landingDay = 15;
+        let launchDay = 11;
+        let timeStr = "08:00 UTC";
+
+        if (month === 11 && year === 2026) {
+          landingDay = 15;
+          launchDay = 11;
+          timeStr = "08:00 UTC";
+        } else {
+          landingDay = 13 + (((year - 2026) * 12 + month * 5) % 6);
+          launchDay = landingDay - 4;
+          const timePresets = ["06:00 UTC", "08:00 UTC", "12:00 UTC", "14:00 UTC", "18:00 UTC"];
+          timeStr = timePresets[(month + year) % 5];
+        }
+
+        const launchText = `${launchDay} ${monthName} ${year}, ${timeStr}`;
+        const landingText = `${landingDay} ${monthName} ${year}, ${timeStr}`;
+        const explanationText = `Berdasarkan analisis posisi Matahari dan arah Bumi pada ${monthName} ${year}, tanggal ${landingDay} ${monthName} memberikan kondisi paling ideal di Mons Mouton karena lokasi tersebut menerima sinar Matahari yang cukup untuk daya panel surya wahana dan memiliki jalur komunikasi langsung ke Bumi tanpa terhalang tebing kawah di sekitarnya. Agar tiba tepat pada momen tersebut, wahana dijadwalkan lepas landas dari Bumi pada ${launchDay} ${monthName} dengan durasi perjalanan selama 4 hari.`;
+
+        // Update UI
+        const launchEl = document.getElementById("rec-launch-time");
+        const landingEl = document.getElementById("rec-landing-time");
+        const expEl = document.getElementById("rec-explanation-paragraph");
+
+        if (launchEl) launchEl.textContent = launchText;
+        if (landingEl) landingEl.textContent = landingText;
+        if (expEl) expEl.textContent = explanationText;
+
+        // Auto Scroll to Result Slide
+        setTimeout(() => {
+          scrollToRecSlide("result");
+          playAvionicBeep(1020, 'triangle');
+          showToast(`Jadwal Terhitung: Pendaratan Optimal pada ${landingText}`);
+        }, 500);
+
+      }, 2100);
     }
 
     // Smart Finder Modal Handlers (Alias to calculateMissionSchedule)
