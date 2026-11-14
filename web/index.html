@@ -892,35 +892,102 @@
   </main>
 
   <!-- ===================================================================== -->
-  <!-- LAYAR 3: SIMULASI PENERBANGAN 3D REAL-TIME (BUMI KE BULAN) -->
+  <!-- LAYAR 3: SIMULASI PENERBANGAN & UJI PENDARATAN (SOLUSI 3) -->
   <!-- ===================================================================== -->
-  <main id="view-simulasi" class="bento-container" style="display: none;">
-    <!-- Sub-header Mode Simulator -->
-    <div class="bento-card bento-full" style="padding: 12px 16px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="font-size: 13px; font-weight: 800; color: var(--text-primary);">MODE SIMULATOR:</span>
-        <div class="segmented-tabs">
-          <button class="tab-btn active" id="btn-mode-3d" onclick="switchTestbedMode('3d')">
-            Simulator 3D Misi Penuh (Bumi ke Bulan)
-          </button>
-          <button class="tab-btn" id="btn-mode-2d" onclick="switchTestbedMode('2d')">
-            Uji Cockpit Manual (2D Physics)
-          </button>
+  <main id="view-simulasi" class="bento-container" style="display: none; max-width: 1240px; margin: 0 auto; gap: 16px;">
+    
+    <!-- Header Solusi 3 (Konsisten dengan Solusi 1 & 2) -->
+    <div class="bento-card bento-full" style="padding: 24px 28px; background: #ffffff;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+        <div style="display: inline-block; background: rgba(14, 116, 144, 0.1); color: var(--artemis-blue); border: 1px solid rgba(14, 116, 144, 0.25); padding: 4px 14px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase;">
+          SOLUSI 3 — SIMULASI PENERBANGAN &amp; UJI PENDARATAN
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; font-size: 11px; font-weight: 800; padding: 4px 14px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px;">
+          <span style="width: 7px; height: 7px; background: #10b981; border-radius: 50%;"></span>
+          <span>STATUS: GO FOR POWERED DESCENT INITIATION (PDI)</span>
         </div>
       </div>
-      <div>
-        <a href="/simulator.html" target="_blank" class="btn-finder-hero" style="padding: 8px 18px; font-size: 12px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-          Buka Fullscreen di Tab Baru &rarr;
-        </a>
+
+      <h2 style="font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0 0 8px; letter-spacing: -0.4px;">
+        Validasi Dinamika Terbang (Powered Descent &amp; Landing) Menuju Mons Mouton Crest
+      </h2>
+
+      <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 16px; max-width: 980px;">
+        Uji simulasi lintasan deselerasi wahana pendarat (Human Landing System - HLS) dari orbit rendah Bulan (15 km) hingga mendarat selamat (<em>touchdown</em>) di <strong>Mons Mouton Crest (-84,9°S, 33,3°W)</strong>. Sistem memadukan integrator numerik <strong>SciPy RK45</strong> dengan model gravitasi Bulan <strong>LP150Q (J2)</strong> untuk memverifikasi batas kecepatan benturan aman ($V_z \le 1{,}0\text{ m/s}$), margin propelan kontinjensi, dan jarak klirens tebing kawah.
+      </p>
+
+      <!-- Target Info Strip -->
+      <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-sm); padding: 8px 16px; font-size: 11.5px; color: var(--text-secondary);">
+        <span>📍 <strong>Target Koordinat:</strong> Mons Mouton Crest (-84,9°S, 33,3°W)</span>
+        <span style="color: #cbd5e1;">•</span>
+        <span>⛰️ <strong>Elevasi Puncak:</strong> +5.920 meter</span>
+        <span style="color: #cbd5e1;">•</span>
+        <span>📐 <strong>Kemiringan Permukaan:</strong> 0,08° (Datar &amp; Bebas Terguling)</span>
+        <span style="color: #cbd5e1;">•</span>
+        <span>📡 <strong>Klirens Sinyal DTE:</strong> +12,35° di atas tebing</span>
       </div>
     </div>
 
+    <!-- 3 Kartu Tahapan Misi Pendaratan (3 Flight Phases - Guided by NASA Experts) -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;" class="bento-full">
+      
+      <!-- Fase 1 -->
+      <div style="background: #ffffff; border: 1px solid #e2e8f0; border-top: 4px solid var(--artemis-blue); border-radius: var(--radius-md); padding: 14px 16px; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <span style="font-size: 20px;">🚀</span>
+          <span style="font-size: 10px; font-weight: 800; color: var(--artemis-blue); background: #e0f2fe; padding: 2px 8px; border-radius: 999px;">FASE 1</span>
+        </div>
+        <h4 style="font-size: 13.5px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
+          Powered Descent Initiation (PDI @ 15 km)
+        </h4>
+        <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.45; margin: 0;">
+          Wahana menyalakan mesin utama secara berlawanan (<em>retro-burn</em>) pada ketinggian 15.000 m dengan kecepatan awal ~1.690 m/s untuk keluar dari orbit rendah Bulan dan memulai pembelokan lintasan pendaratan.
+        </p>
+      </div>
+
+      <!-- Fase 2 -->
+      <div style="background: #ffffff; border: 1px solid #e2e8f0; border-top: 4px solid #f59e0b; border-radius: var(--radius-md); padding: 14px 16px; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <span style="font-size: 20px;">⛰️</span>
+          <span style="font-size: 10px; font-weight: 800; color: #b45309; background: #fef3c7; padding: 2px 8px; border-radius: 999px;">FASE 2</span>
+        </div>
+        <h4 style="font-size: 13.5px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
+          Pendekatan Kritis &amp; Klirens Tebing (&gt;180 m)
+        </h4>
+        <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.45; margin: 0;">
+          Manuver <em>pitch-over</em> di ketinggian 2.500 m – 200 m membuktikan lintasan wahana melintas tinggi di atas bibir tebing kawah Mons Mouton dengan margin bebas aman &gt;180 m serta transmisi radio ke Bumi tetap terkunci.
+        </p>
+      </div>
+
+      <!-- Fase 3 -->
+      <div style="background: #ffffff; border: 1px solid #e2e8f0; border-top: 4px solid var(--emerald-safe); border-radius: var(--radius-md); padding: 14px 16px; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <span style="font-size: 20px;">🎯</span>
+          <span style="font-size: 10px; font-weight: 800; color: var(--emerald-safe); background: #dcfce7; padding: 2px 8px; border-radius: 999px;">FASE 3</span>
+        </div>
+        <h4 style="font-size: 13.5px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
+          Terminal Descent &amp; Touchdown (Vz = 0,80 m/s)
+        </h4>
+        <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.45; margin: 0;">
+          Kaki pendarat menyentuh dataran tinggi Mons Mouton pada kemiringan datar 0,08° dengan kecepatan vertikal 0,80 m/s (di bawah batas toleransi bahaya NASA 1,0 m/s) dan sisa propelan kontinjensi 32,9%.
+        </p>
+      </div>
+
+    </div>
+
     <!-- PDI Flight Dynamics & Trajectory Chart Solver -->
-    <div class="bento-card bento-full">
-      <div class="card-header">
-        <span class="card-title">Powered Descent Initiation (PDI) Solver (RK45 &amp; J2 Gravitasi)</span>
-        <button class="btn-recalc" id="btn-recalc-pdi">
-          Hitung Ulang Trajektori RK45
+    <div class="bento-card bento-full" style="background: #ffffff;">
+      <div class="card-header" style="padding-bottom: 8px; border-bottom: 1px solid var(--border-light); margin-bottom: 6px;">
+        <div>
+          <span class="card-title" style="font-size: 13.5px; font-weight: 800; color: var(--text-primary);">
+            📊 Telemetri Dinamika Terbang PDI (SciPy RK45 &amp; Model Gravitasi LP150Q)
+          </span>
+          <span style="font-size: 11px; color: var(--text-muted); display: block; margin-top: 2px;">
+            Hasil integrasi numerik lintasan deselerasi wahana pendarat dari orbit ke permukaan Bulan.
+          </span>
+        </div>
+        <button class="btn-recalc" id="btn-recalc-pdi" style="font-size: 11.5px; padding: 6px 14px; border-radius: 6px; cursor: pointer;">
+          ⟳ Hitung Ulang Trajektori RK45
         </button>
       </div>
 
@@ -929,55 +996,120 @@
         <div class="data-tile">
           <div class="tile-lbl">Total Delta-V Dibutuhkan</div>
           <div class="tile-val" id="m-dv" style="color: var(--artemis-blue);">1,714.8 m/s</div>
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Anggaran Propelan Optimal</div>
         </div>
         <div class="data-tile">
           <div class="tile-lbl">Propelan Sisa (Margin)</div>
-          <div class="tile-val" id="m-prop" style="color: var(--emerald-safe);">115.3 kg (25.6%)</div>
+          <div class="tile-val" id="m-prop" style="color: var(--emerald-safe);">115.3 kg (32.9%)</div>
+          <div style="font-size: 10px; color: var(--emerald-safe); margin-top: 2px;">✓ Standar NASA &gt; 20%</div>
         </div>
         <div class="data-tile">
           <div class="tile-lbl">Vz Touchdown (Vertikal)</div>
           <div class="tile-val" id="m-vz" style="color: var(--emerald-safe);">0.80 m/s (Aman)</div>
+          <div style="font-size: 10px; color: var(--emerald-safe); margin-top: 2px;">✓ Batas Kritis NASA &le; 1.0 m/s</div>
         </div>
         <div class="data-tile">
           <div class="tile-lbl">Jarak Bebas Tebing Kawah</div>
           <div class="tile-val" id="m-clearance" style="color: var(--emerald-safe);">&gt; 180 m (Aman)</div>
+          <div style="font-size: 10px; color: var(--emerald-safe); margin-top: 2px;">✓ Bebas Blind Spot Tebing</div>
         </div>
       </div>
 
-      <div class="chart-container" id="pdi-chart-box" style="margin-top: 10px;">
-        <span style="color: var(--text-dim); font-size: 12px;">Profil deselerasi pendaratan akan tampil di sini</span>
+      <!-- Chart Display Container -->
+      <div class="chart-container" id="pdi-chart-box" style="margin-top: 10px; min-height: 260px; height: 260px; background: #ffffff;">
+        <span style="color: var(--text-dim); font-size: 12px;">Memuat profil deselerasi pendaratan RK45...</span>
+      </div>
+    </div>
+
+    <!-- Sub-header Mode Simulator & Switcher -->
+    <div class="bento-card bento-full" style="padding: 12px 18px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; background: #ffffff;">
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <span style="font-size: 12.5px; font-weight: 800; color: var(--text-primary);">PILIH METODE PENGUJIAN:</span>
+        <div class="segmented-tabs">
+          <button class="tab-btn active" id="btn-mode-3d" onclick="switchTestbedMode('3d')">
+            🚀 Simulator 3D Misi Penuh (Bumi ke Bulan &amp; HLS)
+          </button>
+          <button class="tab-btn" id="btn-mode-2d" onclick="switchTestbedMode('2d')">
+            🎮 Uji Cockpit Manual (2D Physics &amp; Autopilot)
+          </button>
+        </div>
+      </div>
+      <div>
+        <a href="/simulator.html" target="_blank" class="btn-finder-hero" style="padding: 7px 16px; font-size: 11.5px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          <span>Buka 3D Fullscreen di Tab Baru</span>
+          <span>&nearr;</span>
+        </a>
       </div>
     </div>
 
     <!-- Viewer Containers (3D Embed & 2D Manual Canvas) -->
-    <div class="bento-card bento-full" style="padding: 0; overflow: hidden;">
-      <div id="testbed-subview-3d" style="width: 100%; height: 680px; background: #030712;">
-        <iframe src="/simulator.html" style="width: 100%; height: 100%; border: none; display: block;"></iframe>
+    <div class="bento-card bento-full" style="padding: 0; overflow: hidden; border: 1px solid var(--border-medium); border-radius: var(--radius-md);">
+      
+      <!-- Mode 1: 3D Mission Simulator (Starship HLS / Artemis Lander) -->
+      <div id="testbed-subview-3d" style="width: 100%; height: 680px; background: #030712; position: relative;">
+        <iframe src="/simulator.html" style="width: 100%; height: 100%; border: none; display: block;" title="3D Lunar Mission Simulator"></iframe>
       </div>
 
-      <div id="testbed-subview-2d" style="display: none; flex-direction: column; gap: 14px; padding: 16px;">
-        <div class="testbed-canvas-box">
-          <canvas id="cockpitCanvas"></canvas>
+      <!-- Mode 2: 2D Cockpit Manual Testbed -->
+      <div id="testbed-subview-2d" style="display: none; flex-direction: column; gap: 14px; padding: 18px; background: #030712;">
+        <div class="testbed-canvas-box" style="position: relative; border-radius: 6px; overflow: hidden; border: 1px solid #1e293b;">
+          <canvas id="cockpitCanvas" style="width: 100%; height: 420px; display: block;"></canvas>
         </div>
 
-        <div class="testbed-bar">
-          <div>
-            Kendali Pendaratan: 
-            <span class="kbd-tag">SPACE / W</span> Main Engine &nbsp;•&nbsp; 
-            <span class="kbd-tag">A / D</span> RCS Roll &nbsp;•&nbsp; 
-            <span class="kbd-tag">R</span> Reset Posisi
+        <div class="testbed-bar" style="background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 8px; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div style="font-size: 12px; color: #94a3b8;">
+            <strong style="color: #ffffff;">Kendali Manual:</strong> 
+            <span class="kbd-tag" style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #38bdf8;">SPACE / W / &uarr;</span> Main Engine &nbsp;•&nbsp; 
+            <span class="kbd-tag" style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #38bdf8;">A / D / &larr; / &rarr;</span> RCS Roll &nbsp;•&nbsp; 
+            <span class="kbd-tag" style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: monospace; color: #facc15;">R</span> Reset
           </div>
           <div style="display: flex; gap: 8px;">
-            <button class="tab-btn" id="btn-sim-reset" style="background: var(--bg-subtle);">
-              [RESET] Posisi Awal
+            <button class="tab-btn" id="btn-sim-reset" style="background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 6px 14px; font-size: 11.5px; border-radius: 6px; cursor: pointer;">
+              ⟳ Reset Posisi
             </button>
-            <button class="tab-btn" id="btn-sim-auto" style="background: var(--bg-selected); color: var(--artemis-blue);">
-              [AUTOPILOT] Descent Guidance
+            <button class="tab-btn" id="btn-sim-auto" style="background: #0284c7; color: #ffffff; border: none; padding: 6px 16px; font-size: 11.5px; font-weight: 800; border-radius: 6px; cursor: pointer;">
+              🤖 [AUTOPILOT] Descent Guidance
             </button>
           </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Transparansi Asumsi Ilmiah (NASA Technical Reference & Model Assumptions) -->
+    <div class="bento-card bento-full" style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 16px 20px;">
+      <div style="font-size: 11px; font-weight: 800; color: var(--artemis-blue); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px;">
+        REFERENSI DATASET &amp; ASUMSI FISIKA SIMULATOR (NASA SPACE APPS CHALLENGE)
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; font-size: 11.5px; color: var(--text-secondary); line-height: 1.5;">
+        <div>
+          <strong style="color: var(--text-primary);">• Model Gravitasi &amp; Efemeris:</strong><br>
+          Menggunakan konstanta gravitasi Bulan $g_{moon} = 1{,}62\text{ m/s}^2$ dengan koreksi gravitasi harmonik sferikal $J_2$ (NASA LP150Q) dan data posisi benda langit dari NASA JPL Horizons System (DE440/DE441).
+        </div>
+        <div>
+          <strong style="color: var(--text-primary);">• Topografi &amp; Deteksi Hambatan:</strong><br>
+          Ketinggian elevasi tebing dan kemiringan lereng dihitung dari NASA Lunar Reconnaissance Orbiter (LRO) LOLA Digital Elevation Model resolusi 20 meter/piksel.
+        </div>
+        <div>
+          <strong style="color: var(--text-primary);">• Parameter Wahana Pendarat (HLS):</strong><br>
+          Massa kering 450 kg, propelan awal 350 kg, daya dorong mesin deselerasi 3.200 N dengan $I_{sp} = 310\text{ detik}$, menghasilkan margin cadangan bahan bakar aman sebesar 32,9%.
         </div>
       </div>
     </div>
+
+    <!-- Bottom Navigation Footer: Antar-Solusi Mulus -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+      <button onclick="switchView('visualisasi')" class="btn-hud" style="padding: 10px 18px; font-size: 12.5px; font-weight: 700; background: #ffffff; color: var(--text-primary); border: 1px solid var(--border-medium); border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm);">
+        <span>&larr;</span>
+        <span>Kembali ke Solusi 2: Visualisasi Topografi &amp; Sinyal</span>
+      </button>
+
+      <button onclick="switchView('rekomendasi')" class="btn-hud" style="padding: 10px 18px; font-size: 12.5px; font-weight: 700; background: #ffffff; color: var(--artemis-blue); border: 1px solid var(--artemis-blue); border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm);">
+        <span>Tinjau Kembali Solusi 1: Rekomendasi Waktu</span>
+        <span>&rarr;</span>
+      </button>
+    </div>
+
   </main>
 
   <!-- MODAL: PENCARI REKOMENDASI  <!-- MODAL: PENCARI REKOMENDASI PENDARATAN OTOMATIS (SMART LANDING FINDER) -->
@@ -1075,6 +1207,6 @@
   </div>
 
   <!-- JAVASCRIPT SYSTEM ENGINE -->
-  <script src="/js/app.js?v=25"></script>
+  <script src="/js/app.js?v=26"></script>
 </body>
 </html>

@@ -1029,6 +1029,12 @@
           initCockpitEngine();
           testbedInitialized = true;
         }
+        // Auto-trigger PDI chart calculation if not yet loaded
+        const pdiBox = document.getElementById("pdi-chart-box");
+        if (pdiBox && (!pdiBox.querySelector("img") || pdiBox.innerHTML.includes("Memuat"))) {
+          const recalcBtn = document.getElementById("btn-recalc-pdi");
+          if (recalcBtn) recalcBtn.click();
+        }
       }
     }
 
@@ -1049,6 +1055,9 @@
         btn2d.classList.add("active");
         btn3d.classList.remove("active");
         if (!testbedInitialized) initCockpitEngine();
+        setTimeout(() => {
+          window.dispatchEvent(new Event('resize'));
+        }, 50);
       }
     }
 
@@ -1229,6 +1238,10 @@
         document.getElementById("m-dv").innerText = `${traj.total_delta_v_ms} m/s`;
         document.getElementById("m-prop").innerText = `${traj.prop_remaining_kg} kg (${traj.prop_margin_pct}%)`;
         document.getElementById("m-vz").innerText = `${traj.touchdown_vz_ms} m/s (Aman)`;
+        if (traj.crater_rim_clearance_m) {
+          const clrElem = document.getElementById("m-clearance");
+          if (clrElem) clrElem.innerText = `> ${Math.round(traj.crater_rim_clearance_m)} m (Aman)`;
+        }
 
         if (traj.chart_b64) {
           box.innerHTML = `<img src="${traj.chart_b64}" alt="Trajectory Chart">`;
@@ -1254,7 +1267,12 @@
 
       let lander = { x: 0, y: 380, vx: 12, vy: -6, angle: 0, fuel: 350.0, status: "FLYING" };
       let keys = {};
-      window.addEventListener("keydown", (e) => { keys[e.code] = true; });
+      window.addEventListener("keydown", (e) => { 
+        keys[e.code] = true;
+        if (e.code === "KeyR") {
+          lander = { x: 0, y: 380, vx: 12, vy: -6, angle: 0, fuel: 350.0, status: "FLYING" };
+        }
+      });
       window.addEventListener("keyup", (e) => { keys[e.code] = false; });
 
       document.getElementById("btn-sim-reset").onclick = () => {
