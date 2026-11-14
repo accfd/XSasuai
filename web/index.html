@@ -1275,10 +1275,10 @@
   <!-- 1. COMPACT HEADER BAR -->
   <header>
     <div class="brand-group">
-      <div class="artemis-mark">XE</div>
+      <div class="artemis-mark">XA</div>
       <div class="brand-info">
         <h1>XASUAI — Lunar Landing Site Navigator</h1>
-        <p>Artemis Operations • Mons Mouton, Lunar South Pole (-84.9°S, 33.3°W)</p>
+        <p>Artemis Operations | Mons Mouton, Kutub Selatan Bulan (-84,9° LS, 33,3° BB)</p>
       </div>
     </div>
 
@@ -1288,13 +1288,13 @@
           Beranda
         </button>
         <button class="tab-btn" id="tab-btn-rekomendasi" onclick="switchView('rekomendasi')">
-          1. Rekomendasi
+          Rekomendasi
         </button>
         <button class="tab-btn" id="tab-btn-visualisasi" onclick="switchView('visualisasi')">
-          2. Visualisasi
+          Visualisasi
         </button>
         <button class="tab-btn" id="tab-btn-simulasi" onclick="switchView('simulasi')">
-          3. Simulasi
+          Simulasi
         </button>
       </div>
     </div>
@@ -1304,171 +1304,229 @@
   <!-- LAYAR 0: BERANDA / SISTEM OPERASI KENDALI MISI (FLIGHT DYNAMICS) -->
   <!-- ===================================================================== -->
   <main id="view-home" class="bento-container" style="display: grid;">
-    <div class="bento-card bento-full" style="background: var(--bg-surface); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); color: var(--text-primary); padding: 32px 36px; border-radius: var(--radius-lg);">
-      <div style="max-width: 1060px; margin: 0 auto; text-align: center;">
+    <div class="bento-card bento-full" style="background: var(--bg-surface); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); color: var(--text-primary); padding: 36px 40px; border-radius: var(--radius-lg);">
+      <div style="max-width: 1080px; margin: 0 auto; text-align: center;">
         
         <!-- Header Status & Telemetri Real-Time -->
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; border-bottom: 1px solid var(--border-light); padding-bottom: 16px;">
           <div style="display: flex; align-items: center; gap: 8px;">
             <span class="step-badge" style="background: #eff6ff; border: 1px solid #bfdbfe; color: var(--artemis-blue); padding: 5px 14px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 800; letter-spacing: 0.8px;">
-              ARTEMIS LUNAR OPERATIONS SUITE // FLIGHT DYNAMICS CONSOLE // ACTIVE
+              ARTEMIS LUNAR OPERATIONS SUITE // FLIGHT DYNAMICS CONSOLE | ACTIVE
             </span>
           </div>
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <div class="api-status-chip" style="background: var(--emerald-bg); border: 1px solid var(--emerald-border); color: var(--emerald-safe); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-pill);">
-              <span class="dot-online"></span> NASA JPL HORIZONS: ONLINE
+              <span class="dot-online"></span> NASA JPL Horizons: Online
             </div>
             <div class="mission-status-pill" style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: var(--radius-pill);">
-              SYSTEM STATUS: READY (FLIGHT OPS GO)
+              Status Sistem: Siap Beroperasi (Flight Ops Go)
             </div>
           </div>
         </div>
 
-        <h1 style="font-size: 28px; font-weight: 900; color: var(--text-primary); margin: 0 0 10px; letter-spacing: -0.5px;">
-          XASUAI — Mons Mouton Lunar Landing Navigator
+        <!-- Headline & Ringkasan Sistem -->
+        <h1 style="font-size: 26px; font-weight: 900; color: var(--text-primary); margin: 0 0 12px; letter-spacing: -0.5px;">
+          XASUAI — Sistem Navigasi Lokasi Pendaratan di Bulan
         </h1>
-        <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; max-width: 860px; margin: 0 auto 32px;">
-          Sistem otomasi navigasi lokasi pendaratan presisi dan solver trajektori penerbangan 6-DOF Artemis di dataran tinggi <strong style="color: var(--text-primary);">Mons Mouton, Kutub Selatan Bulan (-84.9°S, 33.3°W)</strong>.
+        <p style="font-size: 14.5px; color: var(--text-secondary); line-height: 1.7; max-width: 880px; margin: 0 auto 36px; text-align: center;">
+          XASUAI adalah sistem yang membantu menentukan lokasi dan waktu pendaratan terbaik bagi wahana Artemis di <strong>Mons Mouton, Kutub Selatan Bulan</strong>. Sistem ini menganalisis kondisi lingkungan, bentuk permukaan Bulan, serta pergerakan wahana untuk memastikan pendaratan berlangsung aman dan terkendali.
         </p>
 
-        <!-- 3 Peringatan Bahaya Operasional Kritis (Critical Mission Hazards) -->
-        <div style="text-align: left; margin-bottom: 32px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
-            <div style="font-size: 11px; font-weight: 800; color: var(--coral-crit); letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
-              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--coral-crit);"></span>
-              CRITICAL MISSION HAZARDS // LUNAR SOUTH POLE ENVIRONMENT
-            </div>
-            <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">
-              Tantangan Kritis yang Wajib Diatasi Sebelum Pendaratan
-            </span>
+        <!-- Bagian 1: Tiga Masalah Utama -->
+        <div style="text-align: left; margin-bottom: 36px;">
+          <div style="margin-bottom: 16px;">
+            <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px; display: flex; align-items: center; gap: 8px;">
+              <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--coral-crit);"></span>
+              Tantangan Utama Pendaratan di Kutub Selatan Bulan
+            </h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+              Ada tiga masalah utama yang harus diatasi sebelum wahana dapat mendarat dengan aman.
+            </p>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px;">
-            <!-- Hazard 1 -> Maps to Tahap 1 -->
-            <div style="background: #fffafa; border: 1px solid #fecaca; border-radius: var(--radius-md); padding: 18px 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 18px;">
+            <!-- Masalah 1 -->
+            <div style="background: #fffafa; border: 1px solid #fecaca; border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
               <div>
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
-                  <div style="font-size: 11px; font-weight: 800; color: #b91c1c; letter-spacing: 0.5px;">
-                    HAZARD 01 — FLUKTUASI PENYINARAN &amp; BLACKOUT KOMUNIKASI
-                  </div>
+                <div style="font-size: 12px; font-weight: 800; color: #b91c1c; margin-bottom: 12px; letter-spacing: 0.3px;">
+                  MASALAH 1 — Keterbatasan Sinar Matahari dan Komunikasi
                 </div>
-                <p style="font-size: 12.5px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 14px;">
-                  Sudut datang surya dan elevasi Bumi sangat rendah (&le; 2.5°). Wahana berisiko terjebak di dalam bayangan abadi (suhu ekstrem <strong style="color: #b91c1c;">-240°C</strong> yang membekukan sel baterai) serta kehilangan sinyal kendali telemetri Bumi.
-                </p>
+                <div style="margin-bottom: 12px;">
+                  <div style="font-size: 11px; font-weight: 800; color: #991b1b; text-transform: uppercase; margin-bottom: 4px;">
+                    Apa masalahnya?
+                  </div>
+                  <p style="font-size: 12.5px; line-height: 1.6; color: var(--text-secondary); margin: 0;">
+                    Di Kutub Selatan Bulan, sinar Matahari dan arah Bumi berada pada sudut yang sangat rendah. Akibatnya, beberapa wilayah tidak mendapatkan sinar Matahari dalam waktu lama dan mengalami suhu ekstrem hingga <strong>-240°C</strong>. Kondisi ini dapat mengganggu pasokan listrik wahana. Selain itu, kawah dan perbukitan dapat menghalangi sinyal komunikasi dengan Bumi.
+                  </p>
+                </div>
               </div>
-              <div style="padding-top: 10px; border-top: 1px solid #fee2e2; font-size: 10px; font-weight: 800; color: #b91c1c; display: flex; align-items: center; justify-content: space-between;">
-                <span>TARGET PENYELESAIAN:</span>
-                <span style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 2px 8px; border-radius: 4px;">DISELESAIKAN OLEH TAHAP 1 &rarr;</span>
+              <div style="background: #ffffff; border: 1px solid #fed7d7; border-radius: 6px; padding: 10px 12px; margin-top: 10px;">
+                <div style="font-size: 11px; font-weight: 800; color: #b91c1c; margin-bottom: 4px;">
+                  Solusi 1 — Rekomendasi Waktu Pendaratan
+                </div>
+                <div style="font-size: 12px; line-height: 1.5; color: var(--text-secondary);">
+                  Sistem menganalisis pergerakan Matahari dan posisi Bumi untuk mencari waktu pendaratan ketika lokasi mendapat sinar Matahari yang cukup dan memiliki jalur komunikasi langsung dengan Bumi.
+                </div>
               </div>
             </div>
 
-            <!-- Hazard 2 -> Maps to Tahap 2 -->
-            <div style="background: #fffdf5; border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 18px 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+            <!-- Masalah 2 -->
+            <div style="background: #fffdf5; border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
               <div>
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
-                  <div style="font-size: 11px; font-weight: 800; color: #b45309; letter-spacing: 0.5px;">
-                    HAZARD 02 — KEMIRINGAN LERENG CURAM &amp; RINTANGAN TEBING
-                  </div>
+                <div style="font-size: 12px; font-weight: 800; color: #b45309; margin-bottom: 12px; letter-spacing: 0.3px;">
+                  MASALAH 2 — Permukaan Tidak Rata dan Lereng Curam
                 </div>
-                <p style="font-size: 12.5px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 14px;">
-                  Topografi kawah Mons Mouton dikelilingi jurang ribuan meter. Ambang batas Artemis HLS mewajibkan <strong style="color: #b45309;">kemiringan lereng &lt; 10°</strong> guna mencegah bahaya wahana terbalik (rollover), dan bibir kawah tidak boleh memblokir antena.
-                </p>
+                <div style="margin-bottom: 12px;">
+                  <div style="font-size: 11px; font-weight: 800; color: #92400e; text-transform: uppercase; margin-bottom: 4px;">
+                    Apa masalahnya?
+                  </div>
+                  <p style="font-size: 12.5px; line-height: 1.6; color: var(--text-secondary); margin: 0;">
+                    Permukaan Mons Mouton memiliki banyak kawah, lereng curam, dan tebing. Jika wahana mendarat di permukaan yang terlalu miring, wahana dapat tergelincir atau terbalik. Selain itu, tebing di sekitar lokasi dapat menghalangi komunikasi dengan Bumi.
+                  </p>
+                </div>
               </div>
-              <div style="padding-top: 10px; border-top: 1px solid #fef3c7; font-size: 10px; font-weight: 800; color: #b45309; display: flex; align-items: center; justify-content: space-between;">
-                <span>TARGET PENYELESAIAN:</span>
-                <span style="background: #fef3c7; border: 1px solid #fcd34d; color: #92400e; padding: 2px 8px; border-radius: 4px;">DISELESAIKAN OLEH TAHAP 2 &rarr;</span>
+              <div style="background: #ffffff; border: 1px solid #fef3c7; border-radius: 6px; padding: 10px 12px; margin-top: 10px;">
+                <div style="font-size: 11px; font-weight: 800; color: #b45309; margin-bottom: 4px;">
+                  Solusi 2 — Visualisasi dan Analisis Topografi
+                </div>
+                <div style="font-size: 12px; line-height: 1.5; color: var(--text-secondary);">
+                  Sistem menampilkan bentuk permukaan Bulan dalam tampilan 2D dan 3D. Setiap lokasi dianalisis untuk mengukur kemiringan tanah dan memastikan tidak ada penghalang yang mengganggu komunikasi.
+                </div>
               </div>
             </div>
 
-            <!-- Hazard 3 -> Maps to Tahap 3 -->
-            <div style="background: #f8faff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 18px 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+            <!-- Masalah 3 -->
+            <div style="background: #f8faff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
               <div>
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 8px;">
-                  <div style="font-size: 11px; font-weight: 800; color: #1d4ed8; letter-spacing: 0.5px;">
-                    HAZARD 03 — DESELERASI KECEPATAN ORBIT &amp; RISIKO CRASH
-                  </div>
+                <div style="font-size: 12px; font-weight: 800; color: #1d4ed8; margin-bottom: 12px; letter-spacing: 0.3px;">
+                  MASALAH 3 — Kecepatan Wahana dan Risiko Kecelakaan Pendaratan
                 </div>
-                <p style="font-size: 12.5px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 14px;">
-                  Wahana meluncur dari kecepatan orbit 1.690 m/s pada ketinggian 15 km menuju pendaratan. Kesalahan profil gaya dorong dapat menghabiskan propelan di udara atau mengakibatkan hantaman permukaan yang fatal (<strong style="color: #1d4ed8;">hard crash</strong>).
-                </p>
+                <div style="margin-bottom: 12px;">
+                  <div style="font-size: 11px; font-weight: 800; color: #1e40af; text-transform: uppercase; margin-bottom: 4px;">
+                    Apa masalahnya?
+                  </div>
+                  <p style="font-size: 12.5px; line-height: 1.6; color: var(--text-secondary); margin: 0;">
+                    Sebelum mendarat, wahana bergerak dengan kecepatan sangat tinggi saat mengorbit Bulan. Wahana harus mengurangi kecepatannya secara bertahap menggunakan mesin pendorong. Jika pengereman tidak tepat, bahan bakar dapat habis sebelum pendaratan atau wahana menghantam permukaan Bulan dengan kecepatan berbahaya.
+                  </p>
+                </div>
               </div>
-              <div style="padding-top: 10px; border-top: 1px solid #dbeafe; font-size: 10px; font-weight: 800; color: #1d4ed8; display: flex; align-items: center; justify-content: space-between;">
-                <span>TARGET PENYELESAIAN:</span>
-                <span style="background: #dbeafe; border: 1px solid #93c5fd; color: #1e40af; padding: 2px 8px; border-radius: 4px;">DISELESAIKAN OLEH TAHAP 3 &rarr;</span>
+              <div style="background: #ffffff; border: 1px solid #dbeafe; border-radius: 6px; padding: 10px 12px; margin-top: 10px;">
+                <div style="font-size: 11px; font-weight: 800; color: #1d4ed8; margin-bottom: 4px;">
+                  Solusi 3 — Simulasi Penerbangan dan Pendaratan
+                </div>
+                <div style="font-size: 12px; line-height: 1.5; color: var(--text-secondary);">
+                  Sistem menyimulasikan pergerakan wahana, mengatur pengereman, dan menghitung kebutuhan bahan bakar. Tujuannya adalah memastikan wahana dapat mengurangi kecepatan secara aman hingga menyentuh permukaan Bulan dengan kecepatan rendah.
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 3 Tahapan Alur Kerja Operasional (Mission Flow) -->
-        <div style="text-align: left; margin-bottom: 36px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
-            <div style="font-size: 11px; font-weight: 800; color: var(--artemis-blue); letter-spacing: 1px; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
-              <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--artemis-blue);"></span>
-              OPERATIONAL MISSION FLOW // 3-PHASE EXECUTION
-            </div>
-            <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">
-              Solusi Terpadu Sistem XASUAI untuk Mengatasi Setiap Ancaman
-            </span>
+        <!-- Bagian 2: Tiga Tahap Alur Kerja -->
+        <div style="text-align: left; margin-bottom: 40px;">
+          <div style="margin-bottom: 16px;">
+            <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px; display: flex; align-items: center; gap: 8px;">
+              <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--artemis-blue);"></span>
+              Alur Kerja XASUAI — 3 Tahap Penyelesaian
+            </h2>
+            <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+              Setiap tahap dirancang untuk menyelesaikan satu masalah utama secara berurutan.
+            </p>
           </div>
 
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 16px;">
-            <!-- Tahap 1: Solusi Hazard 1 -->
-            <div style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid var(--artemis-blue); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 18px;">
+            <!-- Tahap 1 -->
+            <div style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid var(--artemis-blue); border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                   <span class="step-badge" style="background: var(--artemis-blue); color: #ffffff; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 1</span>
-                  <span style="font-size: 10px; font-weight: 800; color: #b91c1c; background: #fee2e2; border: 1px solid #fecaca; padding: 2px 8px; border-radius: 4px;">SOLUSI HAZARD 01</span>
+                  <span style="font-size: 11px; font-weight: 700; color: #b91c1c; font-style: italic;">Solusi untuk Masalah 1</span>
                 </div>
-                <h4 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0 0 8px;">Rekomendasi (MCDA Engine)</h4>
+                <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
+                  TAHAP 1 — Menentukan Waktu Pendaratan
+                </h3>
+                <div style="font-size: 12px; font-weight: 700; color: var(--artemis-blue); margin-bottom: 10px;">
+                  Mesin Rekomendasi (MCDA Engine)
+                </div>
                 <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 14px;">
-                  Solver multi-kriteria memindai 336 jam efemeris JPL Horizons &amp; model LOLA DEM untuk mengunci jendela waktu dengan <strong style="color: var(--text-primary);">100% suplai daya surya</strong> dan komunikasi DTE bebas bayangan kawah.
+                  Sistem menganalisis data pergerakan Matahari, posisi Bumi, dan kondisi permukaan Bulan selama 336 jam menggunakan data NASA JPL Horizons dan peta topografi LOLA DEM.
+                </p>
+                <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 14px;">
+                  Dari analisis tersebut, sistem memilih waktu pendaratan yang memberikan pencahayaan optimal dan jalur komunikasi langsung tanpa terhalang kawah.
                 </p>
               </div>
-              <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 6px; padding: 8px 12px; font-size: 11px; font-weight: 700; color: var(--artemis-blue);">
-                Hasil: 14 Nov 2026, 14:55 UTC (Skor 0.94 / 1.0)
+              <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px 12px; font-size: 11.5px; line-height: 1.6;">
+                <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">Hasil Analisis:</div>
+                <div style="color: var(--artemis-blue); font-weight: 600;">• Waktu rekomendasi: <strong>14 November 2026, 14.55 UTC</strong></div>
+                <div style="color: var(--artemis-blue); font-weight: 600;">• Skor kelayakan: <strong>0,94 dari 1,00</strong></div>
               </div>
             </div>
 
-            <!-- Tahap 2: Solusi Hazard 2 -->
-            <div style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid var(--emerald-safe); border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+            <!-- Tahap 2 -->
+            <div style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid var(--emerald-safe); border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                   <span class="step-badge" style="background: var(--emerald-safe); color: #ffffff; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 2</span>
-                  <span style="font-size: 10px; font-weight: 800; color: #b45309; background: #fef3c7; border: 1px solid #fde68a; padding: 2px 8px; border-radius: 4px;">SOLUSI HAZARD 02</span>
+                  <span style="font-size: 11px; font-weight: 700; color: #b45309; font-style: italic;">Solusi untuk Masalah 2</span>
                 </div>
-                <h4 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0 0 8px;">Visualisasi Topografi (2D/3D &amp; Horizon)</h4>
+                <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
+                  TAHAP 2 — Memeriksa Kondisi Permukaan
+                </h3>
+                <div style="font-size: 12px; font-weight: 700; color: var(--emerald-safe); margin-bottom: 10px;">
+                  Visualisasi Topografi (2D, 3D, dan Horizon)
+                </div>
                 <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 14px;">
-                  Evaluasi kontur tanah LOLA 2D (zoom/pan mikroskopik $1\times - 5\times$) untuk memvalidasi <strong style="color: var(--text-primary);">kemiringan lereng datar 0.08°</strong>, Globe 3D satelit, dan radar radial raymarching 360° klirens bibir kawah.
+                  Sistem menampilkan peta permukaan Bulan dalam bentuk 2D dan 3D. Pengguna dapat memperbesar dan menggeser peta untuk memeriksa kondisi tanah secara lebih detail.
+                </p>
+                <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 14px;">
+                  Sistem juga menganalisis kemiringan permukaan dan memeriksa apakah tebing di sekitar lokasi menghalangi jalur komunikasi.
                 </p>
               </div>
-              <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 6px; padding: 8px 12px; font-size: 11px; font-weight: 700; color: var(--emerald-safe);">
-                Hasil: Lereng 0.08° &lt; 10° | Klirens Sinyal +10.25°
+              <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px 12px; font-size: 11.5px; line-height: 1.6;">
+                <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">Hasil Analisis:</div>
+                <div style="color: var(--emerald-safe); font-weight: 600;">• Kemiringan permukaan: <strong>0,08°</strong> (batas maks 10°)</div>
+                <div style="color: var(--emerald-safe); font-weight: 600;">• Jarak bebas komunikasi: <strong>+10,25°</strong></div>
               </div>
             </div>
 
-            <!-- Tahap 3: Solusi Hazard 3 -->
-            <div style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid #0284c7; border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+            <!-- Tahap 3 -->
+            <div style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid #0284c7; border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                   <span class="step-badge" style="background: #0284c7; color: #ffffff; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 3</span>
-                  <span style="font-size: 10px; font-weight: 800; color: #1d4ed8; background: #dbeafe; border: 1px solid #bfdbfe; padding: 2px 8px; border-radius: 4px;">SOLUSI HAZARD 03</span>
+                  <span style="font-size: 11px; font-weight: 700; color: #1d4ed8; font-style: italic;">Solusi untuk Masalah 3</span>
                 </div>
-                <h4 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0 0 8px;">Simulasi Penerbangan (6-DOF Flight Dynamics)</h4>
+                <h3 style="font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
+                  TAHAP 3 — Menguji Proses Pendaratan
+                </h3>
+                <div style="font-size: 12px; font-weight: 700; color: #0284c7; margin-bottom: 10px;">
+                  Simulasi Penerbangan (6-DOF Flight Dynamics)
+                </div>
                 <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 14px;">
-                  Propagasi gravitasi non-sferis LP150Q (J2) dan solver RK45 bimbingan Kluever adaptif untuk mengendalikan pengereman retro hingga <strong style="color: var(--text-primary);">touchdown pendaratan lunak vertikal (Vz = 0.80 m/s)</strong>.
+                  Sistem menyimulasikan pergerakan wahana berdasarkan gaya gravitasi Bulan dan menguji pengaturan mesin pendorong selama proses pengereman.
+                </p>
+                <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 14px;">
+                  Simulasi ini digunakan untuk memastikan wahana dapat mengurangi kecepatan secara bertahap, mendarat dengan aman, dan tetap memiliki cadangan bahan bakar.
                 </p>
               </div>
-              <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 6px; padding: 8px 12px; font-size: 11px; font-weight: 700; color: #0284c7;">
-                Hasil: Vz = 0.80 m/s (&le; 1.5 m/s) | Propelan Sisa 25.6%
+              <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px 12px; font-size: 11.5px; line-height: 1.6;">
+                <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">Hasil Simulasi:</div>
+                <div style="color: #0284c7; font-weight: 600;">• Kecepatan vertikal: <strong>0,80 m/s</strong> (maks 1,5 m/s)</div>
+                <div style="color: #0284c7; font-weight: 600;">• Sisa bahan bakar: <strong>25,6%</strong></div>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Tombol Tindakan Utama (Hero CTA) -->
-        <div style="display: flex; justify-content: center;">
-          <button class="btn-finder-hero" onclick="switchView('rekomendasi')" style="font-size: 14px; font-weight: 800; padding: 16px 42px; letter-spacing: 0.5px; box-shadow: 0 4px 18px rgba(37, 99, 235, 0.35); border-radius: var(--radius-sm); cursor: pointer;">
+        <!-- Bagian 3: Mulai Analisis Lokasi Pendaratan (CTA) -->
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 26px 24px; text-align: center; max-width: 760px; margin: 0 auto;">
+          <h2 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0 0 8px;">
+            Mulai Analisis Lokasi Pendaratan
+          </h2>
+          <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0 auto 20px; max-width: 580px;">
+            Gunakan XASUAI untuk menentukan waktu pendaratan, memeriksa kondisi permukaan, dan menyimulasikan proses pendaratan wahana Artemis.
+          </p>
+          <button class="btn-finder-hero" onclick="switchView('rekomendasi')" style="font-size: 14px; font-weight: 800; padding: 15px 38px; letter-spacing: 0.5px; box-shadow: 0 4px 18px rgba(37, 99, 235, 0.35); border-radius: var(--radius-sm); cursor: pointer;">
             MASUK KE SISTEM REKOMENDASI PENDARATAN &rarr;
           </button>
         </div>
