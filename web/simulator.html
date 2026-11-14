@@ -193,10 +193,10 @@
       bottom: 0;
       left: 0;
       right: 0;
-      z-index: 20;
+      z-index: 30;
       padding: 24px 40px 24px;
       background: linear-gradient(to top, rgba(6, 8, 14, 0.95) 0%, rgba(6, 8, 14, 0.6) 70%, transparent 100%);
-      pointer-events: none;
+      pointer-events: auto;
     }
 
     .bottom-inner {
@@ -301,24 +301,31 @@
     }
 
     .play-btn {
-      width: 44px;
-      height: 44px;
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
       color: #ffffff;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 16px;
       font-weight: 800;
       transition: all 0.2s ease;
+      pointer-events: auto !important;
+      position: relative;
+      z-index: 35;
     }
     .play-btn:hover {
-      background: rgba(0, 212, 255, 0.2);
+      background: rgba(0, 212, 255, 0.25);
       border-color: #00d4ff;
-      transform: scale(1.05);
+      transform: scale(1.08);
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+    }
+    .play-btn:active {
+      transform: scale(0.95);
     }
 
     .phase-display {
@@ -1131,12 +1138,40 @@
       updateSimulation(parseFloat(e.target.value));
     });
 
-    window.togglePlay = () => {
+    function togglePlay() {
+      // Jika sudah di ujung akhir simulasi (Touchdown), putar ulang dari awal
+      if (simProgress >= 10000) {
+        simProgress = 0;
+      }
       isPlaying = !isPlaying;
       const btn = document.getElementById('btn-play');
-      btn.innerHTML = isPlaying ? "&#10074;&#10074;" : "&#9658;";
-      btn.style.color = isPlaying ? "#00d4ff" : "#ffffff";
-    };
+      if (btn) {
+        btn.innerHTML = isPlaying ? "&#10074;&#10074;" : "&#9658;";
+        btn.style.color = isPlaying ? "#00d4ff" : "#ffffff";
+        btn.style.borderColor = isPlaying ? "#00d4ff" : "rgba(255, 255, 255, 0.3)";
+        btn.title = isPlaying ? "Jeda Simulasi (Spasi)" : "Putar Simulasi (Spasi)";
+      }
+      console.log("Status playback simulator:", isPlaying ? "BERJALAN" : "DIJEDA");
+    }
+    window.togglePlay = togglePlay;
+
+    // Pasang Event Listener Langsung ke Tombol Play/Pause
+    const playBtn = document.getElementById('btn-play');
+    if (playBtn) {
+      playBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        togglePlay();
+      });
+    }
+
+    // Tombol Pintas Keyboard Spasi (Spacebar)
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        togglePlay();
+      }
+    });
 
     window.setSpeed = (spd) => {
       timeMultiplier = spd;
@@ -1171,7 +1206,12 @@
         if (simProgress >= 10000) {
           simProgress = 10000;
           isPlaying = false;
-          document.getElementById('btn-play').innerHTML = "&#9658;";
+          const btn = document.getElementById('btn-play');
+          if (btn) {
+            btn.innerHTML = "&#9658;";
+            btn.style.color = "#ffffff";
+            btn.style.borderColor = "rgba(255, 255, 255, 0.3)";
+          }
         }
         updateSimulation(simProgress);
       }
