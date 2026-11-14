@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>XASUAI — Lunar Landing Site Navigator | Artemis Mission Operations</title>
   <link rel="icon" type="image/png" href="/logo.png">
+  <script src="/three.min.js"></script>
   <style>
     /* =====================================================================
        CLEAN INDUSTRIAL AEROSPACE AESTHETIC (BENTO GRID - NASA/LINEAR STYLE)
@@ -1328,6 +1329,44 @@
         max-width: 100%;
       }
     }
+    /* Interactive Card Transitions & Hover Feedback */
+    .interactive-card {
+      cursor: pointer;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .interactive-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 14px 30px -4px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(37, 99, 235, 0.4);
+    }
+
+    .interactive-card:active {
+      transform: translateY(-2px);
+    }
+
+    .interactive-card .action-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      transition: all 0.2s ease;
+    }
+
+    .interactive-card:hover .action-hint {
+      transform: translateX(4px);
+    }
+
+    /* Smooth View Animations */
+    main.bento-container {
+      animation: fadeInView 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeInView {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body>
@@ -1344,19 +1383,22 @@
 
     <div class="header-actions">
       <div class="segmented-tabs">
-        <button class="tab-btn active" id="tab-btn-home" onclick="switchView('home')">
+        <button class="tab-btn active" id="tab-btn-home" onclick="switchView('home'); playAvionicBeep(520, 'sine');">
           Beranda
         </button>
-        <button class="tab-btn" id="tab-btn-rekomendasi" onclick="switchView('rekomendasi')">
+        <button class="tab-btn" id="tab-btn-rekomendasi" onclick="switchView('rekomendasi'); playAvionicBeep(640, 'sine');">
           Rekomendasi
         </button>
-        <button class="tab-btn" id="tab-btn-visualisasi" onclick="switchView('visualisasi')">
+        <button class="tab-btn" id="tab-btn-visualisasi" onclick="switchView('visualisasi'); playAvionicBeep(720, 'sine');">
           Visualisasi
         </button>
-        <button class="tab-btn" id="tab-btn-simulasi" onclick="switchView('simulasi')">
+        <button class="tab-btn" id="tab-btn-simulasi" onclick="switchView('simulasi'); playAvionicBeep(800, 'sine');">
           Simulasi
         </button>
       </div>
+      <button id="sfx-toggle-btn" class="tab-btn" onclick="toggleSFX()" style="border: 1px solid rgba(255,255,255,0.18); background: rgba(15,23,42,0.65); color: #38bdf8; font-size: 11px; padding: 6px 12px;" title="Nyalakan/Matikan Efek Suara Kokpit">
+        🔊 Audio HUD: ON
+      </button>
     </div>
   </header>
 
@@ -1371,9 +1413,59 @@
         <h1 style="font-size: 26px; font-weight: 900; color: var(--text-primary); margin: 0 0 12px; letter-spacing: -0.5px;">
           XASUAI — Sistem Navigasi Lokasi Pendaratan di Bulan
         </h1>
-        <p style="font-size: 14.5px; color: var(--text-secondary); line-height: 1.7; max-width: 880px; margin: 0 auto 36px; text-align: center;">
+        <p style="font-size: 14.5px; color: var(--text-secondary); line-height: 1.7; max-width: 880px; margin: 0 auto 28px; text-align: center;">
           XASUAI adalah sistem yang membantu menentukan lokasi dan waktu pendaratan terbaik bagi wahana Artemis di <strong>Mons Mouton, Kutub Selatan Bulan</strong>. Sistem ini menganalisis kondisi lingkungan, bentuk permukaan Bulan, serta pergerakan wahana untuk memastikan pendaratan berlangsung aman dan terkendali.
         </p>
+
+        <!-- INTERACTIVE 3D MOON EXPLORER WIDGET -->
+        <div style="background: #030712; border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-md); margin: 0 auto 36px; overflow: hidden; position: relative; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45); text-align: left;">
+          
+          <!-- Top HUD Bar -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; background: rgba(15, 23, 42, 0.85); border-bottom: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap; gap: 10px; z-index: 10; position: relative;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span class="step-badge" style="background: rgba(37, 99, 235, 0.3); border: 1px solid rgba(56, 189, 248, 0.5); color: #38bdf8; font-size: 10px; font-weight: 800; padding: 3px 10px; border-radius: var(--radius-pill);">
+                3D ORBITAL EXPLORER
+              </span>
+              <span style="font-size: 11px; font-weight: 700; color: #f8fafc; letter-spacing: 0.3px;">
+                Eksplorasi Interaktif Mons Mouton (-84.9° LS, 33.3° BB)
+              </span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <button class="btn-hud" onclick="toggleHomeGlobeRotation()" id="btn-home-rotate" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: #f8fafc; font-size: 11px; padding: 4px 10px; border-radius: 6px; cursor: pointer;">
+                ⟳ Putar Otomatis
+              </button>
+              <button class="btn-hud" onclick="focusHomeMonsMouton()" style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.2); color: #f8fafc; font-size: 11px; padding: 4px 10px; border-radius: 6px; cursor: pointer;">
+                🎯 Kunci Mons Mouton
+              </button>
+              <button class="btn-hud" onclick="switchView('visualisasi'); playAvionicBeep(720, 'sine');" style="background: var(--artemis-blue); border: none; color: #ffffff; font-size: 11px; font-weight: 800; padding: 5px 14px; border-radius: 6px; cursor: pointer;">
+                Buka Peta Topografi Penuh (Tahap 2) &rarr;
+              </button>
+            </div>
+          </div>
+
+          <!-- 3D Canvas Container -->
+          <div id="homeMoonContainer" style="width: 100%; height: 320px; position: relative; cursor: grab; background: radial-gradient(circle at center, #0f1d38 0%, #030712 100%);">
+            <!-- Loading indicator -->
+            <div id="homeMoonLoading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #38bdf8; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; z-index: 5;">
+              <div class="spinner" style="width: 18px; height: 18px; border: 2px solid rgba(56, 189, 248, 0.2); border-top-color: #38bdf8; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+              Memuat Model 3D Bulan &amp; Penanda Sasaran...
+            </div>
+          </div>
+
+          <!-- Bottom Telemetry HUD Bar -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; background: rgba(15, 23, 42, 0.9); border-top: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap; gap: 10px; font-size: 11px;">
+            <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap; color: #cbd5e1;">
+              <div><span style="color: #94a3b8;">SASARAN:</span> <strong style="color: #facc15;">MONS MOUTON CREST</strong></div>
+              <div><span style="color: #94a3b8;">KOORDINAT:</span> <strong style="color: #38bdf8;">-84.9° LS, 33.3° BB</strong></div>
+              <div><span style="color: #94a3b8;">ELEVASI:</span> <strong style="color: #34d399;">+5.920 m</strong></div>
+              <div><span style="color: #94a3b8;">KEMIRINGAN:</span> <strong style="color: #34d399;">0.08° (AMAT DATAR)</strong></div>
+            </div>
+            <div style="color: #94a3b8; font-style: italic; font-size: 10.5px;">
+              💡 Tips: Klik &amp; geser mouse untuk memutar Bulan 3D
+            </div>
+          </div>
+
+        </div>
 
         <!-- Bagian 1: Tiga Masalah Utama -->
         <div style="text-align: left; margin-bottom: 36px;">
@@ -1389,7 +1481,7 @@
 
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 18px;">
             <!-- Masalah 1 -->
-            <div style="background: #fffafa; border: 1px solid #fecaca; border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+            <div class="interactive-card" onclick="switchView('rekomendasi'); playAvionicBeep(640, 'sine');" style="background: #fffafa; border: 1px solid #fecaca; border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);" title="Klik untuk menuju Solusi Rekomendasi">
               <div>
                 <div style="font-size: 12px; font-weight: 800; color: #b91c1c; margin-bottom: 12px; letter-spacing: 0.3px;">
                   MASALAH 1 — Keterbatasan Sinar Matahari dan Komunikasi
@@ -1407,14 +1499,17 @@
                 <div style="font-size: 11px; font-weight: 800; color: #b91c1c; margin-bottom: 4px;">
                   Solusi 1 — Rekomendasi Waktu Pendaratan
                 </div>
-                <div style="font-size: 12px; line-height: 1.5; color: var(--text-secondary);">
+                <div style="font-size: 12px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 8px;">
                   Sistem menganalisis pergerakan Matahari dan posisi Bumi untuk mencari waktu pendaratan ketika lokasi mendapat sinar Matahari yang cukup dan memiliki jalur komunikasi langsung dengan Bumi.
+                </div>
+                <div class="action-hint" style="font-size: 11px; font-weight: 800; color: #b91c1c;">
+                  KLIK UNTUK SELESAIKAN DENGAN TAHAP 1 &rarr;
                 </div>
               </div>
             </div>
 
             <!-- Masalah 2 -->
-            <div style="background: #fffdf5; border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+            <div class="interactive-card" onclick="switchView('visualisasi'); playAvionicBeep(720, 'sine');" style="background: #fffdf5; border: 1px solid #fde68a; border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);" title="Klik untuk menuju Solusi Visualisasi Topografi">
               <div>
                 <div style="font-size: 12px; font-weight: 800; color: #b45309; margin-bottom: 12px; letter-spacing: 0.3px;">
                   MASALAH 2 — Permukaan Tidak Rata dan Lereng Curam
@@ -1432,14 +1527,17 @@
                 <div style="font-size: 11px; font-weight: 800; color: #b45309; margin-bottom: 4px;">
                   Solusi 2 — Visualisasi dan Analisis Topografi
                 </div>
-                <div style="font-size: 12px; line-height: 1.5; color: var(--text-secondary);">
+                <div style="font-size: 12px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 8px;">
                   Sistem menampilkan bentuk permukaan Bulan dalam tampilan 2D dan 3D. Setiap lokasi dianalisis untuk mengukur kemiringan tanah dan memastikan tidak ada penghalang yang mengganggu komunikasi.
+                </div>
+                <div class="action-hint" style="font-size: 11px; font-weight: 800; color: #b45309;">
+                  KLIK UNTUK ANALISIS DENGAN TAHAP 2 &rarr;
                 </div>
               </div>
             </div>
 
             <!-- Masalah 3 -->
-            <div style="background: #f8faff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+            <div class="interactive-card" onclick="switchView('simulasi'); playAvionicBeep(800, 'sine');" style="background: #f8faff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);" title="Klik untuk menuju Simulasi Penerbangan">
               <div>
                 <div style="font-size: 12px; font-weight: 800; color: #1d4ed8; margin-bottom: 12px; letter-spacing: 0.3px;">
                   MASALAH 3 — Kecepatan Wahana dan Risiko Kecelakaan Pendaratan
@@ -1457,8 +1555,11 @@
                 <div style="font-size: 11px; font-weight: 800; color: #1d4ed8; margin-bottom: 4px;">
                   Solusi 3 — Simulasi Penerbangan dan Pendaratan
                 </div>
-                <div style="font-size: 12px; line-height: 1.5; color: var(--text-secondary);">
+                <div style="font-size: 12px; line-height: 1.5; color: var(--text-secondary); margin-bottom: 8px;">
                   Sistem menyimulasikan pergerakan wahana, mengatur pengereman, dan menghitung kebutuhan bahan bakar. Tujuannya adalah memastikan wahana dapat mengurangi kecepatan secara aman hingga menyentuh permukaan Bulan dengan kecepatan rendah.
+                </div>
+                <div class="action-hint" style="font-size: 11px; font-weight: 800; color: #1d4ed8;">
+                  KLIK UNTUK UJI DENGAN TAHAP 3 &rarr;
                 </div>
               </div>
             </div>
@@ -1498,7 +1599,7 @@
           <!-- 3 Cards dengan Panah Penghubung -->
           <div class="workflow-cards-wrapper">
             <!-- Tahap 1: Rekomendasi -->
-            <div class="workflow-card-item" style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid var(--artemis-blue); border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+            <div class="workflow-card-item interactive-card" onclick="switchView('rekomendasi'); playAvionicBeep(640, 'sine');" style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid var(--artemis-blue); border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);" title="Klik untuk membuka Langkah 1: Rekomendasi">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                   <span class="step-badge" style="background: var(--artemis-blue); color: #ffffff; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 1</span>
@@ -1517,10 +1618,15 @@
                   Dari analisis tersebut, sistem memilih waktu pendaratan yang memberikan pencahayaan optimal dan jalur komunikasi langsung tanpa terhalang kawah.
                 </p>
               </div>
-              <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px 12px; font-size: 11.5px; line-height: 1.6;">
-                <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">Hasil Analisis:</div>
-                <div style="color: var(--artemis-blue); font-weight: 600;">• Waktu rekomendasi: <strong>14 November 2026, 14.55 UTC</strong></div>
-                <div style="color: var(--artemis-blue); font-weight: 600;">• Skor kelayakan: <strong>0,94 dari 1,00</strong></div>
+              <div>
+                <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px 12px; font-size: 11.5px; line-height: 1.6;">
+                  <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">Hasil Analisis:</div>
+                  <div style="color: var(--artemis-blue); font-weight: 600;">• Waktu rekomendasi: <strong>14 November 2026, 14.55 UTC</strong></div>
+                  <div style="color: var(--artemis-blue); font-weight: 600;">• Skor kelayakan: <strong>0,94 dari 1,00</strong></div>
+                </div>
+                <div class="action-hint" style="margin-top: 10px; font-size: 11px; font-weight: 800; color: var(--artemis-blue);">
+                  BUKA MESIN REKOMENDASI &rarr;
+                </div>
               </div>
             </div>
 
@@ -1532,7 +1638,7 @@
             </div>
 
             <!-- Tahap 2: Visualisasi -->
-            <div class="workflow-card-item" style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid var(--emerald-safe); border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+            <div class="workflow-card-item interactive-card" onclick="switchView('visualisasi'); playAvionicBeep(720, 'sine');" style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid var(--emerald-safe); border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);" title="Klik untuk membuka Langkah 2: Visualisasi Topografi">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                   <span class="step-badge" style="background: var(--emerald-safe); color: #ffffff; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 2</span>
@@ -1551,10 +1657,15 @@
                   Sistem juga menganalisis kemiringan permukaan dan memeriksa apakah tebing di sekitar lokasi menghalangi jalur komunikasi.
                 </p>
               </div>
-              <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px 12px; font-size: 11.5px; line-height: 1.6;">
-                <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">Hasil Analisis:</div>
-                <div style="color: var(--emerald-safe); font-weight: 600;">• Kemiringan permukaan: <strong>0,08°</strong> (batas maks 10°)</div>
-                <div style="color: var(--emerald-safe); font-weight: 600;">• Jarak bebas komunikasi: <strong>+10,25°</strong></div>
+              <div>
+                <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px 12px; font-size: 11.5px; line-height: 1.6;">
+                  <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">Hasil Analisis:</div>
+                  <div style="color: var(--emerald-safe); font-weight: 600;">• Kemiringan permukaan: <strong>0,08°</strong> (batas maks 10°)</div>
+                  <div style="color: var(--emerald-safe); font-weight: 600;">• Jarak bebas komunikasi: <strong>+10,25°</strong></div>
+                </div>
+                <div class="action-hint" style="margin-top: 10px; font-size: 11px; font-weight: 800; color: var(--emerald-safe);">
+                  BUKA VISUALISASI 2D/3D &rarr;
+                </div>
               </div>
             </div>
 
@@ -1566,7 +1677,7 @@
             </div>
 
             <!-- Tahap 3: Simulasi -->
-            <div class="workflow-card-item" style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid #0284c7; border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
+            <div class="workflow-card-item interactive-card" onclick="switchView('simulasi'); playAvionicBeep(800, 'sine');" style="background: #ffffff; border: 1px solid var(--border-light); border-top: 3px solid #0284c7; border-radius: var(--radius-md); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);" title="Klik untuk membuka Langkah 3: Simulasi Penerbangan">
               <div>
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                   <span class="step-badge" style="background: #0284c7; color: #ffffff; padding: 3px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;">TAHAP 3</span>
@@ -1585,10 +1696,15 @@
                   Simulasi ini digunakan untuk memastikan wahana dapat mengurangi kecepatan secara bertahap, mendarat dengan aman, dan tetap memiliki cadangan bahan bakar.
                 </p>
               </div>
-              <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px 12px; font-size: 11.5px; line-height: 1.6;">
-                <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">Hasil Simulasi:</div>
-                <div style="color: #0284c7; font-weight: 600;">• Kecepatan vertikal: <strong>0,80 m/s</strong> (maks 1,5 m/s)</div>
-                <div style="color: #0284c7; font-weight: 600;">• Sisa bahan bakar: <strong>25,6%</strong></div>
+              <div>
+                <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: 6px; padding: 10px 12px; font-size: 11.5px; line-height: 1.6;">
+                  <div style="font-weight: 800; color: var(--text-primary); margin-bottom: 2px;">Hasil Simulasi:</div>
+                  <div style="color: #0284c7; font-weight: 600;">• Kecepatan vertikal: <strong>0,80 m/s</strong> (maks 1,5 m/s)</div>
+                  <div style="color: #0284c7; font-weight: 600;">• Sisa bahan bakar: <strong>25,6%</strong></div>
+                </div>
+                <div class="action-hint" style="margin-top: 10px; font-size: 11px; font-weight: 800; color: #0284c7;">
+                  LUNCURKAN SIMULATOR 3D &rarr;
+                </div>
               </div>
             </div>
           </div>
@@ -2085,8 +2201,250 @@
   </div>
 
   <!-- JAVASCRIPT SYSTEM ENGINE -->
-  <script src="/three.min.js"></script>
   <script>
+    // ==========================================
+    // AUDIO HUD SYNTHESIZER (WEB AUDIO API)
+    // ==========================================
+    let sfxEnabled = true;
+    let audioCtx = null;
+
+    function toggleSFX() {
+      sfxEnabled = !sfxEnabled;
+      const btn = document.getElementById("sfx-toggle-btn");
+      if (btn) {
+        btn.innerHTML = sfxEnabled ? "🔊 Audio HUD: ON" : "🔇 Audio HUD: OFF";
+        btn.style.color = sfxEnabled ? "#38bdf8" : "#64748b";
+      }
+      if (sfxEnabled) playAvionicBeep(880, 'sine', 0.1);
+    }
+
+    function playAvionicBeep(freq = 600, type = 'sine', duration = 0.08) {
+      if (!sfxEnabled) return;
+      try {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) audioCtx = new AudioContextClass();
+        }
+        if (!audioCtx) return;
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        // Silently ignore audio restrictions
+      }
+    }
+
+    // ==========================================
+    // INTERACTIVE HOME 3D MOON MISSION GLOBE
+    // ==========================================
+    let homeMoonRenderer = null;
+    let homeMoonScene = null;
+    let homeMoonCamera = null;
+    let homeMoonMesh = null;
+    let homeBeaconGroup = null;
+    let homeMoonRotating = true;
+    let homeMoonInitialized = false;
+
+    function initHomeMoonGlobe() {
+      if (homeMoonInitialized) return;
+      const container = document.getElementById("homeMoonContainer");
+      if (!container) return;
+
+      const w = container.clientWidth || 900;
+      const h = container.clientHeight || 320;
+
+      // 1. Scene & Camera (Tilted so South Pole is prominently visible)
+      homeMoonScene = new THREE.Scene();
+      homeMoonCamera = new THREE.PerspectiveCamera(40, w / h, 0.1, 1000);
+      homeMoonCamera.position.set(0, -14, 22);
+      homeMoonCamera.lookAt(0, -1, 0);
+
+      // 2. WebGL Renderer
+      homeMoonRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      homeMoonRenderer.setSize(w, h);
+      homeMoonRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(homeMoonRenderer.domElement);
+
+      // 3. Lighting
+      const ambLight = new THREE.AmbientLight(0x334155, 0.85);
+      homeMoonScene.add(ambLight);
+
+      const sunLight = new THREE.DirectionalLight(0xffffff, 1.4);
+      sunLight.position.set(25, 12, 18);
+      homeMoonScene.add(sunLight);
+
+      // 4. Background Starfield
+      const starGeo = new THREE.BufferGeometry();
+      const starPos = [];
+      for (let i = 0; i < 300; i++) {
+        starPos.push((Math.random() - 0.5) * 350, (Math.random() - 0.5) * 350, (Math.random() - 0.5) * 350);
+      }
+      starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
+      const starMat = new THREE.PointsMaterial({ color: 0x93c5fd, size: 1.2, transparent: true, opacity: 0.75 });
+      homeMoonScene.add(new THREE.Points(starGeo, starMat));
+
+      // 5. Lunar Sphere with NASA Texture
+      const moonGeo = new THREE.SphereGeometry(7.5, 64, 64);
+      const textureLoader = new THREE.TextureLoader();
+      const moonTexture = textureLoader.load('/data/moon_1024.jpg', () => {
+        const loadingElem = document.getElementById("homeMoonLoading");
+        if (loadingElem) loadingElem.style.display = "none";
+      });
+      const moonMat = new THREE.MeshStandardMaterial({
+        map: moonTexture,
+        roughness: 0.85,
+        metalness: 0.05
+      });
+      homeMoonMesh = new THREE.Mesh(moonGeo, moonMat);
+      homeMoonScene.add(homeMoonMesh);
+
+      // 6. South Pole Latitude Rings (-70°, -80°, -85°)
+      const gridMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.35 });
+      [-70, -80, -85].forEach(lat => {
+        const r = 7.52 * Math.cos(lat * Math.PI / 180);
+        const y = 7.52 * Math.sin(lat * Math.PI / 180);
+        const circleGeo = new THREE.BufferGeometry();
+        const pts = [];
+        for (let i = 0; i <= 64; i++) {
+          const a = (i / 64) * Math.PI * 2;
+          pts.push(r * Math.cos(a), y, r * Math.sin(a));
+        }
+        circleGeo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+        homeMoonMesh.add(new THREE.Line(circleGeo, gridMat));
+      });
+
+      // 7. Target Beacon at Mons Mouton (-84.9°S, 33.3°W)
+      homeBeaconGroup = new THREE.Group();
+      const pinGeo = new THREE.CylinderGeometry(0.06, 0.06, 1.2, 8);
+      const pinMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
+      const pinMesh = new THREE.Mesh(pinGeo, pinMat);
+      pinMesh.position.y = 0.6;
+      homeBeaconGroup.add(pinMesh);
+
+      const ringGeo = new THREE.RingGeometry(0.2, 0.45, 24);
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide });
+      const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+      ringMesh.rotation.x = Math.PI / 2;
+      homeBeaconGroup.add(ringMesh);
+
+      // Convert coordinate: -84.9° Lat, -33.3° Lon
+      const phi = (90 - (-84.9)) * (Math.PI / 180);
+      const theta = (-33.3 + 180) * (Math.PI / 180);
+      const bx = -7.55 * Math.sin(phi) * Math.cos(theta);
+      const by = 7.55 * Math.cos(phi);
+      const bz = 7.55 * Math.sin(phi) * Math.sin(theta);
+      const pos = new THREE.Vector3(bx, by, bz);
+      homeBeaconGroup.position.copy(pos);
+      homeBeaconGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), pos.clone().normalize());
+      homeMoonMesh.add(homeBeaconGroup);
+
+      // 8. Mouse & Touch Drag Controls
+      let isDragging = false;
+      let prevX = 0, prevY = 0;
+
+      container.addEventListener("mousedown", (e) => {
+        isDragging = true;
+        prevX = e.clientX;
+        prevY = e.clientY;
+        container.style.cursor = "grabbing";
+      });
+
+      window.addEventListener("mouseup", () => {
+        isDragging = false;
+        if (container) container.style.cursor = "grab";
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!isDragging || !homeMoonMesh) return;
+        const deltaX = e.clientX - prevX;
+        const deltaY = e.clientY - prevY;
+        prevX = e.clientX;
+        prevY = e.clientY;
+
+        homeMoonMesh.rotation.y += deltaX * 0.008;
+        homeMoonMesh.rotation.x += deltaY * 0.008;
+      });
+
+      container.addEventListener("touchstart", (e) => {
+        if (e.touches.length === 1) {
+          isDragging = true;
+          prevX = e.touches[0].clientX;
+          prevY = e.touches[0].clientY;
+        }
+      }, { passive: true });
+
+      window.addEventListener("touchmove", (e) => {
+        if (!isDragging || !homeMoonMesh || e.touches.length !== 1) return;
+        const deltaX = e.touches[0].clientX - prevX;
+        const deltaY = e.touches[0].clientY - prevY;
+        prevX = e.touches[0].clientX;
+        prevY = e.touches[0].clientY;
+
+        homeMoonMesh.rotation.y += deltaX * 0.008;
+        homeMoonMesh.rotation.x += deltaY * 0.008;
+      }, { passive: true });
+
+      window.addEventListener("touchend", () => {
+        isDragging = false;
+      });
+
+      // 9. Animation Loop with Beacon Ring Pulsing
+      let ringPulse = 0;
+      function animateHomeMoon() {
+        requestAnimationFrame(animateHomeMoon);
+        if (homeMoonRotating && homeMoonMesh && !isDragging) {
+          homeMoonMesh.rotation.y += 0.0022;
+        }
+        ringPulse += 0.04;
+        if (ringMesh) {
+          const s = 1.0 + Math.sin(ringPulse) * 0.35;
+          ringMesh.scale.set(s, s, s);
+        }
+        if (homeMoonRenderer && homeMoonScene && homeMoonCamera) {
+          homeMoonRenderer.render(homeMoonScene, homeMoonCamera);
+        }
+      }
+      animateHomeMoon();
+
+      window.addEventListener("resize", () => {
+        if (!homeMoonRenderer || !homeMoonCamera || !container) return;
+        const nw = container.clientWidth || 900;
+        const nh = container.clientHeight || 320;
+        homeMoonCamera.aspect = nw / nh;
+        homeMoonCamera.updateProjectionMatrix();
+        homeMoonRenderer.setSize(nw, nh);
+      });
+
+      homeMoonInitialized = true;
+    }
+
+    function toggleHomeGlobeRotation() {
+      homeMoonRotating = !homeMoonRotating;
+      const btn = document.getElementById("btn-home-rotate");
+      if (btn) {
+        btn.innerHTML = homeMoonRotating ? "⏸ Jeda Putar" : "⟳ Putar Otomatis";
+      }
+      playAvionicBeep(520, 'sine');
+    }
+
+    function focusHomeMonsMouton() {
+      if (!homeMoonMesh || !homeMoonCamera) return;
+      homeMoonMesh.rotation.set(-0.25, 0.35, 0);
+      homeMoonCamera.position.set(0, -14, 22);
+      homeMoonCamera.lookAt(0, -1, 0);
+      playAvionicBeep(750, 'triangle');
+    }
+
     let currentSite = "ALPHA";
     let timelineData = [];
     let currentMapMode = "dem";
@@ -2679,6 +3037,20 @@
         if (homeView) homeView.style.display = "grid";
         if (btnHome) btnHome.classList.add("active");
         try { history.pushState(null, '', '/'); } catch(e){}
+        setTimeout(() => {
+          if (!homeMoonInitialized) {
+            initHomeMoonGlobe();
+          } else if (homeMoonRenderer && homeMoonCamera) {
+            const container = document.getElementById("homeMoonContainer");
+            if (container) {
+              const nw = container.clientWidth || 900;
+              const nh = container.clientHeight || 320;
+              homeMoonCamera.aspect = nw / nh;
+              homeMoonCamera.updateProjectionMatrix();
+              homeMoonRenderer.setSize(nw, nh);
+            }
+          }
+        }, 50);
       } else if (viewName === 'rekomendasi') {
         if (recView) recView.style.display = "grid";
         if (btnRec) btnRec.classList.add("active");
