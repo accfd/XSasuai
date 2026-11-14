@@ -6,7 +6,7 @@
   <title>XASUAI — Sistem Navigasi Lokasi Pendaratan di Bulan</title>
   <link rel="icon" type="image/png" href="/logo.png">
   <script src="/three.min.js"></script>
-  <link rel="stylesheet" href="/css/style.css?v=7">
+  <link rel="stylesheet" href="/css/style.css?v=8">
 </head>
 <body>
 
@@ -298,129 +298,154 @@
 <!-- ===================================================================== -->
   <!-- LAYAR 1: REKOMENDASI WAKTU PENDARATAN (SOLUSI 1) -->
   <!-- ===================================================================== -->
-  <main id="view-rekomendasi" class="bento-container" style="display: none; max-width: 960px; margin: 0 auto; padding: 24px 16px;">
-    
-    <!-- Input Section: Pilihan Bulan & Tahun -->
-    <div class="bento-card bento-full" style="background: var(--bg-surface); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 28px 24px; box-shadow: var(--shadow-sm); margin-bottom: 24px; text-align: center;">
-      <div style="max-width: 680px; margin: 0 auto;">
-        <span style="background: rgba(14, 116, 144, 0.1); color: var(--artemis-blue); border: 1px solid rgba(14, 116, 144, 0.25); padding: 4px 14px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">
-          SOLUSI 1 — REKOMENDASI WAKTU PENDARATAN
-        </span>
-        <h2 style="font-size: 24px; font-weight: 800; color: var(--text-primary); margin: 12px 0 8px;">
-          Pencarian Jadwal Peluncuran &amp; Pendaratan Terbaik
-        </h2>
-        <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin: 0 0 24px;">
-          Pilih bulan dan tahun rencana misi. Sistem akan menganalisis lintasan orbit Matahari dan posisi Bumi untuk menemukan momen pencahayaan optimal dan komunikasi langsung bebas rintangan tebing kawah.
-        </p>
-
-        <!-- Form Pemilihan Bulan & Tahun -->
-        <div style="display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 8px;">
-          <div style="display: flex; align-items: center; gap: 8px; background: var(--bg-subtle); border: 1px solid var(--border-medium); border-radius: var(--radius-md); padding: 6px 14px;">
-            <label for="select-mission-month" style="font-size: 12px; font-weight: 700; color: var(--text-secondary);">Periode Misi:</label>
-            <select id="select-mission-month" onchange="onMissionMonthChange()" style="background: transparent; border: none; font-size: 14px; font-weight: 800; color: var(--text-primary); outline: none; cursor: pointer; padding: 4px 0;">
-              <option value="2026-11" selected>November 2026</option>
-              <option value="2026-12">Desember 2026</option>
-              <option value="2027-01">Januari 2027</option>
-              <option value="2027-02">Februari 2027</option>
-              <option value="2027-03">Maret 2027</option>
-            </select>
-          </div>
-
-          <button id="btn-hero-optimize" class="btn-finder-hero" onclick="calculateMissionSchedule()" style="font-size: 13.5px; font-weight: 800; padding: 12px 28px; border-radius: var(--radius-md); box-shadow: 0 4px 16px rgba(14, 116, 144, 0.35);">
-            HITUNG JADWAL REKOMENDASI
-          </button>
-        </div>
-
-        <!-- Progress Bar (saat menghitung) -->
-        <div id="optimization-progress-bar" style="display: none; margin-top: 18px; background: var(--bg-subtle); border-radius: 999px; height: 8px; overflow: hidden; border: 1px solid var(--border-light);">
-          <div id="optimization-progress-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--artemis-blue), var(--emerald-safe)); transition: width 0.3s ease;"></div>
-        </div>
-        <div id="optimization-status-text" style="display: none; font-size: 12px; font-weight: 700; color: var(--artemis-blue); margin-top: 8px;">
-          Memindai posisi Matahari &amp; Bumi dari JPL Horizons...
-        </div>
-      </div>
-    </div>
-
-    <!-- Single Clean Result Card (Tanpa Card dalam Card) -->
-    <div class="bento-card bento-full" id="solution-banner-card" style="background: #ffffff; border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 32px 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
+  <main id="view-rekomendasi" style="display: none; width: 100%; position: relative;">
+    <div class="rekomendasi-slides-container" id="rekomendasi-slides">
       
-      <!-- Card Title & Status Badge -->
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-light); flex-wrap: wrap; gap: 10px;">
-        <div>
-          <h3 style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
-            Hasil Rekomendasi Jadwal Misi
-          </h3>
-          <div style="font-size: 12px; color: var(--text-secondary);">
-            Target Lokasi: <strong>Mons Mouton Crest (-84.9°S, 33.3°W)</strong>
+      <!-- =================================================================== -->
+      <!-- SLIDE 1: INPUT PERIODE MISI (1 LAYAR PENUH) -->
+      <!-- =================================================================== -->
+      <section id="rec-slide-1" class="rekomendasi-slide-section">
+        <div style="max-width: 720px; width: 100%; text-align: center; background: #ffffff; border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 42px 32px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);">
+          
+          <div style="display: inline-block; background: rgba(14, 116, 144, 0.1); color: var(--artemis-blue); border: 1px solid rgba(14, 116, 144, 0.25); padding: 5px 16px; border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 16px;">
+            SOLUSI 1 — REKOMENDASI WAKTU PENDARATAN
           </div>
+          
+          <h2 style="font-size: 26px; font-weight: 800; color: var(--text-primary); margin: 0 0 12px; letter-spacing: -0.5px;">
+            Pencarian Jadwal Peluncuran &amp; Pendaratan Terbaik
+          </h2>
+          
+          <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.65; margin: 0 auto 32px; max-width: 580px;">
+            Pilih bulan dan tahun rencana misi. Sistem akan menganalisis lintasan orbit Matahari dan posisi Bumi untuk menemukan momen pencahayaan optimal dan komunikasi langsung bebas rintangan tebing kawah.
+          </p>
+
+          <!-- Form Pemilihan Bulan & Tahun -->
+          <div style="display: flex; justify-content: center; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; gap: 10px; background: #f8fafc; border: 1px solid var(--border-medium); border-radius: var(--radius-md); padding: 10px 18px; box-shadow: var(--shadow-sm);">
+              <label for="select-mission-month" style="font-size: 13px; font-weight: 700; color: var(--text-secondary);">Periode Misi:</label>
+              <select id="select-mission-month" onchange="onMissionMonthChange()" style="background: transparent; border: none; font-size: 14.5px; font-weight: 800; color: var(--text-primary); outline: none; cursor: pointer; padding: 2px 0;">
+                <option value="2026-11" selected>November 2026</option>
+                <option value="2026-12">Desember 2026</option>
+                <option value="2027-01">Januari 2027</option>
+                <option value="2027-02">Februari 2027</option>
+                <option value="2027-03">Maret 2027</option>
+              </select>
+            </div>
+
+            <button id="btn-hero-optimize" class="btn-finder-hero" onclick="calculateMissionSchedule()" style="font-size: 14px; font-weight: 800; padding: 13px 32px; border-radius: var(--radius-md); box-shadow: 0 4px 18px rgba(14, 116, 144, 0.4);">
+              HITUNG JADWAL REKOMENDASI
+            </button>
+          </div>
+
+          <!-- Progress Bar (saat menghitung) -->
+          <div id="optimization-progress-bar" style="display: none; margin-top: 20px; background: var(--bg-subtle); border-radius: 999px; height: 8px; overflow: hidden; border: 1px solid var(--border-light);">
+            <div id="optimization-progress-fill" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--artemis-blue), var(--emerald-safe)); transition: width 0.3s ease;"></div>
+          </div>
+          <div id="optimization-status-text" style="display: none; font-size: 12px; font-weight: 700; color: var(--artemis-blue); margin-top: 10px;">
+            Memindai posisi Matahari &amp; Bumi dari JPL Horizons...
+          </div>
+
+          <!-- Subtle hint to scroll to result -->
+          <div onclick="scrollToRecSlide(2)" style="cursor: pointer; margin-top: 32px; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--artemis-blue); padding: 6px 16px; border-radius: 999px; background: #f0f9ff; transition: all 0.2s ease;">
+            <span>Lihat Hasil Rekomendasi</span>
+            <span>&darr;</span>
+          </div>
+
         </div>
-        <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; font-size: 11.5px; font-weight: 800; padding: 6px 14px; border-radius: 999px; display: flex; align-items: center; gap: 6px;">
-          <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></span>
-          STATUS: OPTIMAL &amp; AMAN
+      </section>
+
+      <!-- =================================================================== -->
+      <!-- SLIDE 2: HASIL REKOMENDASI JADWAL MISI (1 LAYAR PENUH) -->
+      <!-- =================================================================== -->
+      <section id="rec-slide-2" class="rekomendasi-slide-section">
+        <div style="max-width: 860px; width: 100%; background: #ffffff; border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 36px 32px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); position: relative;">
+          
+          <!-- Top bar with Back button and Status -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <button onclick="scrollToRecSlide(1)" style="background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 6px;" onmouseover="this.style.color='var(--artemis-blue)'" onmouseout="this.style.color='var(--text-muted)'">
+              <span>&uarr;</span>
+              <span>Ubah Periode Misi</span>
+            </button>
+            <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; font-size: 11.5px; font-weight: 800; padding: 5px 14px; border-radius: 999px; display: flex; align-items: center; gap: 6px;">
+              <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%;"></span>
+              STATUS: OPTIMAL &amp; AMAN
+            </div>
+          </div>
+
+          <!-- Card Title -->
+          <div style="margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border-light);">
+            <h3 style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px;">
+              Hasil Rekomendasi Jadwal Misi
+            </h3>
+            <div style="font-size: 12.5px; color: var(--text-secondary);">
+              Target Lokasi: <strong>Mons Mouton Crest (-84.9°S, 33.3°W)</strong>
+            </div>
+          </div>
+
+          <!-- Arrow Flow: Lepas Landas -> Transit 4 Hari -> Pendaratan -->
+          <div style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 22px 24px; margin-bottom: 24px; gap: 16px; flex-wrap: wrap;">
+            
+            <!-- Kolom Lepas Landas Bumi -->
+            <div style="flex: 1; min-width: 220px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <span style="font-size: 20px;">🚀</span>
+                <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">LEPAS LANDAS DARI BUMI</span>
+              </div>
+              <div id="rec-launch-time" style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
+                11 November 2026, 08:00 UTC
+              </div>
+              <div style="font-size: 11.5px; color: var(--text-secondary);">
+                Peluncuran roket dari Bumi menuju lintasan translunar
+              </div>
+            </div>
+
+            <!-- Panah Alur Transit 4 Hari -->
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 12px; min-width: 140px;">
+              <div style="font-size: 11px; font-weight: 800; color: var(--artemis-blue); margin-bottom: 4px; background: #e0f2fe; padding: 3px 12px; border-radius: 999px;">
+                4 Hari Perjalanan
+              </div>
+              <div style="display: flex; align-items: center; width: 100%; color: var(--artemis-blue);">
+                <div style="height: 2px; background: #0284c7; flex: 1;"></div>
+                <span style="font-size: 14px; margin-left: -2px; color: #0284c7;">►</span>
+              </div>
+            </div>
+
+            <!-- Kolom Pendaratan Bulan -->
+            <div style="flex: 1; min-width: 220px; text-align: right;">
+              <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 6px;">
+                <span style="font-size: 11px; font-weight: 800; color: #047857; text-transform: uppercase; letter-spacing: 0.5px;">PENDARATAN DI BULAN</span>
+                <span style="font-size: 20px;">🌕</span>
+              </div>
+              <div id="rec-landing-time" style="font-size: 18px; font-weight: 800; color: #047857; margin-bottom: 4px;">
+                15 November 2026, 08:00 UTC
+              </div>
+              <div style="font-size: 11.5px; color: var(--text-secondary);">
+                Touchdown aman di Mons Mouton, Kutub Selatan Bulan
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Paragraf Penjelasan Mengapa Waktu Ini Dipilih -->
+          <div style="margin-bottom: 26px;">
+            <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 8px;">
+              Mengapa Waktu Ini Dipilih?
+            </h4>
+            <p id="rec-explanation-paragraph" style="font-size: 13.5px; line-height: 1.75; color: var(--text-secondary); margin: 0;">
+              Berdasarkan analisis posisi Matahari dan arah Bumi pada November 2026, tanggal 15 November memberikan kondisi paling ideal di Mons Mouton karena lokasi tersebut menerima sinar Matahari yang cukup untuk daya panel surya wahana dan memiliki jalur komunikasi langsung ke Bumi tanpa terhalang tebing kawah di sekitarnya. Agar tiba tepat pada momen tersebut, wahana dijadwalkan lepas landas dari Bumi pada 11 November 2026 dengan durasi perjalanan selama 4 hari.
+            </p>
+          </div>
+
+          <!-- Tombol Aksi Menuju Visualisasi -->
+          <div style="display: flex; justify-content: flex-end; align-items: center; padding-top: 18px; border-top: 1px solid var(--border-light);">
+            <button class="btn-finder-hero" onclick="switchView('visualisasi'); playAvionicBeep(800, 'sine');" style="padding: 14px 32px; font-size: 13.5px; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(14, 116, 144, 0.35);">
+              <span>Lihat Titik Pendaratan di Visualisasi</span>
+              <span>&rarr;</span>
+            </button>
+          </div>
+
         </div>
-      </div>
-
-      <!-- Arrow Flow: Lepas Landas -> Transit 4 Hari -> Pendaratan -->
-      <div style="display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 24px; margin-bottom: 24px; gap: 16px; flex-wrap: wrap;">
-        
-        <!-- Kolom Lepas Landas Bumi -->
-        <div style="flex: 1; min-width: 220px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-            <span style="font-size: 18px;">🚀</span>
-            <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">LEPAS LANDAS DARI BUMI</span>
-          </div>
-          <div id="rec-launch-time" style="font-size: 18px; font-weight: 800; color: var(--text-primary); margin-bottom: 4px;">
-            11 November 2026, 08:00 UTC
-          </div>
-          <div style="font-size: 11.5px; color: var(--text-secondary);">
-            Peluncuran roket dari Bumi menuju lintasan translunar
-          </div>
-        </div>
-
-        <!-- Panah Alur Transit 4 Hari -->
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 12px; min-width: 140px;">
-          <div style="font-size: 11px; font-weight: 800; color: var(--artemis-blue); margin-bottom: 4px; background: #e0f2fe; padding: 3px 12px; border-radius: 999px;">
-            4 Hari Perjalanan
-          </div>
-          <div style="display: flex; align-items: center; width: 100%; color: var(--artemis-blue);">
-            <div style="height: 2px; background: #0284c7; flex: 1;"></div>
-            <span style="font-size: 14px; margin-left: -2px; color: #0284c7;">►</span>
-          </div>
-        </div>
-
-        <!-- Kolom Pendaratan Bulan -->
-        <div style="flex: 1; min-width: 220px; text-align: right;">
-          <div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-bottom: 6px;">
-            <span style="font-size: 11px; font-weight: 800; color: #047857; text-transform: uppercase; letter-spacing: 0.5px;">PENDARATAN DI BULAN</span>
-            <span style="font-size: 18px;">🌕</span>
-          </div>
-          <div id="rec-landing-time" style="font-size: 18px; font-weight: 800; color: #047857; margin-bottom: 4px;">
-            15 November 2026, 08:00 UTC
-          </div>
-          <div style="font-size: 11.5px; color: var(--text-secondary);">
-            Touchdown aman di Mons Mouton, Kutub Selatan Bulan
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Paragraf Penjelasan Mengapa Waktu Ini Dipilih -->
-      <div style="margin-bottom: 28px;">
-        <h4 style="font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 8px;">
-          Mengapa Waktu Ini Dipilih?
-        </h4>
-        <p id="rec-explanation-paragraph" style="font-size: 13.5px; line-height: 1.75; color: var(--text-secondary); margin: 0;">
-          Berdasarkan analisis posisi Matahari dan arah Bumi pada November 2026, tanggal 15 November memberikan kondisi paling ideal di Mons Mouton karena lokasi tersebut menerima sinar Matahari yang cukup untuk daya panel surya wahana dan memiliki jalur komunikasi langsung ke Bumi tanpa terhalang tebing kawah di sekitarnya. Agar tiba tepat pada momen tersebut, wahana dijadwalkan lepas landas dari Bumi pada 11 November 2026 dengan durasi perjalanan selama 4 hari.
-        </p>
-      </div>
-
-      <!-- Tombol Aksi Menuju Visualisasi -->
-      <div style="display: flex; justify-content: flex-end; align-items: center; padding-top: 20px; border-top: 1px solid var(--border-light);">
-        <button class="btn-finder-hero" onclick="switchView('visualisasi'); playAvionicBeep(800, 'sine');" style="padding: 14px 32px; font-size: 13.5px; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(14, 116, 144, 0.35);">
-          <span>Lihat Titik Pendaratan di Visualisasi</span>
-          <span>&rarr;</span>
-        </button>
-      </div>
+      </section>
 
     </div>
   </main>
@@ -794,6 +819,6 @@
   </div>
 
   <!-- JAVASCRIPT SYSTEM ENGINE -->
-  <script src="/js/app.js?v=7"></script>
+  <script src="/js/app.js?v=8"></script>
 </body>
 </html>

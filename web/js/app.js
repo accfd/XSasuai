@@ -316,6 +316,18 @@
       playAvionicBeep(600, 'sine');
     }
 
+    function scrollToRecSlide(slideIndex) {
+      const container = document.getElementById("rekomendasi-slides");
+      const target = document.getElementById(`rec-slide-${slideIndex}`);
+      if (container && target) {
+        container.scrollTo({
+          top: target.offsetTop,
+          behavior: "smooth"
+        });
+        playAvionicBeep(640, 'sine');
+      }
+    }
+
     function calculateMissionSchedule() {
       const select = document.getElementById("select-mission-month");
       const monthKey = select ? select.value : "2026-11";
@@ -355,6 +367,11 @@
 
           playAvionicBeep(900, 'sine');
           showToast(`Jadwal Terhitung: Pendaratan Optimal pada ${schedule.landing}`);
+
+          // Smoothly scroll down to Slide 2 Result
+          setTimeout(() => {
+            scrollToRecSlide(2);
+          }, 200);
         }
       }, 150);
     }
