@@ -1161,12 +1161,6 @@
     </div>
 
     <div class="header-actions">
-      <div class="api-status-chip">
-        <span class="dot-online"></span> NASA JPL: ONLINE
-      </div>
-      <div class="mission-status-pill" id="global-status-pill">
-        <span>✓</span> MISSION STATUS: GO (SAFE)
-      </div>
       <div class="segmented-tabs">
         <button class="tab-btn active" id="tab-btn-guide" onclick="switchView('guide')">
           Panduan Misi
@@ -1192,6 +1186,17 @@
       <p>
         <strong>Xesuai</strong> adalah sistem navigasi lokasi pendaratan presisi dan simulator trajektori penerbangan <em>Powered Descent Guidance</em> untuk misi Artemis di dataran tinggi <strong>Mons Mouton, Kutub Selatan Bulan (-84.9°S, 33.3°W)</strong>. Sistem ini mengintegrasikan data topografi elevasi riil NASA LROC LOLA, dinamika efemeris langsung NASA JPL Horizons, solver integrasi numerik RK45, serta antarmuka visual intuitif untuk menjawab 3 pertanyaan kritis misi antariksa.
       </p>
+      <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
+        <button class="btn-cta-primary" onclick="switchView('console')">
+          Buka Mission Console ➔
+        </button>
+        <button class="btn-cta-secondary" onclick="openSmartFinderModal()">
+          Cari Tanggal & Posisi Optimal
+        </button>
+        <button class="btn-cta-secondary" onclick="switchView('testbed')">
+          Uji Simulator Testbed
+        </button>
+      </div>
       <div style="display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap;">
         <button class="btn-cta-primary" onclick="switchView('console')">
           Buka Mission Console ➔
@@ -1321,7 +1326,14 @@
     <div class="bento-card bento-full">
       <div class="card-header">
         <span class="card-title">Kandidat Lokasi Pendaratan Mons Mouton</span>
-        <span style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Pilih salah satu situs untuk evaluasi komprehensif</span>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <div class="api-status-chip">
+            <span class="dot-online"></span> NASA JPL: ONLINE
+          </div>
+          <div class="mission-status-pill" id="global-status-pill">
+            MISSION STATUS: GO (SAFE)
+          </div>
+        </div>
       </div>
 
       <!-- SMART FINDER CALLOUT BANNER (SANGAT MENCOLOK) -->
