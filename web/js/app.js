@@ -888,11 +888,12 @@
         // Radius bola bulan = 8.0 unit (ekuivalen 1,737.4 km)
         const deltaUnits = Math.max(0.069, dist - 8.0);
         const altKm = Math.round(deltaUnits * (1737.4 / 8.0));
+        const isEn = window.currentAppLanguage === 'en';
         if (altKm <= 35) {
-          altElem.textContent = `Ketinggian: 15,0 km | Target: Terkunci`;
+          altElem.textContent = isEn ? `Altitude: 15.0 km | Target: Locked` : `Ketinggian: 15,0 km | Target: Terkunci`;
           altElem.style.color = "#00ffaa";
         } else {
-          altElem.textContent = `Ketinggian: ${altKm.toLocaleString('id-ID')} km`;
+          altElem.textContent = isEn ? `Altitude: ${altKm.toLocaleString('en-US')} km` : `Ketinggian: ${altKm.toLocaleString('id-ID')} km`;
           altElem.style.color = "#ffffff";
         }
       }
@@ -989,7 +990,10 @@
           const altKm = Math.round(50000 - ease * (50000 - 15));
           const altElem = document.getElementById("globe-alt-readout");
           if (altElem) {
-            altElem.textContent = progress < 1.0 ? `Ketinggian: ${altKm.toLocaleString('id-ID')} km` : `Ketinggian: 15,0 km | Target: Terkunci`;
+            const isEn = window.currentAppLanguage === 'en';
+            altElem.textContent = progress < 1.0 
+              ? (isEn ? `Altitude: ${altKm.toLocaleString('en-US')} km` : `Ketinggian: ${altKm.toLocaleString('id-ID')} km`)
+              : (isEn ? `Altitude: 15.0 km | Target: Locked` : `Ketinggian: 15,0 km | Target: Terkunci`);
             altElem.style.color = progress < 1.0 ? "#facc15" : "#38bdf8";
           }
 
@@ -1028,7 +1032,10 @@
 
       const coordElem = document.getElementById("globe-target-readout");
       if (coordElem) {
-        coordElem.textContent = `Sasaran: Mons Mouton Crest (${lat.toFixed(1).replace('.', ',')}°S, ${lon.toFixed(1).replace('.', ',')}°W)`;
+        const isEn = window.currentAppLanguage === 'en';
+        coordElem.textContent = isEn
+          ? `Target: Mons Mouton Crest (${lat.toFixed(1)}°S, ${lon.toFixed(1)}°W)`
+          : `Sasaran: Mons Mouton Crest (${lat.toFixed(1).replace('.', ',')}°S, ${lon.toFixed(1).replace('.', ',')}°W)`;
       }
     }
 
@@ -1054,7 +1061,8 @@
       threeCamera.lookAt(0, -2, 0);
       const altElem = document.getElementById("globe-alt-readout");
       if (altElem) {
-        altElem.textContent = "Ketinggian: 1.737 km | Orbit Bebas";
+        const isEn = window.currentAppLanguage === 'en';
+        altElem.textContent = isEn ? "Altitude: 1,737 km | Free Orbit" : "Ketinggian: 1.737 km | Orbit Bebas";
         altElem.style.color = "#ffffff";
       }
     }
@@ -2144,14 +2152,30 @@
         vis_globe_target: "Target: Mons Mouton Crest (-84,9°S, 33,3°W)",
         vis_globe_fly_btn: "Fly-To Mons Mouton",
         vis_globe_reset_btn: "Tampilan Global",
-        vis_globe_btn_next: "Lanjut: Peta Kelerengan 2D &rarr;",
+        vis_globe_hud_tag: "ORBITAL CAMERA 3D",
+        vis_globe_hud_alt: "Ketinggian: 15,0 km | Target: Terkunci",
+        vis_globe_hud_target: "Sasaran: Mons Mouton Crest (-84,9°S, 33,3°W)",
+        vis_globe_nav_hint: "<strong>Petunjuk Navigasi:</strong> Klik dan geser untuk memutar globe. Gunakan roda tetikus untuk memperbesar atau memperkecil tampilan.",
+        vis_globe_btn_next: "Lanjut ke Visualisasi 2: Pemeriksaan Peta Kontur 2D (LOLA DEM) &darr;",
 
         // Solusi 2 - Slide 3 (Peta 2D)
         vis_map_back: "Kembali ke Menu Visualisasi",
         vis_map_title: "Inspeksi Kelerengan & Kontur Medan 2D (LOLA DEM)",
         vis_map_target: "Lokasi: Mons Mouton Crest (-84,9°S, 33,3°W)",
-        vis_map_hint: "Gunakan Roda Gulir untuk Zoom • Klik & Tarik untuk Menggeser Peta",
-        vis_map_btn_next: "Lanjut: Topografi 3D Mons Mouton &rarr;",
+        vis_map_hint: "Gunakan Roda Gulir untuk Zoom • Klik &amp; Tarik untuk Menggeser Peta",
+        vis_m1_title: "KEMIRINGAN LERENG",
+        vis_m1_val: "0,08° (Sangat Datar, di bawah 10°)",
+        vis_m1_desc: "Permukaan aman dari risiko wahana terguling.",
+        vis_m2_title: "ELEVASI PUNCAK",
+        vis_m2_val: "+5.920 m (Dataran Tinggi)",
+        vis_m2_desc: "Berada jauh di atas dasar kawah yang gelap.",
+        vis_m3_title: "ILUMINASI SURYA",
+        vis_m3_val: "100% Bebas Bayangan",
+        vis_m3_desc: "Mendapatkan cahaya Matahari untuk mendukung pasokan listrik.",
+        vis_m4_title: "STATUS TOPOGRAFI",
+        vis_m4_val: "VERIFIKASI GO (AMAN)",
+        vis_m4_desc: "Memenuhi standar keselamatan NASA.",
+        vis_map_btn_next: "Lanjut ke Visualisasi 3: Topografi 3D dan Pemeriksaan Jalur Sinyal &darr;",
 
         // Solusi 2 - Slide 4 (Topografi 3D & Jalur Sinyal)
         s4_back: "Kembali ke Menu Visualisasi",
@@ -2317,14 +2341,30 @@
         vis_globe_target: "Target: Mons Mouton Crest (-84.9°S, 33.3°W)",
         vis_globe_fly_btn: "Fly-To Mons Mouton",
         vis_globe_reset_btn: "Global Overview",
-        vis_globe_btn_next: "Next: 2D Slope Map &rarr;",
+        vis_globe_hud_tag: "3D ORBITAL CAMERA",
+        vis_globe_hud_alt: "Altitude: 15.0 km | Target: Locked",
+        vis_globe_hud_target: "Target: Mons Mouton Crest (-84.9°S, 33.3°W)",
+        vis_globe_nav_hint: "<strong>Navigation Guide:</strong> Click and drag to rotate the globe. Use mouse wheel to zoom in or out.",
+        vis_globe_btn_next: "Next to Visualization 2: 2D Contour Map Inspection (LOLA DEM) &darr;",
 
         // Solution 2 - Slide 3 (2D Map)
         vis_map_back: "Back to Visualization Menu",
         vis_map_title: "2D Slope & Terrain Contour Inspection (LOLA DEM)",
         vis_map_target: "Location: Mons Mouton Crest (-84.9°S, 33.3°W)",
-        vis_map_hint: "Use Scroll Wheel to Zoom • Click & Drag to Pan Map",
-        vis_map_btn_next: "Next: 3D Topography &rarr;",
+        vis_map_hint: "Use Scroll Wheel to Zoom • Click &amp; Drag to Pan Map",
+        vis_m1_title: "SLOPE GRADIENT",
+        vis_m1_val: "0.08° (Extremely Flat, below 10°)",
+        vis_m1_desc: "Surface is safe from lander tip-over hazards.",
+        vis_m2_title: "PEAK ELEVATION",
+        vis_m2_val: "+5,920 m (Elevated Plateau)",
+        vis_m2_desc: "Positioned high above shadowed crater basins.",
+        vis_m3_title: "SOLAR ILLUMINATION",
+        vis_m3_val: "100% Shadow-Free",
+        vis_m3_desc: "Direct sunlight ensures continuous solar power supply.",
+        vis_m4_title: "TOPOGRAPHY STATUS",
+        vis_m4_val: "VERIFIED GO (SAFE)",
+        vis_m4_desc: "Compliant with all NASA Artemis landing criteria.",
+        vis_map_btn_next: "Next to Visualization 3: 3D Topography & Signal Path Inspection &darr;",
 
         // Solution 2 - Slide 4 (3D Terrain & Signal Path)
         s4_back: "Back to Visualization Menu",

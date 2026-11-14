@@ -652,7 +652,7 @@
             <div style="display: flex; align-items: center; gap: 10px;">
               <button onclick="scrollToVisSlide('menu')" style="background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px;" onmouseover="this.style.color='var(--artemis-blue)'" onmouseout="this.style.color='var(--text-muted)'">
                 <span>&uarr;</span>
-                <span>Kembali ke Menu Visualisasi</span>
+                <span data-i18n="vis_globe_back">Kembali ke Menu Visualisasi</span>
               </button>
               <span class="card-title" style="font-size: 17px; font-weight: 800;">
                 <span data-i18n="vis_globe_title">Navigasi Orbital 3D — Menuju Mons Mouton Crest</span>
@@ -673,9 +673,9 @@
             <!-- 3D Globe HUD Overlay -->
             <div class="globe-hud-overlay">
               <div class="globe-hud-info">
-                <span class="hud-tag">ORBITAL CAMERA 3D</span>
-                <span id="globe-alt-readout" class="hud-alt" style="color: #38bdf8; font-weight: 800;">Ketinggian: 15,0 km | Target: Terkunci</span>
-                <span id="globe-target-readout" class="hud-coord">Sasaran: Mons Mouton Crest (-84,9°S, 33,3°W)</span>
+                <span data-i18n="vis_globe_hud_tag" class="hud-tag">ORBITAL CAMERA 3D</span>
+                <span data-i18n="vis_globe_hud_alt" id="globe-alt-readout" class="hud-alt" style="color: #38bdf8; font-weight: 800;">Ketinggian: 15,0 km | Target: Terkunci</span>
+                <span data-i18n="vis_globe_hud_target" id="globe-target-readout" class="hud-coord">Sasaran: Mons Mouton Crest (-84,9°S, 33,3°W)</span>
               </div>
               <div class="globe-hud-actions">
                 <button class="btn-hud" onclick="zoomGlobe(-2.0)" title="Dolly Zoom In">＋ Zoom</button>
@@ -693,11 +693,11 @@
 
           <!-- Slide 2 Bottom Bar -->
           <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border-light); flex-wrap: wrap; gap: 8px;">
-            <div style="font-size: 11.5px; color: var(--text-secondary);">
+            <div data-i18n="vis_globe_nav_hint" style="font-size: 11.5px; color: var(--text-secondary);">
               <strong>Petunjuk Navigasi:</strong> Klik dan geser untuk memutar globe. Gunakan roda tetikus untuk memperbesar atau memperkecil tampilan.
             </div>
             <div onclick="scrollToVisSlide('dem')" style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--artemis-blue); background: #f0f9ff; padding: 5px 14px; border-radius: 999px;">
-              <span>Lanjut ke Visualisasi 2: Pemeriksaan Peta Kontur 2D (LOLA DEM)</span>
+              <span data-i18n="vis_globe_btn_next">Lanjut ke Visualisasi 2: Pemeriksaan Peta Kontur 2D (LOLA DEM) &darr;</span>
               <span>&darr;</span>
             </div>
           </div>
@@ -716,7 +716,7 @@
             <div style="display: flex; align-items: center; gap: 10px;">
               <button onclick="scrollToVisSlide('menu')" style="background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px;" onmouseover="this.style.color='var(--artemis-blue)'" onmouseout="this.style.color='var(--text-muted)'">
                 <span>&uarr;</span>
-                <span>Kembali ke Menu Visualisasi</span>
+                <span data-i18n="vis_globe_back">Kembali ke Menu Visualisasi</span>
               </button>
               <span class="card-title" style="font-size: 17px; font-weight: 800;">
                 <span data-i18n="vis_map_title">Inspeksi Kelerengan &amp; Kontur Medan 2D (LOLA DEM)</span>
@@ -746,7 +746,7 @@
                 <button class="btn-hud" onclick="zoomDem(-0.5)" title="Perkecil (Zoom Out)">－</button>
                 <button class="btn-hud" onclick="resetDemZoom()" title="Reset Tampilan Zoom">Reset</button>
               </div>
-              <div class="dem-hint-badge" style="position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: var(--radius-sm); padding: 4px 8px; color: #94a3b8; font-size: 10px; font-weight: 600; z-index: 25; pointer-events: none; backdrop-filter: blur(4px);">
+              <div data-i18n="vis_map_hint" class="dem-hint-badge" style="position: absolute; top: 10px; left: 10px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: var(--radius-sm); padding: 4px 8px; color: #94a3b8; font-size: 10px; font-weight: 600; z-index: 25; pointer-events: none; backdrop-filter: blur(4px);">
                 Gunakan Roda Gulir untuk Zoom • Klik &amp; Tarik untuk Menggeser Peta
               </div>
             </div>
@@ -755,30 +755,30 @@
           <!-- Bottom Metric Tiles -->
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 10px 14px; margin-top: 10px;">
             <div>
-              <div style="font-size: 9.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">KEMIRINGAN LERENG</div>
-              <div style="font-size: 14px; font-weight: 800; color: var(--emerald-safe); margin-top: 2px;">0,08° (Sangat Datar, di bawah 10°)</div>
-              <div style="font-size: 10.5px; color: var(--text-dim);">Permukaan aman dari risiko wahana terguling.</div>
+              <div data-i18n="vis_m1_title" style="font-size: 9.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">KEMIRINGAN LERENG</div>
+              <div data-i18n="vis_m1_val" style="font-size: 14px; font-weight: 800; color: var(--emerald-safe); margin-top: 2px;">0,08° (Sangat Datar, di bawah 10°)</div>
+              <div data-i18n="vis_m1_desc" style="font-size: 10.5px; color: var(--text-dim);">Permukaan aman dari risiko wahana terguling.</div>
             </div>
             <div>
-              <div style="font-size: 9.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">ELEVASI PUNCAK</div>
-              <div style="font-size: 14px; font-weight: 800; color: var(--artemis-blue); margin-top: 2px;">+5.920 m (Dataran Tinggi)</div>
-              <div style="font-size: 10.5px; color: var(--text-dim);">Berada jauh di atas dasar kawah yang gelap.</div>
+              <div data-i18n="vis_m2_title" style="font-size: 9.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">ELEVASI PUNCAK</div>
+              <div data-i18n="vis_m2_val" style="font-size: 14px; font-weight: 800; color: var(--artemis-blue); margin-top: 2px;">+5.920 m (Dataran Tinggi)</div>
+              <div data-i18n="vis_m2_desc" style="font-size: 10.5px; color: var(--text-dim);">Berada jauh di atas dasar kawah yang gelap.</div>
             </div>
             <div>
-              <div style="font-size: 9.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">ILUMINASI SURYA</div>
-              <div style="font-size: 14px; font-weight: 800; color: var(--emerald-safe); margin-top: 2px;">100% Bebas Bayangan</div>
-              <div style="font-size: 10.5px; color: var(--text-dim);">Mendapatkan cahaya Matahari untuk mendukung pasokan listrik.</div>
+              <div data-i18n="vis_m3_title" style="font-size: 9.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">ILUMINASI SURYA</div>
+              <div data-i18n="vis_m3_val" style="font-size: 14px; font-weight: 800; color: var(--emerald-safe); margin-top: 2px;">100% Bebas Bayangan</div>
+              <div data-i18n="vis_m3_desc" style="font-size: 10.5px; color: var(--text-dim);">Mendapatkan cahaya Matahari untuk mendukung pasokan listrik.</div>
             </div>
             <div>
-              <div style="font-size: 9.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">STATUS TOPOGRAFI</div>
-              <div style="font-size: 14px; font-weight: 800; color: var(--emerald-safe); margin-top: 2px;">VERIFIKASI GO (AMAN)</div>
-              <div style="font-size: 10.5px; color: var(--text-dim);">Memenuhi standar keselamatan NASA.</div>
+              <div data-i18n="vis_m4_title" style="font-size: 9.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">STATUS TOPOGRAFI</div>
+              <div data-i18n="vis_m4_val" style="font-size: 14px; font-weight: 800; color: var(--emerald-safe); margin-top: 2px;">VERIFIKASI GO (AMAN)</div>
+              <div data-i18n="vis_m4_desc" style="font-size: 10.5px; color: var(--text-dim);">Memenuhi standar keselamatan NASA.</div>
             </div>
           </div>
 
           <!-- Slide 3 Navigation Cue to Slide 4 -->
           <div onclick="scrollToVisSlide('terrain')" style="cursor: pointer; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; font-weight: 800; color: var(--artemis-blue);">
-            <span>Lanjut ke Visualisasi 3: Topografi 3D dan Pemeriksaan Jalur Sinyal</span>
+            <span data-i18n="vis_map_btn_next">Lanjut ke Visualisasi 3: Topografi 3D dan Pemeriksaan Jalur Sinyal &darr;</span>
             <span>&darr;</span>
           </div>
 
@@ -1107,6 +1107,6 @@
   </div>
 
   <!-- JAVASCRIPT SYSTEM ENGINE -->
-  <script src="/js/app.js?v=75"></script>
+  <script src="/js/app.js?v=80"></script>
 </body>
 </html>
