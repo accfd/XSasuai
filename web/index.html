@@ -664,6 +664,11 @@
       100% { transform: rotate(360deg); }
     }
 
+    @keyframes bounceDown {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(5px); }
+    }
+
     /* VIEW 3: SYSTEM GUIDE & ONBOARDING (PANDUAN & ALUR SISTEM) */
     #view-guide {
       display: flex;
@@ -1416,22 +1421,31 @@
           XASUAI adalah sistem yang membantu menentukan lokasi dan waktu pendaratan terbaik bagi wahana Artemis di <strong>Mons Mouton, Kutub Selatan Bulan</strong>. Sistem ini menganalisis kondisi lingkungan, bentuk permukaan Bulan, serta pergerakan wahana untuk memastikan pendaratan berlangsung aman dan terkendali.
         </p>
 
-        <!-- PURE CINEMATIC 3D MOON -->
-        <div style="background: radial-gradient(circle at center, #0f1d38 0%, #030712 100%); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: var(--radius-md); margin: 0 auto 36px; overflow: hidden; position: relative; box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45); height: 320px; cursor: grab;" id="homeMoonContainer">
+        <!-- PURE CINEMATIC 3D MOON (TRANSPARENT BACKGROUND & FLOATING) -->
+        <div style="background: transparent; border: none; margin: 0 auto 12px; overflow: visible; position: relative; height: 330px; cursor: pointer; filter: drop-shadow(0 20px 28px rgba(15, 23, 42, 0.22));" id="homeMoonContainer" title="Klik Bulan untuk Membuka Analisis &amp; Tantangan">
           <!-- Loading indicator -->
-          <div id="homeMoonLoading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #38bdf8; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; z-index: 5;">
-            <div class="spinner" style="width: 18px; height: 18px; border: 2px solid rgba(56, 189, 248, 0.2); border-top-color: #38bdf8; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+          <div id="homeMoonLoading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--artemis-blue); font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 8px; z-index: 5;">
+            <div class="spinner" style="width: 18px; height: 18px; border: 2px solid rgba(37, 99, 235, 0.2); border-top-color: var(--artemis-blue); border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
             Memuat Model 3D Bulan...
           </div>
         </div>
 
-        <!-- Bagian 1: Tiga Masalah Utama -->
-        <div style="text-align: left; margin-bottom: 36px;">
-          <div style="margin-bottom: 20px; text-align: center;">
-            <h2 style="font-size: 19px; font-weight: 800; color: var(--text-primary); margin: 0 0 6px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
-              <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--coral-crit);"></span>
-              Tantangan Utama Pendaratan di Kutub Selatan Bulan
-            </h2>
+        <!-- Tombol Interaktif Petunjuk Klik Bulan -->
+        <div id="homeMoonCtaPill" onclick="revealHomeChallenges()" style="display: inline-flex; align-items: center; gap: 8px; background: rgba(37, 99, 235, 0.08); border: 1.5px solid rgba(37, 99, 235, 0.28); color: var(--artemis-blue); padding: 10px 24px; border-radius: 999px; font-size: 13.5px; font-weight: 800; cursor: pointer; transition: all 0.25s ease; margin-bottom: 24px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.12);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 18px rgba(37, 99, 235, 0.2)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 14px rgba(37, 99, 235, 0.12)';">
+          <span style="font-size: 15px;">🌕</span>
+          <span>Klik Bulan untuk Membuka Analisis &amp; Tantangan Pendaratan</span>
+          <span style="display: inline-block; animation: bounceDown 1.4s infinite; font-size: 14px;">&darr;</span>
+        </div>
+
+        <!-- Bagian Detail Tantangan, Alur Kerja & Mulai Analisis (Terbuka Saat Bulan Diklik) -->
+        <div id="home-details-section" style="display: none; opacity: 0; transition: opacity 0.5s ease-in-out; margin-top: 16px;">
+          <!-- Bagian 1: Tiga Masalah Utama -->
+          <div id="section-tantangan-title" style="text-align: left; margin-bottom: 36px;">
+            <div style="margin-bottom: 20px; text-align: center;">
+              <h2 style="font-size: 19px; font-weight: 800; color: var(--text-primary); margin: 0 0 6px; display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--coral-crit);"></span>
+                Tantangan Utama Pendaratan di Kutub Selatan Bulan
+              </h2>
             <p style="font-size: 13.5px; color: var(--text-muted); margin: 0;">
               Ada tiga masalah utama yang harus diatasi sebelum wahana dapat mendarat dengan aman.
             </p>
@@ -1680,6 +1694,8 @@
             MASUK KE SISTEM REKOMENDASI PENDARATAN &rarr;
           </button>
         </div>
+
+        </div> <!-- tutup #home-details-section -->
 
       </div>
     </div>
@@ -2219,7 +2235,7 @@
       if (!container) return;
 
       const w = container.clientWidth || 900;
-      const h = container.clientHeight || 320;
+      const h = container.clientHeight || 330;
 
       // 1. Scene & Camera (Centered perspective)
       homeMoonScene = new THREE.Scene();
@@ -2227,31 +2243,21 @@
       homeMoonCamera.position.set(0, 0, 24);
       homeMoonCamera.lookAt(0, 0, 0);
 
-      // 2. WebGL Renderer
+      // 2. WebGL Renderer with Transparent Background
       homeMoonRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       homeMoonRenderer.setSize(w, h);
       homeMoonRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       container.appendChild(homeMoonRenderer.domElement);
 
-      // 3. Lighting
-      const ambLight = new THREE.AmbientLight(0x334155, 0.85);
+      // 3. Realistic Soft Lunar Lighting
+      const ambLight = new THREE.AmbientLight(0x64748b, 1.15);
       homeMoonScene.add(ambLight);
 
-      const sunLight = new THREE.DirectionalLight(0xffffff, 1.4);
-      sunLight.position.set(25, 12, 18);
+      const sunLight = new THREE.DirectionalLight(0xffffff, 1.35);
+      sunLight.position.set(22, 12, 20);
       homeMoonScene.add(sunLight);
 
-      // 4. Background Starfield
-      const starGeo = new THREE.BufferGeometry();
-      const starPos = [];
-      for (let i = 0; i < 300; i++) {
-        starPos.push((Math.random() - 0.5) * 350, (Math.random() - 0.5) * 350, (Math.random() - 0.5) * 350);
-      }
-      starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPos, 3));
-      const starMat = new THREE.PointsMaterial({ color: 0x93c5fd, size: 1.2, transparent: true, opacity: 0.75 });
-      homeMoonScene.add(new THREE.Points(starGeo, starMat));
-
-      // 5. Lunar Sphere with NASA Texture (Pure Spinning Moon)
+      // 4. Lunar Sphere with NASA Texture (Pure Floating Moon)
       const moonGeo = new THREE.SphereGeometry(7.5, 64, 64);
       const textureLoader = new THREE.TextureLoader();
       const moonTexture = textureLoader.load('/data/moon_1024.jpg', () => {
@@ -2260,32 +2266,39 @@
       });
       const moonMat = new THREE.MeshStandardMaterial({
         map: moonTexture,
-        roughness: 0.85,
-        metalness: 0.05
+        roughness: 0.88,
+        metalness: 0.02
       });
       homeMoonMesh = new THREE.Mesh(moonGeo, moonMat);
       homeMoonScene.add(homeMoonMesh);
 
-      // 6. Mouse & Touch Drag Controls
+      // 5. Mouse & Touch Drag Controls with Click Detection
       let isDragging = false;
       let prevX = 0, prevY = 0;
+      let movedDist = 0;
 
       container.addEventListener("mousedown", (e) => {
         isDragging = true;
         prevX = e.clientX;
         prevY = e.clientY;
+        movedDist = 0;
         container.style.cursor = "grabbing";
       });
 
       window.addEventListener("mouseup", () => {
+        if (!isDragging) return;
         isDragging = false;
-        if (container) container.style.cursor = "grab";
+        if (container) container.style.cursor = "pointer";
+        if (movedDist < 8) {
+          revealHomeChallenges();
+        }
       });
 
       window.addEventListener("mousemove", (e) => {
         if (!isDragging || !homeMoonMesh) return;
         const deltaX = e.clientX - prevX;
         const deltaY = e.clientY - prevY;
+        movedDist += Math.abs(deltaX) + Math.abs(deltaY);
         prevX = e.clientX;
         prevY = e.clientY;
 
@@ -2298,6 +2311,7 @@
           isDragging = true;
           prevX = e.touches[0].clientX;
           prevY = e.touches[0].clientY;
+          movedDist = 0;
         }
       }, { passive: true });
 
@@ -2305,6 +2319,7 @@
         if (!isDragging || !homeMoonMesh || e.touches.length !== 1) return;
         const deltaX = e.touches[0].clientX - prevX;
         const deltaY = e.touches[0].clientY - prevY;
+        movedDist += Math.abs(deltaX) + Math.abs(deltaY);
         prevX = e.touches[0].clientX;
         prevY = e.touches[0].clientY;
 
@@ -2313,10 +2328,14 @@
       }, { passive: true });
 
       window.addEventListener("touchend", () => {
+        if (!isDragging) return;
         isDragging = false;
+        if (movedDist < 10) {
+          revealHomeChallenges();
+        }
       });
 
-      // 7. Animation Loop (Smooth continuous rotation)
+      // 6. Animation Loop (Smooth continuous rotation)
       function animateHomeMoon() {
         requestAnimationFrame(animateHomeMoon);
         if (homeMoonRotating && homeMoonMesh && !isDragging) {
@@ -2331,13 +2350,44 @@
       window.addEventListener("resize", () => {
         if (!homeMoonRenderer || !homeMoonCamera || !container) return;
         const nw = container.clientWidth || 900;
-        const nh = container.clientHeight || 320;
+        const nh = container.clientHeight || 330;
         homeMoonCamera.aspect = nw / nh;
         homeMoonCamera.updateProjectionMatrix();
         homeMoonRenderer.setSize(nw, nh);
       });
 
       homeMoonInitialized = true;
+    }
+
+    function revealHomeChallenges() {
+      const details = document.getElementById("home-details-section");
+      const ctaPill = document.getElementById("homeMoonCtaPill");
+      if (!details) return;
+
+      playAvionicBeep(650, 'sine');
+
+      if (details.style.display === "none" || details.style.opacity === "0") {
+        details.style.display = "block";
+        setTimeout(() => {
+          details.style.opacity = "1";
+          const tantanganHeader = document.getElementById("section-tantangan-title");
+          if (tantanganHeader) {
+            tantanganHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 30);
+        if (ctaPill) {
+          ctaPill.innerHTML = `<span style="font-size: 15px;">✓</span> <span>Tantangan Pendaratan Terbuka</span> <span style="font-size: 14px;">&darr;</span>`;
+          ctaPill.style.background = "rgba(16, 185, 129, 0.1)";
+          ctaPill.style.borderColor = "rgba(16, 185, 129, 0.35)";
+          ctaPill.style.color = "var(--emerald-safe)";
+        }
+      } else {
+        const tantanganHeader = document.getElementById("section-tantangan-title");
+        if (tantanganHeader) {
+          tantanganHeader.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }
     }
 
     function toggleHomeGlobeRotation() {
