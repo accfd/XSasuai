@@ -30,7 +30,7 @@ def test_endpoints():
     # 1. Test Static Index
     r = requests.get(f"{base_url}/")
     assert r.status_code == 200
-    assert "Xesuai" in r.text or "XESUAI" in r.text
+    assert "Xasuai" in r.text or "XASUAI" in r.text
     print("✓ GET / (Static Index) PASS")
 
     # 2. Test /api/sites
