@@ -1,15 +1,15 @@
 {
   "selected_site": "ALPHA",
   "scan_terrain_done": false,
-  "landing_date": "2026-10-15",
-  "landing_time_utc": "14:15",
+  "landing_date": "2026-11-14",
+  "landing_time_utc": "12:00",
   "lunar_day_offset": 7.407673423728814,
-  "sun_az": 159.49,
-  "sun_el": -3.5,
-  "earth_az": 34.63,
-  "earth_el": -2.35,
+  "sun_az": 153.79,
+  "sun_el": -3.02,
+  "earth_az": 31.3,
+  "earth_el": 0.23,
   "solar_ok": false,
-  "dte_ok": false,
+  "dte_ok": true,
   "horizon_planned": true,
   "target_coords_3d": [
     187500.0,
@@ -21,7 +21,7 @@
   "touchdown_time_s": 60.049999999998725,
   "touchdown_vz_ms": 1.1981684902715348,
   "trajectory_solved": true,
-  "last_updated": "2026-11-14T13:56:26.104000+00:00",
+  "last_updated": "2026-11-14T13:57:33.265627+00:00",
   "schema_version": "1.0.0",
   "last_written_by": "simulate_landing"
 }
