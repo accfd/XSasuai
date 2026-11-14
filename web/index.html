@@ -6,7 +6,7 @@
   <title>XASUAI — Sistem Navigasi Lokasi Pendaratan di Bulan</title>
   <link rel="icon" type="image/png" href="/logo.png">
   <script src="/three.min.js"></script>
-  <link rel="stylesheet" href="/css/style.css?v=14">
+  <link rel="stylesheet" href="/css/style.css?v=15">
 </head>
 <body>
 
@@ -662,103 +662,191 @@
       </section>
 
       <!-- =================================================================== -->
-      <!-- SLIDE 3: VISUALISASI 3D BEBAS TEBING & JALUR SINYAL BUMI (1 LAYAR PENUH) -->
+      <!-- SLIDE 3: VISUALISASI 3D REALISTIS BERDASARKAN SCAN_TERRAIN.PY (1 LAYAR PENUH) -->
       <!-- =================================================================== -->
       <section id="vis-slide-3" class="visualisasi-slide-section">
-        <div style="max-width: 1160px; width: 100%; height: 100%; max-height: calc(100vh - 120px); background: #ffffff; border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 20px 24px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); position: relative; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;">
+        <div style="max-width: 1240px; width: 100%; height: 100%; max-height: calc(100vh - 110px); background: #ffffff; border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 14px 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); position: relative; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden;">
           
           <!-- Top bar with Back Button & Status -->
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <button onclick="scrollToVisSlide(2)" style="background: none; border: none; color: var(--text-muted); font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px;" onmouseover="this.style.color='var(--artemis-blue)'" onmouseout="this.style.color='var(--text-muted)'">
-              <span>&uarr;</span>
-              <span>Kembali ke Peta 2D</span>
-            </button>
-            <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; font-size: 10.5px; font-weight: 800; padding: 4px 12px; border-radius: 999px; display: flex; align-items: center; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <button onclick="scrollToVisSlide(2)" style="background: none; border: none; color: var(--text-muted); font-size: 11.5px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px;" onmouseover="this.style.color='var(--artemis-blue)'" onmouseout="this.style.color='var(--text-muted)'">
+                <span>&uarr;</span>
+                <span>Kembali ke Peta 2D</span>
+              </button>
+              <div style="display: inline-block; background: #eff6ff; color: #1d4ed8; padding: 2px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase;">
+                SOLUSI 2 • TAHAP 3 DARI 3: SCAN_TERRAIN 3D ENGINE
+              </div>
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); color: #047857; font-size: 10.5px; font-weight: 800; padding: 3px 12px; border-radius: 999px; display: flex; align-items: center; gap: 6px;">
               <span style="width: 7px; height: 7px; background: #10b981; border-radius: 50%;"></span>
-              SINYAL BUMI: DIRECT LINE-OF-SIGHT (100% CLEAR)
+              DATA VALID: NASA LOLA DEM + JPL HORIZONS DE441
             </div>
           </div>
 
-          <!-- Section Heading -->
-          <div style="margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid var(--border-light);">
-            <div style="display: inline-block; background: #eff6ff; color: #1d4ed8; padding: 2px 10px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 4px;">
-              SOLUSI 2 • TAHAP 3 DARI 3
-            </div>
-            <h3 style="font-size: 17px; font-weight: 800; color: var(--text-primary); margin: 0 0 2px;">
-              Visualisasi 3D Bebas Rintangan Tebing &amp; Jalur Sinyal ke Bumi
+          <!-- Section Heading Compact -->
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border-light);">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;">
+              Visualisasi 3D Topografi Mons Mouton &amp; Panorama Ufuk 360°
             </h3>
-            <p style="font-size: 12px; color: var(--text-secondary); margin: 0; line-height: 1.4;">
-              Membuktikan garis sinyal antena (*Direct-to-Earth*) melintas tinggi di atas bibir tebing kawah Mons Mouton tanpa blind spot.
-            </p>
+            <span style="font-size: 11px; color: var(--text-secondary);">
+              Analisis riil ketinggian tebing kawah, garis sinyal Bumi (DTE), dan iluminasi surya.
+            </span>
           </div>
 
-          <!-- Split Grid: 3D Horizon View (Left) + Radar & Explanation (Right) -->
-          <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 18px; align-items: center; flex: 1; min-height: 0; margin-bottom: 10px;">
+          <!-- Split Grid: Real 3D Terrain (Left) + 3 Real Scientific Panels (Right) -->
+          <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 14px; flex: 1; min-height: 0; margin-bottom: 8px;">
             
-            <!-- Left Column: 3D Horizon & Signal Beam Container -->
-            <div style="background: #030712; border: 1px solid #1e293b; border-radius: var(--radius-md); padding: 8px; text-align: center; position: relative; overflow: hidden; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
-              <div style="position: absolute; top: 12px; left: 14px; z-index: 10; font-size: 10px; font-weight: 800; color: #38bdf8; background: rgba(3, 7, 18, 0.85); padding: 3px 8px; border-radius: 4px; border: 1px solid rgba(56, 189, 248, 0.3);">
-                3D TERRAIN &amp; SIGNAL BEAM (INTERAKTIF)
+            <!-- Left Column: Real 3D Terrain Canvas & Controls -->
+            <div style="background: #030712; border: 1px solid #1e293b; border-radius: var(--radius-md); padding: 8px; position: relative; overflow: hidden; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
+              
+              <!-- 3D Header Toolbar (Layer Switcher & Site Selector) -->
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 6px; z-index: 10;">
+                <!-- Layer Buttons -->
+                <div style="display: flex; gap: 4px;">
+                  <button id="btn-layer-mcda" class="btn-hud active" onclick="switch3DLayer('mcda')" style="font-size: 10px; padding: 3px 8px; background: #0284c7; color: #fff;">
+                    Kelayakan (1)
+                  </button>
+                  <button id="btn-layer-dem" class="btn-hud" onclick="switch3DLayer('dem')" style="font-size: 10px; padding: 3px 8px;">
+                    Elevasi (2)
+                  </button>
+                  <button id="btn-layer-slope" class="btn-hud" onclick="switch3DLayer('slope')" style="font-size: 10px; padding: 3px 8px;">
+                    Lereng (3)
+                  </button>
+                </div>
+                <!-- Site Buttons -->
+                <div style="display: flex; gap: 4px;">
+                  <button id="btn-site-alpha" class="btn-hud active" onclick="select3DSite('ALPHA')" style="font-size: 10px; padding: 3px 8px; border-color: #facc15; color: #facc15;">
+                    Site Alpha
+                  </button>
+                  <button id="btn-site-beta" class="btn-hud" onclick="select3DSite('BETA')" style="font-size: 10px; padding: 3px 8px; border-color: #00e5ff; color: #00e5ff;">
+                    Site Beta
+                  </button>
+                  <button id="btn-site-gamma" class="btn-hud" onclick="select3DSite('GAMMA')" style="font-size: 10px; padding: 3px 8px; border-color: #ff4d4d; color: #ff4d4d;">
+                    Site Gamma
+                  </button>
+                  <button class="btn-hud" onclick="reset3DView()" title="Reset Sudut Pandang" style="font-size: 10px; padding: 3px 8px;">
+                    ⟳ Reset
+                  </button>
+                </div>
               </div>
-              <div id="threeHorizonContainer" style="width: 100%; flex: 1; min-height: 200px; max-height: 240px; position: relative; border-radius: 6px; overflow: hidden;"></div>
+
+              <!-- 3D Canvas Viewport -->
+              <div id="threeHorizonContainer" style="width: 100%; flex: 1; min-height: 220px; position: relative; border-radius: 6px; overflow: hidden;"></div>
+              
+              <!-- 3D Footer Status Readout -->
               <div style="background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-sm); padding: 5px 10px; font-size: 10.5px; font-weight: 700; color: #38bdf8; margin-top: 6px; display: flex; justify-content: space-between; align-items: center;">
-                <span>Sinyal Bumi: <strong>+10.25°</strong></span>
-                <span>Tebing Kawah: <strong>-2.10°</strong></span>
-                <span style="color: #34d399;">Klirens: <strong>+12.35° [AMAN]</strong></span>
+                <span id="readout-3d-status" style="color: #34d399;">● GO FOR LANDING | Site Alpha • Skor 92/100</span>
+                <span id="readout-3d-elev">Elevasi: 5.828 m</span>
+                <span id="readout-3d-margin" style="color: #facc15;">Surya: +6.3° | DTE: +6.5°</span>
               </div>
             </div>
 
-            <!-- Right Column: Radar Sky-Plot & Human-Friendly Explanation -->
-            <div style="display: flex; flex-direction: column; justify-content: center; height: 100%; box-sizing: border-box;">
+            <!-- Right Column: 3 Authentic Cards matching scan_terrain.py -->
+            <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; gap: 6px; box-sizing: border-box;">
               
-              <!-- Radar Sky-Plot Mini Box -->
-              <div style="display: flex; align-items: center; gap: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: var(--radius-md); padding: 8px 12px; margin-bottom: 8px;">
-                <div class="radar-frame" id="skyplot-box" style="width: 72px; height: 72px; min-width: 72px; position: relative; margin: 0; border-radius: 50%; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                  <div class="spinner"></div>
+              <!-- KARTU 1: PANORAMA UFUK 360° (LOCAL HORIZON VIEW) -->
+              <div style="background: #060a14; border: 1px solid #1e293b; border-radius: var(--radius-md); padding: 8px 10px; flex: 1.1; display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <span id="card1-title" style="font-size: 10px; font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.5px;">
+                    PANORAMA UFUK 360° (LOCAL HORIZON VIEW) — SITE ALPHA
+                  </span>
+                  <span id="card1-clearance" style="font-size: 9.5px; font-weight: 800; color: #10b981; background: rgba(16, 185, 129, 0.15); padding: 2px 6px; border-radius: 4px;">
+                    Klirens Tebing: +12.35° [BEBAS]
+                  </span>
                 </div>
-                <div>
-                  <div style="font-size: 9.5px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">
-                    360° RADAR POLAR SKY-PLOT
-                  </div>
-                  <div id="skyplot-clearance-text" style="font-size: 12px; font-weight: 800; color: var(--emerald-safe); margin: 2px 0;">
-                    Klirens Tebing: +12.35°
-                  </div>
-                  <div style="font-size: 10px; color: var(--text-secondary); line-height: 1.35;">
-                    Garis pandang antena radio wahana mengarah ke Bumi tanpa terpotong tebing kawah.
-                  </div>
+                <!-- Canvas Panorama 360 -->
+                <div style="width: 100%; flex: 1; min-height: 95px; position: relative;">
+                  <canvas id="canvas-horizon-360" style="width: 100%; height: 100%; display: block; border-radius: 4px;"></canvas>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8; margin-top: 2px;">
+                  <span>■ Kontur Tebing LOLA</span>
+                  <span style="color: #38bdf8;">•••• Librasi Bumi (28h)</span>
+                  <span style="color: #facc15;">● Matahari (+6.3°)</span>
+                  <span style="color: #10b981;">◆ Bumi DTE (+6.6°)</span>
                 </div>
               </div>
 
-              <!-- Explanation Paragraph -->
-              <h4 style="font-size: 13px; font-weight: 800; color: var(--text-primary); margin: 0 0 3px;">
-                Mengapa Lokasi Ini Bebas Hambatan Sinyal?
-              </h4>
-              <p style="font-size: 11.5px; line-height: 1.5; color: var(--text-secondary); margin: 0 0 6px;">
-                Mons Mouton merupakan dataran tinggi terangkat (*elevated plateau*) di Kutub Selatan Bulan dengan elevasi mencapai <strong>+5.920 meter</strong>. Ketinggian ini menempatkan antena wahana jauh di atas dinding kawah di sekitarnya.
-              </p>
-              <p style="font-size: 11.5px; line-height: 1.5; color: var(--text-secondary); margin: 0 0 8px;">
-                Arah antena radio wahana ke Bumi berada pada elevasi <strong>+10.25°</strong>, yang menghasilkan margin sudut <strong>+12.35° di atas tebing kawah tertinggi</strong>. Dengan posisi ini, komunikasi transmisi data dengan stasiun kendali di Bumi berlangsung tanpa putus (*zero loss-of-signal*).
-              </p>
-
-              <!-- Safe Attribute Badges -->
-              <div style="display: flex; gap: 6px; flex-wrap: wrap;">
-                <span style="background: #ecfdf5; border: 1px solid #a7f3d0; color: #047857; font-size: 9.5px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">
-                  ✓ Sinyal Bumi: Direct Line-of-Sight
-                </span>
-                <span style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1d4ed8; font-size: 9.5px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">
-                  ✓ Daya Surya: 100% Aktif
-                </span>
-                <span style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; font-size: 9.5px; font-weight: 800; padding: 2px 8px; border-radius: 6px;">
-                  ✓ Lereng: 0.08° (Datar &amp; Stabil)
-                </span>
+              <!-- KARTU 2: PRAKIRAAN 14 HARI PASCA-PENDARATAN -->
+              <div style="background: #060a14; border: 1px solid #1e293b; border-radius: var(--radius-md); padding: 8px 10px; flex: 1.0; display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <span id="card2-title" style="font-size: 10px; font-weight: 800; color: #f8fafc; letter-spacing: 0.4px;">
+                    PRAKIRAAN 14 HARI: Surya 65% • Sinyal DTE 100% • Suhu ≈ 167 K
+                  </span>
+                  <span style="font-size: 8.5px; color: #94a3b8;">14 Hari Operasi</span>
+                </div>
+                <!-- Canvas Prakiraan 14d -->
+                <div style="width: 100%; flex: 1; min-height: 80px; position: relative;">
+                  <canvas id="canvas-forecast-14d" style="width: 100%; height: 100%; display: block; border-radius: 4px;"></canvas>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 8.5px; color: #94a3b8; margin-top: 2px;">
+                  <span style="color: #facc15;">— Margin Surya (Daya)</span>
+                  <span style="color: #38bdf8;">— Margin Bumi (Sinyal DTE)</span>
+                  <span style="color: #ef4444;">-- Batas Terhalang Bukit (0°)</span>
+                </div>
               </div>
+
+              <!-- KARTU 3: PERBANDINGAN KANDIDAT LOKASI -->
+              <div style="background: #0b1120; border: 1px solid #1e293b; border-radius: var(--radius-md); padding: 6px 8px; flex: 1.0; display: flex; flex-direction: column; justify-content: space-between;">
+                <div style="font-size: 9.5px; font-weight: 800; color: #94a3b8; text-transform: uppercase; margin-bottom: 4px; display: flex; justify-content: space-between;">
+                  <span>PERBANDINGAN KANDIDAT LOKASI (19 Nov 2026 06:00 UTC)</span>
+                  <span style="color: #38bdf8; cursor: pointer;">Klik baris untuk memilih</span>
+                </div>
+                <!-- Table -->
+                <table style="width: 100%; border-collapse: collapse; font-size: 9.5px; text-align: center; color: #cbd5e1;">
+                  <thead>
+                    <tr style="border-bottom: 1px solid #334155; color: #94a3b8; font-size: 8.5px;">
+                      <th style="padding: 2px 4px; text-align: left;">Kandidat</th>
+                      <th style="padding: 2px 4px;">Lereng</th>
+                      <th style="padding: 2px 4px;">Jarak PSR</th>
+                      <th style="padding: 2px 4px;">Surya</th>
+                      <th style="padding: 2px 4px;">DTE</th>
+                      <th style="padding: 2px 4px;">14h Pwr/DTE</th>
+                      <th style="padding: 2px 4px;">Keputusan</th>
+                    </tr>
+                  </thead>
+                  <tbody id="candidate-table-body">
+                    <tr id="row-ALPHA" onclick="select3DSite('ALPHA')" style="background: #0f2942; color: #38bdf8; font-weight: 800; cursor: pointer; border-bottom: 1px solid #1e293b;">
+                      <td style="padding: 3px 4px; text-align: left;">► Site Alpha</td>
+                      <td style="padding: 3px 4px;">0.00°</td>
+                      <td style="padding: 3px 4px;">6.6 km</td>
+                      <td style="padding: 3px 4px;">+6.3°</td>
+                      <td style="padding: 3px 4px;">+6.5°</td>
+                      <td style="padding: 3px 4px;">65% / 100%</td>
+                      <td style="padding: 3px 4px;"><span style="background: #065f46; color: #ecfdf5; padding: 1px 6px; border-radius: 3px; font-weight: 800;">GO (92%)</span></td>
+                    </tr>
+                    <tr id="row-BETA" onclick="select3DSite('BETA')" style="cursor: pointer; border-bottom: 1px solid #1e293b;">
+                      <td style="padding: 3px 4px; text-align: left;">Site Beta</td>
+                      <td style="padding: 3px 4px;">0.00°</td>
+                      <td style="padding: 3px 4px;">10.0 km</td>
+                      <td style="padding: 3px 4px;">+6.2°</td>
+                      <td style="padding: 3px 4px;">+4.0°</td>
+                      <td style="padding: 3px 4px;">81% / 92%</td>
+                      <td style="padding: 3px 4px;"><span style="background: #065f46; color: #ecfdf5; padding: 1px 6px; border-radius: 3px; font-weight: 800;">GO (88%)</span></td>
+                    </tr>
+                    <tr id="row-GAMMA" onclick="select3DSite('GAMMA')" style="cursor: pointer;">
+                      <td style="padding: 3px 4px; text-align: left;">Site Gamma</td>
+                      <td style="padding: 3px 4px;">0.00°</td>
+                      <td style="padding: 3px 4px;">8.6 km</td>
+                      <td style="padding: 3px 4px;">+6.1°</td>
+                      <td style="padding: 3px 4px;">+5.4°</td>
+                      <td style="padding: 3px 4px;">58% / 100%</td>
+                      <td style="padding: 3px 4px;"><span style="background: #7f1d1d; color: #fee2e2; padding: 1px 6px; border-radius: 3px; font-weight: 800;">NO-GO</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
             </div>
 
           </div>
 
           <!-- Bottom CTA to Simulator -->
-          <div style="display: flex; justify-content: flex-end; align-items: center; padding-top: 8px; border-top: 1px solid var(--border-light);">
-            <button class="btn-finder-hero" onclick="switchView('simulasi'); playAvionicBeep(800, 'sine');" style="padding: 10px 24px; font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(14, 116, 144, 0.35);">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 6px; border-top: 1px solid var(--border-light);">
+            <div style="font-size: 11px; color: var(--text-secondary);">
+              <strong>Navigasi 3D:</strong> Geser tetikus untuk memutar sudut pandang • Roda tetikus untuk zoom.
+            </div>
+            <button class="btn-finder-hero" onclick="switchView('simulasi'); playAvionicBeep(800, 'sine');" style="padding: 8px 20px; font-size: 12.5px; font-weight: 800; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(14, 116, 144, 0.35);">
               <span>Lanjut: Uji Pendaratan di Simulator Penerbangan</span>
               <span>&rarr;</span>
             </button>
@@ -954,6 +1042,6 @@
   </div>
 
   <!-- JAVASCRIPT SYSTEM ENGINE -->
-  <script src="/js/app.js?v=14"></script>
+  <script src="/js/app.js?v=15"></script>
 </body>
 </html>

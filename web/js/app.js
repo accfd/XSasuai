@@ -1405,12 +1405,28 @@
       requestAnimationFrame(loop);
     }
 
-        // 3D Horizon & Direct-to-Earth Signal Beam Visualizer (Slide 3)
+    // =========================================================================
+    // 3D HORIZON & TOPOGRAFI TERRAIN REALISTIS (BERDASARKAN SCAN_TERRAIN.PY)
+    // =========================================================================
     let horizonViewerInitialized = false;
     let horizonScene, horizonCamera, horizonRenderer;
-    let horizonMeshGroup;
+    let terrainMeshGroup, terrainMeshMat;
+    let realTerrainData = null;
+    let terrainTextures = {};
+    let active3DSiteKey = "ALPHA";
+    let active3DLayerKey = "mcda";
+    let activeSitePinGroup = null;
+    let sitePinsMap = {};
+    let earthBeamGroup = null;
+    let sunBeamGroup = null;
 
-    function initThreeHorizonViewer() {
+    let isDragging3D = false;
+    let prevMouse3DX = 0, prevMouse3DY = 0;
+    let terrainOrbitAngle = -Math.PI / 4;
+    let terrainCamPitch = 14;
+    let terrainCamDist = 28;
+
+    async function initThreeHorizonViewer() {
       if (horizonViewerInitialized) {
         onWindowResizeHorizon();
         return;
@@ -1418,16 +1434,15 @@
       const container = document.getElementById("threeHorizonContainer");
       if (!container) return;
 
-      const w = container.clientWidth || 480;
-      const h = container.clientHeight || 320;
+      const w = container.clientWidth || 540;
+      const h = container.clientHeight || 260;
 
       // 1. Scene & Camera
       horizonScene = new THREE.Scene();
       horizonScene.background = new THREE.Color(0x030712);
 
-      horizonCamera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
-      horizonCamera.position.set(-16, 12, 22);
-      horizonCamera.lookAt(0, 2, 0);
+      horizonCamera = new THREE.PerspectiveCamera(45, w / h, 0.1, 200);
+      updateHorizonCameraPos();
 
       // 2. Renderer
       horizonRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -1435,257 +1450,598 @@
       horizonRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       container.appendChild(horizonRenderer.domElement);
 
-      // 3. Lights
-      const ambLight = new THREE.AmbientLight(0xffffff, 0.55);
+      // 3. Lighting
+      const ambLight = new THREE.AmbientLight(0xffffff, 0.7);
       horizonScene.add(ambLight);
 
-      const dirLight = new THREE.DirectionalLight(0xfffbeb, 1.3);
-      dirLight.position.set(20, 18, 12);
+      const dirLight = new THREE.DirectionalLight(0xfffbeb, 1.4);
+      dirLight.position.set(30, 40, 20);
       horizonScene.add(dirLight);
 
-      horizonMeshGroup = new THREE.Group();
-      horizonScene.add(horizonMeshGroup);
+      terrainMeshGroup = new THREE.Group();
+      horizonScene.add(terrainMeshGroup);
 
-      // 4. Procedural Crater & Mountain Terrain Mesh
-      const terrainGeo = new THREE.PlaneGeometry(26, 26, 48, 48);
-      terrainGeo.rotateX(-Math.PI / 2);
-      const posAttr = terrainGeo.attributes.position;
-      for (let i = 0; i < posAttr.count; i++) {
-        const x = posAttr.getX(i);
-        const z = posAttr.getZ(i);
-        const dist = Math.sqrt(x * x + z * z);
-        let y = 0;
-        // Central elevated plateau (Mons Mouton Crest)
-        if (dist < 3.2) {
-          y = 3.6 - (dist / 3.2) * 0.3;
-        } else if (dist < 7.2) {
-          // Surrounding crater depression
-          y = 1.0 - Math.sin(((dist - 3.2) / 4.0) * Math.PI) * 0.8;
-        } else if (dist < 11.0) {
-          // Elevated crater rim ridge
-          const rimFactor = Math.sin(((dist - 7.2) / 3.8) * Math.PI);
-          y = 1.4 + rimFactor * 2.2;
-        } else {
-          y = 1.2;
-        }
-        // Surface roughness
-        y += (Math.sin(x * 1.4) + Math.cos(z * 1.4)) * 0.12;
-        posAttr.setY(i, y);
-      }
-      terrainGeo.computeVertexNormals();
-
-      const terrainMat = new THREE.MeshStandardMaterial({
-        color: 0x334155,
-        roughness: 0.9,
-        metalness: 0.1,
-        flatShading: true
-      });
-      const terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
-      horizonMeshGroup.add(terrainMesh);
-
-      // Wireframe overlay for aerospace aesthetic
-      const wireMat = new THREE.MeshBasicMaterial({ color: 0x64748b, wireframe: true, transparent: true, opacity: 0.22 });
-      const wireMesh = new THREE.Mesh(terrainGeo, wireMat);
-      horizonMeshGroup.add(wireMesh);
-
-      // 5. Lander on Mons Mouton Crest
-      const landerGroup = new THREE.Group();
-      landerGroup.position.set(0, 3.6, 0);
-
-      const landerGeo = new THREE.CylinderGeometry(0.32, 0.48, 0.75, 8);
-      const landerMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.2 });
-      const landerMesh = new THREE.Mesh(landerGeo, landerMat);
-      landerMesh.position.y = 0.38;
-      landerGroup.add(landerMesh);
-
-      const beaconLightGeo = new THREE.SphereGeometry(0.18, 16, 16);
-      const beaconLightMat = new THREE.MeshBasicMaterial({ color: 0x10b981 });
-      const beaconLight = new THREE.Mesh(beaconLightGeo, beaconLightMat);
-      beaconLight.position.y = 0.9;
-      landerGroup.add(beaconLight);
-
-      horizonMeshGroup.add(landerGroup);
-
-      // 6. Direct-to-Earth Signal Beam (Laser Beam to Earth at +10.25° elevation)
-      const beamAngleRad = 10.25 * Math.PI / 180;
-      const beamLength = 22;
-      const beamEndX = Math.cos(beamAngleRad) * beamLength;
-      const beamEndY = 3.6 + 0.9 + Math.sin(beamAngleRad) * beamLength;
-      const beamEndZ = 0;
-
-      const beamCurve = new THREE.LineCurve3(
-        new THREE.Vector3(0, 3.6 + 0.9, 0),
-        new THREE.Vector3(beamEndX, beamEndY, beamEndZ)
-      );
-      const beamGeo = new THREE.TubeGeometry(beamCurve, 20, 0.08, 8, false);
-      const beamMat = new THREE.MeshBasicMaterial({
-        color: 0x38bdf8,
-        transparent: true,
-        opacity: 0.85
-      });
-      const beamMesh = new THREE.Mesh(beamGeo, beamMat);
-      horizonMeshGroup.add(beamMesh);
-
-      // Halo tube
-      const haloGeo = new THREE.TubeGeometry(beamCurve, 20, 0.22, 8, false);
-      const haloMat = new THREE.MeshBasicMaterial({
-        color: 0x0284c7,
-        transparent: true,
-        opacity: 0.35,
-        wireframe: true
-      });
-      const haloMesh = new THREE.Mesh(haloGeo, haloMat);
-      horizonMeshGroup.add(haloMesh);
-
-      // Helper: Canvas Text Sprite for Aerospace 3D Annotations
-      function createHorizonTextSprite(text, bgColor, borderColor) {
-        const canvas = document.createElement('canvas');
-        canvas.width = 512;
-        canvas.height = 128;
-        const ctx = canvas.getContext('2d');
-        
-        ctx.fillStyle = bgColor || "rgba(15, 23, 42, 0.85)";
-        ctx.strokeStyle = borderColor || "#38bdf8";
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        if (ctx.roundRect) {
-          ctx.roundRect(10, 10, 492, 108, 16);
-        } else {
-          ctx.rect(10, 10, 492, 108);
-        }
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = "#ffffff";
-        ctx.font = "bold 30px sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(text, 256, 64);
-
-        const tex = new THREE.CanvasTexture(canvas);
-        tex.minFilter = THREE.LinearFilter;
-        const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
-        const sprite = new THREE.Sprite(mat);
-        sprite.scale.set(5.5, 1.38, 1);
-        return sprite;
+      // 4. Load Real Terrain JSON & Textures from scan_terrain.py
+      try {
+        const resp = await fetch("/web_data/terrain_3d_data.json");
+        realTerrainData = await resp.json();
+      } catch (err) {
+        console.warn("Gagal load terrain_3d_data.json:", err);
       }
 
-      // Sprite 1: Posisi Wahana di Mons Mouton Crest
-      const landerSprite = createHorizonTextSprite("📍 Posisi Kita: Mons Mouton (+5.920 m)", "rgba(16, 185, 129, 0.9)", "#10b981");
-      landerSprite.position.set(0, 5.3, 0);
-      horizonMeshGroup.add(landerSprite);
+      // Preload Textures
+      const texLoader = new THREE.TextureLoader();
+      terrainTextures["mcda"] = texLoader.load("/web_data/textures/tex_mcda.png");
+      terrainTextures["dem"] = texLoader.load("/web_data/textures/tex_dem.png");
+      terrainTextures["slope"] = texLoader.load("/web_data/textures/tex_slope.png");
 
-      // Line leader to lander
-      const landerLineGeo = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, 4.4, 0),
-        new THREE.Vector3(0, 4.7, 0)
-      ]);
-      const landerLineMat = new THREE.LineBasicMaterial({ color: 0x10b981, linewidth: 2 });
-      horizonMeshGroup.add(new THREE.Line(landerLineGeo, landerLineMat));
+      // Build Real Terrain Mesh from Heightmap
+      buildRealTerrainMesh();
 
-      // Sprite 2: Puncak Tebing Kawah
-      const rimSprite = createHorizonTextSprite("⛰️ Dinding Tebing Kawah (-2.10°)", "rgba(225, 29, 72, 0.85)", "#f43f5e");
-      rimSprite.position.set(9.2, 4.2, 0);
-      horizonMeshGroup.add(rimSprite);
+      // Setup Mouse Orbit Controls
+      setupHorizonControls(container);
 
-      // Sprite 3: Klirens Bebas Halangan Sinyal ke Bumi
-      const clearanceSprite = createHorizonTextSprite("✓ Klirens Sinyal +12.35° [BEBAS RINTANGAN]", "rgba(14, 116, 144, 0.95)", "#38bdf8");
-      clearanceSprite.position.set(9.2, 6.4, 0);
-      horizonMeshGroup.add(clearanceSprite);
+      // Render 2D Scientific Cards (Panorama 360 & Prakiraan 14d)
+      renderHorizon360Canvas();
+      renderForecast14dCanvas();
+      updateCandidateTableVisual();
 
-      // Vertical measurement bracket between rim and beam
-      const beamHeightAtRim = 3.6 + 0.9 + Math.tan(beamAngleRad) * 9.2;
-      const bracketGeo = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(9.2, 3.4, 0),
-        new THREE.Vector3(9.2, beamHeightAtRim, 0)
-      ]);
-      const bracketMat = new THREE.LineDashedMaterial({
-        color: 0x38bdf8,
-        dashSize: 0.3,
-        gapSize: 0.2,
-        linewidth: 2
-      });
-      const bracketLine = new THREE.Line(bracketGeo, bracketMat);
-      bracketLine.computeLineDistances();
-      horizonMeshGroup.add(bracketLine);
-
-      // 7. Earth Sphere at the end of the beam
-      const earthGeo = new THREE.SphereGeometry(1.2, 24, 24);
-      const earthMat = new THREE.MeshStandardMaterial({
-        color: 0x2563eb,
-        roughness: 0.4,
-        emissive: 0x1d4ed8,
-        emissiveIntensity: 0.35
-      });
-      const earthSphere = new THREE.Mesh(earthGeo, earthMat);
-      earthSphere.position.set(beamEndX + 1.2, beamEndY + 0.3, beamEndZ);
-      horizonMeshGroup.add(earthSphere);
-
-      const atmosGeo = new THREE.SphereGeometry(1.4, 24, 24);
-      const atmosMat = new THREE.MeshBasicMaterial({
-        color: 0x38bdf8,
-        transparent: true,
-        opacity: 0.3,
-        wireframe: true
-      });
-      const atmosMesh = new THREE.Mesh(atmosGeo, atmosMat);
-      atmosMesh.position.copy(earthSphere.position);
-      horizonMeshGroup.add(atmosMesh);
-
-      // 8. Interactive Mouse Rotation Drag
-      let isDraggingHorizon = false;
-      let prevMouseX = 0, prevMouseY = 0;
-      const dom = horizonRenderer.domElement;
-      dom.style.cursor = "grab";
-
-      dom.addEventListener("mousedown", (e) => {
-        isDraggingHorizon = true;
-        prevMouseX = e.clientX;
-        prevMouseY = e.clientY;
-        dom.style.cursor = "grabbing";
-      });
-
-      window.addEventListener("mouseup", () => {
-        isDraggingHorizon = false;
-        if (dom) dom.style.cursor = "grab";
-      });
-
-      window.addEventListener("mousemove", (e) => {
-        if (!isDraggingHorizon || !horizonMeshGroup) return;
-        const dx = e.clientX - prevMouseX;
-        const dy = e.clientY - prevMouseY;
-        horizonMeshGroup.rotation.y += dx * 0.008;
-        horizonCamera.position.y = Math.max(4, Math.min(25, horizonCamera.position.y - dy * 0.08));
-        horizonCamera.lookAt(0, 2, 0);
-        prevMouseX = e.clientX;
-        prevMouseY = e.clientY;
-      });
-
-      // 9. Render Loop
+      // Render Loop
       function animateHorizon() {
         requestAnimationFrame(animateHorizon);
-        if (!isDraggingHorizon && horizonMeshGroup) {
-          horizonMeshGroup.rotation.y += 0.0015;
+        if (!isDragging3D && terrainMeshGroup) {
+          terrainMeshGroup.rotation.y += 0.0008; // subtle aerospace slow rotation
         }
-        const time = performance.now() * 0.005;
-        beamMat.opacity = 0.7 + Math.sin(time) * 0.25;
-        beaconLight.scale.setScalar(1 + Math.sin(time * 2) * 0.3);
-
+        if (earthBeamGroup) {
+          const t = performance.now() * 0.005;
+          earthBeamGroup.children.forEach((c) => {
+            if (c.material && c.material.opacity !== undefined) {
+              c.material.opacity = 0.65 + Math.sin(t) * 0.25;
+            }
+          });
+        }
         horizonRenderer.render(horizonScene, horizonCamera);
       }
       animateHorizon();
       horizonViewerInitialized = true;
     }
 
+    function updateHorizonCameraPos() {
+      if (!horizonCamera) return;
+      const cx = Math.sin(terrainOrbitAngle) * terrainCamDist;
+      const cz = Math.cos(terrainOrbitAngle) * terrainCamDist;
+      horizonCamera.position.set(cx, terrainCamPitch, cz);
+      horizonCamera.lookAt(0, 1.5, 0);
+    }
+
+    function setupHorizonControls(container) {
+      const dom = horizonRenderer.domElement;
+      dom.style.cursor = "grab";
+
+      dom.addEventListener("mousedown", (e) => {
+        isDragging3D = true;
+        prevMouse3DX = e.clientX;
+        prevMouse3DY = e.clientY;
+        dom.style.cursor = "grabbing";
+      });
+
+      window.addEventListener("mouseup", () => {
+        isDragging3D = false;
+        if (dom) dom.style.cursor = "grab";
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!isDragging3D || !terrainMeshGroup) return;
+        const dx = e.clientX - prevMouse3DX;
+        const dy = e.clientY - prevMouse3DY;
+        terrainOrbitAngle -= dx * 0.008;
+        terrainCamPitch = Math.max(3, Math.min(35, terrainCamPitch - dy * 0.08));
+        updateHorizonCameraPos();
+        prevMouse3DX = e.clientX;
+        prevMouse3DY = e.clientY;
+      });
+
+      dom.addEventListener("wheel", (e) => {
+        e.preventDefault();
+        terrainCamDist = Math.max(12, Math.min(55, terrainCamDist + (e.deltaY > 0 ? 2.5 : -2.5)));
+        updateHorizonCameraPos();
+      }, { passive: false });
+    }
+
+    function buildRealTerrainMesh() {
+      const heightImg = new Image();
+      heightImg.crossOrigin = "anonymous";
+      heightImg.src = "/web_data/textures/heightmap.png";
+      heightImg.onload = () => {
+        const offCanvas = document.createElement("canvas");
+        const ctx = offCanvas.getContext("2d");
+        const w = heightImg.width || 369;
+        const h = heightImg.height || 180;
+        offCanvas.width = w;
+        offCanvas.height = h;
+        ctx.drawImage(heightImg, 0, 0);
+        const imgData = ctx.getImageData(0, 0, w, h).data;
+
+        const meshW = 36.0;
+        const meshH = 36.0 * (h / w);
+        const segW = Math.min(120, w - 1);
+        const segH = Math.min(60, h - 1);
+
+        const geo = new THREE.PlaneGeometry(meshW, meshH, segW, segH);
+        geo.rotateX(-Math.PI / 2);
+        const posAttr = geo.attributes.position;
+
+        for (let i = 0; i < posAttr.count; i++) {
+          const vx = posAttr.getX(i);
+          const vz = posAttr.getZ(i);
+
+          const u = (vx + meshW / 2) / meshW;
+          const v = (vz + meshH / 2) / meshH;
+
+          const px = Math.min(w - 1, Math.max(0, Math.floor(u * w)));
+          const py = Math.min(h - 1, Math.max(0, Math.floor(v * h)));
+
+          const idx = (py * w + px) * 4;
+          const hNorm = imgData[idx] / 255.0; // 0.0 to 1.0
+
+          // Vertical displacement matching plateau elevation
+          posAttr.setY(i, hNorm * 5.8);
+        }
+        geo.computeVertexNormals();
+
+        terrainMeshMat = new THREE.MeshStandardMaterial({
+          map: terrainTextures[active3DLayerKey] || terrainTextures["mcda"],
+          roughness: 0.85,
+          metalness: 0.15,
+          flatShading: false
+        });
+
+        const mesh = new THREE.Mesh(geo, terrainMeshMat);
+        terrainMeshGroup.add(mesh);
+
+        // Add subtle wireframe
+        const wireMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true, transparent: true, opacity: 0.08 });
+        terrainMeshGroup.add(new THREE.Mesh(geo, wireMat));
+
+        // Place Candidate Pins (Alpha, Beta, Gamma)
+        placeRealSitePins(meshW, meshH);
+        updateActiveSiteBeams(meshW, meshH);
+      };
+    }
+
+    function placeRealSitePins(meshW, meshH) {
+      if (!realTerrainData || !realTerrainData.sites) return;
+
+      const pinColors = {
+        ALPHA: 0xfacc15, // Yellow
+        BETA: 0x00e5ff,  // Cyan
+        GAMMA: 0xff4d4d  // Red
+      };
+
+      realTerrainData.sites.forEach((site) => {
+        const pinGroup = new THREE.Group();
+
+        const worldX = (site.norm_x - 0.5) * meshW;
+        const worldZ = (site.norm_y - 0.5) * meshH;
+        const worldY = site.elev_ratio * 5.8;
+
+        pinGroup.position.set(worldX, worldY, worldZ);
+
+        // Pole
+        const poleGeo = new THREE.CylinderGeometry(0.08, 0.08, 2.8, 8);
+        const poleMat = new THREE.MeshBasicMaterial({ color: pinColors[site.key] || 0xffffff });
+        const pole = new THREE.Mesh(poleGeo, poleMat);
+        pole.position.y = 1.4;
+        pinGroup.add(pole);
+
+        // Glowing Beacon Sphere
+        const sphereGeo = new THREE.SphereGeometry(0.35, 16, 16);
+        const sphereMat = new THREE.MeshStandardMaterial({
+          color: pinColors[site.key] || 0xffffff,
+          emissive: pinColors[site.key] || 0xffffff,
+          emissiveIntensity: 0.8
+        });
+        const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+        sphere.position.y = 2.8;
+        pinGroup.add(sphere);
+
+        // Floating Label Sprite
+        const sprite = createHorizonTextSprite(`${site.label} (${Math.round(site.elev)}m)`, "rgba(9, 13, 22, 0.9)", `#${pinColors[site.key].toString(16)}`);
+        sprite.position.set(0, 3.8, 0);
+        sprite.scale.set(4.8, 1.2, 1);
+        pinGroup.add(sprite);
+
+        terrainMeshGroup.add(pinGroup);
+        sitePinsMap[site.key] = { group: pinGroup, x: worldX, y: worldY, z: worldZ, site: site };
+      });
+    }
+
+    function updateActiveSiteBeams(meshW, meshH) {
+      if (earthBeamGroup) terrainMeshGroup.remove(earthBeamGroup);
+      if (sunBeamGroup) terrainMeshGroup.remove(sunBeamGroup);
+
+      const activePin = sitePinsMap[active3DSiteKey];
+      if (!activePin || !realTerrainData) return;
+
+      const origin = new THREE.Vector3(activePin.x, activePin.y + 2.8, activePin.z);
+
+      // 1. Direct-to-Earth Cyan Laser Beam
+      earthBeamGroup = new THREE.Group();
+      const earthAzRad = THREE.MathUtils.degToRad(realTerrainData.ephemeris.earth_az);
+      const earthElRad = THREE.MathUtils.degToRad(realTerrainData.ephemeris.earth_elev);
+
+      const beamLen = 28.0;
+      const dirX = Math.sin(earthAzRad) * Math.cos(earthElRad);
+      const dirY = Math.sin(earthElRad);
+      const dirZ = -Math.cos(earthAzRad) * Math.cos(earthElRad);
+
+      const earthTarget = origin.clone().add(new THREE.Vector3(dirX, dirY, dirZ).multiplyScalar(beamLen));
+
+      const beamCurve = new THREE.LineCurve3(origin, earthTarget);
+      const beamGeo = new THREE.TubeGeometry(beamCurve, 20, 0.08, 8, false);
+      const beamMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.85 });
+      earthBeamGroup.add(new THREE.Mesh(beamGeo, beamMat));
+
+      // Earth Blue Marble Sphere at tip
+      const earthGeo = new THREE.SphereGeometry(1.2, 24, 24);
+      const earthMat = new THREE.MeshStandardMaterial({ color: 0x2563eb, emissive: 0x1d4ed8, emissiveIntensity: 0.4 });
+      const earthSphere = new THREE.Mesh(earthGeo, earthMat);
+      earthSphere.position.copy(earthTarget);
+      earthBeamGroup.add(earthSphere);
+
+      // Earth Label Sprite
+      const earthLabel = createHorizonTextSprite(`BUMI DTE (+${realTerrainData.ephemeris.earth_elev.toFixed(1)}°)`, "rgba(15, 23, 42, 0.9)", "#38bdf8");
+      earthLabel.position.copy(earthTarget).add(new THREE.Vector3(0, 1.8, 0));
+      earthLabel.scale.set(4.4, 1.1, 1);
+      earthBeamGroup.add(earthLabel);
+
+      terrainMeshGroup.add(earthBeamGroup);
+
+      // 2. Yellow Sun Ray
+      sunBeamGroup = new THREE.Group();
+      const sunAzRad = THREE.MathUtils.degToRad(realTerrainData.ephemeris.sun_az);
+      const sunElRad = THREE.MathUtils.degToRad(realTerrainData.ephemeris.sun_elev);
+
+      const sunLen = 32.0;
+      const sDirX = Math.sin(sunAzRad) * Math.cos(sunElRad);
+      const sDirY = Math.sin(sunElRad);
+      const sDirZ = -Math.cos(sunAzRad) * Math.cos(sunElRad);
+
+      const sunTarget = origin.clone().add(new THREE.Vector3(sDirX, sDirY, sDirZ).multiplyScalar(sunLen));
+
+      const sunCurve = new THREE.LineCurve3(origin, sunTarget);
+      const sunBeamGeo = new THREE.TubeGeometry(sunCurve, 16, 0.06, 6, false);
+      const sunBeamMat = new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.75 });
+      sunBeamGroup.add(new THREE.Mesh(sunBeamGeo, sunBeamMat));
+
+      // Glowing Sun Sphere
+      const sunGeo = new THREE.SphereGeometry(1.6, 20, 20);
+      const sunMat = new THREE.MeshBasicMaterial({ color: 0xfde047 });
+      const sunSphere = new THREE.Mesh(sunGeo, sunMat);
+      sunSphere.position.copy(sunTarget);
+      sunBeamGroup.add(sunSphere);
+
+      terrainMeshGroup.add(sunBeamGroup);
+    }
+
+    function switch3DLayer(layerKey) {
+      active3DLayerKey = layerKey;
+      if (terrainMeshMat && terrainTextures[layerKey]) {
+        terrainMeshMat.map = terrainTextures[layerKey];
+        terrainMeshMat.needsUpdate = true;
+      }
+      document.querySelectorAll("#btn-layer-mcda, #btn-layer-dem, #btn-layer-slope").forEach(b => b.classList.remove("active"));
+      const btn = document.getElementById(`btn-layer-${layerKey}`);
+      if (btn) btn.classList.add("active");
+    }
+
+    function select3DSite(siteKey) {
+      active3DSiteKey = siteKey;
+      document.querySelectorAll("#btn-site-alpha, #btn-site-beta, #btn-site-gamma").forEach(b => b.classList.remove("active"));
+      const btn = document.getElementById(`btn-site-${siteKey.toLowerCase()}`);
+      if (btn) btn.classList.add("active");
+
+      // Update 3D beams
+      const meshW = 36.0, meshH = 36.0 * (180 / 369);
+      updateActiveSiteBeams(meshW, meshH);
+
+      // Smooth camera focus onto active site pin
+      const pin = sitePinsMap[siteKey];
+      if (pin) {
+        terrainOrbitAngle = Math.atan2(pin.x, pin.z) + 0.4;
+        updateHorizonCameraPos();
+      }
+
+      // Update 2D Scientific Cards & Readout
+      renderHorizon360Canvas();
+      renderForecast14dCanvas();
+      updateCandidateTableVisual();
+    }
+
+    function reset3DView() {
+      terrainOrbitAngle = -Math.PI / 4;
+      terrainCamPitch = 14;
+      terrainCamDist = 28;
+      updateHorizonCameraPos();
+    }
+
+    function updateCandidateTableVisual() {
+      if (!realTerrainData || !realTerrainData.sites) return;
+      const curSite = realTerrainData.sites.find(s => s.key === active3DSiteKey) || realTerrainData.sites[0];
+
+      // Update Table Highlight
+      ["ALPHA", "BETA", "GAMMA"].forEach((k) => {
+        const row = document.getElementById(`row-${k}`);
+        if (!row) return;
+        if (k === active3DSiteKey) {
+          row.style.background = "#0f2942";
+          row.style.color = "#38bdf8";
+          row.style.fontWeight = "800";
+        } else {
+          row.style.background = "transparent";
+          row.style.color = "#cbd5e1";
+          row.style.fontWeight = "normal";
+        }
+      });
+
+      // Update 3D Footer Status
+      const statusElem = document.getElementById("readout-3d-status");
+      const elevElem = document.getElementById("readout-3d-elev");
+      const marginElem = document.getElementById("readout-3d-margin");
+
+      if (statusElem) {
+        statusElem.innerHTML = curSite.is_go
+          ? `● GO FOR LANDING | ${curSite.label} • Skor ${Math.round(curSite.score_100)}/100`
+          : `● NO-GO | ${curSite.label} • Skor ${Math.round(curSite.score_100)}/100`;
+        statusElem.style.color = curSite.is_go ? "#34d399" : "#f87171";
+      }
+      if (elevElem) elevElem.innerText = `Elevasi: ${Math.round(curSite.elev).toLocaleString()} m`;
+      if (marginElem) marginElem.innerText = `Surya: ${curSite.sun_margin >= 0 ? '+' : ''}${curSite.sun_margin.toFixed(1)}° | DTE: ${curSite.earth_margin >= 0 ? '+' : ''}${curSite.earth_margin.toFixed(1)}°`;
+
+      // Update Card 1 Header
+      const c1Title = document.getElementById("card1-title");
+      const c1Clear = document.getElementById("card1-clearance");
+      if (c1Title) c1Title.innerText = `PANORAMA UFUK 360° (LOCAL HORIZON VIEW) — ${curSite.label.toUpperCase()}`;
+      if (c1Clear) {
+        c1Clear.innerText = `Klirens Tebing: +${curSite.earth_margin.toFixed(1)}° [${curSite.earth_margin >= 1.5 ? 'BEBAS' : 'TERHALANG'}]`;
+        c1Clear.style.color = curSite.earth_margin >= 1.5 ? "#10b981" : "#f87171";
+      }
+
+      // Update Card 2 Header
+      const c2Title = document.getElementById("card2-title");
+      if (c2Title) {
+        c2Title.innerText = `PRAKIRAAN 14 HARI: Surya ${Math.round(curSite.solar_cont_pct)}% • Sinyal DTE ${Math.round(curSite.dte_cont_pct)}% • Suhu ≈ ${Math.round(curSite.est_temp_k)} K`;
+      }
+    }
+
+    // Canvas 1: Panorama Ufuk 360° (Exact scan_terrain.py logic)
+    function renderHorizon360Canvas() {
+      const canvas = document.getElementById("canvas-horizon-360");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      canvas.width = canvas.parentElement.clientWidth || 440;
+      canvas.height = canvas.parentElement.clientHeight || 110;
+
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Dark background
+      ctx.fillStyle = "#050a14";
+      ctx.fillRect(0, 0, w, h);
+
+      if (!realTerrainData || !realTerrainData.sites) return;
+      const site = realTerrainData.sites.find(s => s.key === active3DSiteKey) || realTerrainData.sites[0];
+      const hor = site.horizon_deg || [];
+      const ep = realTerrainData.ephemeris;
+
+      // Coordinate mapping: Azimuth (0..360) -> X, Elev (-5..+14) -> Y
+      const minEl = -5.0, maxEl = 14.0;
+      const mapX = (az) => ((az % 360) / 360.0) * w;
+      const mapY = (el) => h - ((el - minEl) / (maxEl - minEl)) * h;
+
+      // 1. Grid & Azimuth Ticks
+      ctx.strokeStyle = "#1e293b";
+      ctx.lineWidth = 1;
+      [0, 90, 180, 270, 360].forEach((az) => {
+        const x = mapX(az);
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+      });
+
+      // 0° reference line
+      const y0 = mapY(0);
+      ctx.strokeStyle = "#334155";
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(0, y0);
+      ctx.lineTo(w, y0);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // 2. Kontur Tebing LOLA (Dark Blue Polygon)
+      ctx.fillStyle = "#0f2942";
+      ctx.strokeStyle = "#0284c7";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(0, h);
+      for (let az = 0; az < 360; az++) {
+        const el = hor[az] !== undefined ? hor[az] : 0;
+        ctx.lineTo(mapX(az), mapY(el));
+      }
+      ctx.lineTo(w, h);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // 3. Librasi Bumi (28h Dotted Loop)
+      if (ep.lib_az && ep.lib_el && ep.lib_az.length > 0) {
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([2, 3]);
+        ctx.beginPath();
+        for (let i = 0; i < ep.lib_az.length; i++) {
+          const lx = mapX(ep.lib_az[i]);
+          const ly = mapY(ep.lib_el[i]);
+          if (i === 0) ctx.moveTo(lx, ly);
+          else ctx.lineTo(lx, ly);
+        }
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      // 4. Sun Marker (Yellow Circle)
+      const sunX = mapX(ep.sun_az);
+      const sunY = mapY(ep.sun_elev);
+      ctx.fillStyle = "#facc15";
+      ctx.beginPath();
+      ctx.arc(sunX, sunY, 5.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = "#fde047";
+      ctx.font = "bold 9px monospace";
+      ctx.fillText(`Matahari (+${ep.sun_elev.toFixed(1)}°)`, Math.min(w - 95, sunX + 8), sunY - 4);
+
+      // 5. Earth DTE Marker (Green Diamond)
+      const earthX = mapX(ep.earth_az);
+      const earthY = mapY(ep.earth_elev);
+      ctx.fillStyle = site.earth_margin >= 1.5 ? "#10b981" : "#f97316";
+      ctx.beginPath();
+      ctx.moveTo(earthX, earthY - 6);
+      ctx.lineTo(earthX + 6, earthY);
+      ctx.lineTo(earthX, earthY + 6);
+      ctx.lineTo(earthX - 6, earthY);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = "#7dd3fc";
+      ctx.font = "bold 9px monospace";
+      ctx.fillText(`Bumi (+${ep.earth_elev.toFixed(1)}°)`, Math.max(8, earthX - 70), earthY - 4);
+    }
+
+    // Canvas 2: Prakiraan 14 Hari Pasca-Pendaratan (Exact scan_terrain.py logic)
+    function renderForecast14dCanvas() {
+      const canvas = document.getElementById("canvas-forecast-14d");
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      canvas.width = canvas.parentElement.clientWidth || 440;
+      canvas.height = canvas.parentElement.clientHeight || 95;
+
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // Dark background
+      ctx.fillStyle = "#060a14";
+      ctx.fillRect(0, 0, w, h);
+
+      if (!realTerrainData || !realTerrainData.sites) return;
+      const site = realTerrainData.sites.find(s => s.key === active3DSiteKey) || realTerrainData.sites[0];
+      const sunEl = site.sun_el_series || [];
+      const sunHor = site.sun_hor_series || [];
+      const earthEl = site.earth_el_series || [];
+      const earthHor = site.earth_hor_series || [];
+
+      const n = sunEl.length;
+      if (n === 0) return;
+
+      const minM = -4.0, maxM = 10.0;
+      const mapX = (idx) => (idx / (n - 1)) * w;
+      const mapY = (val) => h - ((val - minM) / (maxM - minM)) * h;
+
+      // 0° dashed line (Batas Terhalang Bukit)
+      const y0 = mapY(0);
+      ctx.strokeStyle = "#ef4444";
+      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, y0);
+      ctx.lineTo(w, y0);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Curve 1: Margin Matahari (Yellow)
+      ctx.strokeStyle = "#facc15";
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      for (let i = 0; i < n; i++) {
+        const m = sunEl[i] - sunHor[i];
+        const x = mapX(i);
+        const y = mapY(m);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Curve 2: Margin Bumi DTE (Cyan)
+      ctx.strokeStyle = "#38bdf8";
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      for (let i = 0; i < n; i++) {
+        const m = earthEl[i] - earthHor[i];
+        const x = mapX(i);
+        const y = mapY(m);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Axis label
+      ctx.fillStyle = "#64748b";
+      ctx.font = "8px sans-serif";
+      ctx.fillText("Hari 0 (Touchdown)", 4, h - 3);
+      ctx.fillText("Hari 7", w / 2 - 12, h - 3);
+      ctx.fillText("Hari 14", w - 32, h - 3);
+    }
+
+    function createHorizonTextSprite(text, bgColor, borderColor) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 128;
+      const ctx = canvas.getContext('2d');
+      
+      ctx.fillStyle = bgColor || "rgba(15, 23, 42, 0.85)";
+      ctx.strokeStyle = borderColor || "#38bdf8";
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      if (ctx.roundRect) {
+        ctx.roundRect(10, 10, 492, 108, 16);
+      } else {
+        ctx.rect(10, 10, 492, 108);
+      }
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 32px sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, 256, 64);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.minFilter = THREE.LinearFilter;
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+      return new THREE.Sprite(mat);
+    }
+
     function onWindowResizeHorizon() {
       if (!horizonRenderer || !horizonCamera) return;
       const container = document.getElementById("threeHorizonContainer");
       if (!container) return;
-      const w = container.clientWidth || 480;
-      const h = container.clientHeight || 320;
+      const w = container.clientWidth || 540;
+      const h = container.clientHeight || 260;
       horizonCamera.aspect = w / h;
       horizonCamera.updateProjectionMatrix();
       horizonRenderer.setSize(w, h);
+
+      renderHorizon360Canvas();
+      renderForecast14dCanvas();
     }
 
 

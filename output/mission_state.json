@@ -3,7 +3,7 @@
   "scan_terrain_done": false,
   "landing_date": "2026-11-14",
   "landing_time_utc": "12:00",
-  "lunar_day_offset": 7.407673423728814,
+  "lunar_day_offset": 4.2,
   "sun_az": 153.79,
   "sun_el": -3.02,
   "earth_az": 31.3,
@@ -12,16 +12,16 @@
   "dte_ok": true,
   "horizon_planned": true,
   "target_coords_3d": [
-    187500.0,
-    95000.0,
-    5920.0
+    0.0,
+    0.0,
+    0.0
   ],
   "total_dv_ms": 1714.8,
   "prop_remaining_kg": 115.3,
-  "touchdown_time_s": 60.049999999998725,
-  "touchdown_vz_ms": 1.1981684902715348,
+  "touchdown_time_s": 0.0,
+  "touchdown_vz_ms": 0.0,
   "trajectory_solved": true,
-  "last_updated": "2026-11-14T14:16:06.899713+00:00",
+  "last_updated": "2026-11-14T16:06:21.985486+00:00",
   "schema_version": "1.0.0",
-  "last_written_by": "simulate_landing"
+  "last_written_by": "system"
 }

@@ -252,6 +252,7 @@ def make_app():
         (r"/api/timeline", TimelineHandler),
         (r"/api/trajectory", TrajectoryHandler),
         (r"/api/launch_sim", LaunchSimHandler),
+        (r"/web_data/(.*)", NoCacheStaticFileHandler, {"path": os.path.join(web_dir, "data")}),
         (r"/data/(.*)", tornado.web.StaticFileHandler, {"path": data_dir}),
         (r"/(.*)", NoCacheStaticFileHandler, {"path": web_dir, "default_filename": "index.html"}),
     ])
