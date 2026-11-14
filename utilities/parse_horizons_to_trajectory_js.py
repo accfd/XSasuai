@@ -6,13 +6,6 @@ NASA JPL Horizons to WebGL Trajectory Compiler
 Misi: Artemis III / SpaceX Starship Human Landing System (HLS)
 Target Pendaratan: Mons Mouton Crest, Kutub Selatan Bulan (-84.9°S, 33.3°W)
 =============================================================================
-Mengompilasi 2 berkas NASA JPL Horizons:
-1. data/moon_ephemeris.txt
-2. data/artemis_ephemeris_mons_mouton.txt
-menjadi modul JavaScript:
-- web/trajectory.js
-- web/synthetic_mission_trajectory.js
-=============================================================================
 """
 
 import os
@@ -107,27 +100,26 @@ def interpolate_moon_pos(moon_records, target_jd):
 
 def determine_flight_phase(day, alt_km, vel_kms):
     """Menentukan fase penerbangan berdasarkan waktu misi relatif dan profil ketinggian."""
-    if day <= 0.00625:
+    if day <= 0.00694:
         return "EARTH LAUNCH & ASCENT"
     elif day <= 0.07292:
         return "EARTH PARKING ORBIT (LEO)"
-    elif day <= 0.090:
+    elif day <= 0.09028:
         return "TRANS-LUNAR INJECTION (TLI)"
-    elif day <= 4.450:
+    elif day <= 4.380:
         return "TRANSLUNAR TRANSIT (COAST)"
-    elif day <= 4.530:
+    elif day <= 4.450:
         return "LUNAR POLAR ORBIT (REV 1 - 100 KM)"
-    elif day <= 4.6136:
+    elif day <= 4.52268:
         return "LUNAR POLAR ORBIT (REV 2 - 15 KM)"
-    elif day <= 4.6170:
+    elif day <= 4.5270:
         return "POWERED DESCENT: BRAKING PHASE"
-    elif day <= 4.6210:
+    elif day <= 4.5305:
         return "POWERED DESCENT: APPROACH & PITCH-UP"
+    elif day < 4.53101:
+        return "TERMINAL VERTICAL DESCENT"
     else:
-        if alt_km <= 0.005:
-            return "TOUCHDOWN (MONS MOUTON CREST)"
-        else:
-            return "TERMINAL VERTICAL DESCENT"
+        return "TOUCHDOWN (MONS MOUTON CREST)"
 
 
 def main():
@@ -195,6 +187,11 @@ def main():
             round(az * SCALE, 6),
             round(-ay * SCALE, 6)
         ]
+        moon_three = [
+            round(mx * SCALE, 6),
+            round(mz * SCALE, 6),
+            round(-my * SCALE, 6)
+        ]
 
         phase = determine_flight_phase(day, alt_km, v_tot)
 
@@ -205,11 +202,10 @@ def main():
 
         # Telemetri propulsi dan dinamika
         if "POWERED DESCENT" in phase or "TERMINAL" in phase or "TOUCHDOWN" in phase:
-            # Fase PDI: 720 detik menuju pendaratan
-            pdi_progress = max(0.0, min(1.0, (day - 4.6136) / (total_mission_days - 4.6136)))
+            pdi_progress = max(0.0, min(1.0, (day - 4.52268) / (total_mission_days - 4.52268)))
             current_fuel = max(42.5, initial_fuel - (pdi_progress * (initial_fuel - 42.5)))
             throttle_pct = 78.0 if pdi_progress < 0.8 else (35.0 if pdi_progress < 0.98 else 0.0)
-            pitch_deg = -15.0 + pdi_progress * 105.0  # -15° (horizontal braking) menuju +90° (vertical)
+            pitch_deg = -15.0 + pdi_progress * 105.0
             g_force = 1.0 + throttle_pct * 0.015
         elif "LAUNCH" in phase:
             current_fuel = 450.0
@@ -231,6 +227,7 @@ def main():
             "day": round(day, 6),
             "t_sec": round(t_sec, 1),
             "pos": pos_three,
+            "moon_pos": moon_three,
             "alt_km": round(alt_km, 3),
             "vel_kms": round(v_tot, 4),
             "fuel_kg": round(current_fuel, 1),
@@ -278,15 +275,15 @@ def main():
         "total_points": len(mission_points),
         "start_day": 0.0,
         "touchdown_day": round(total_mission_days, 5),
-        "touchdown_met": "T+04d:14h:55m",
+        "touchdown_met": "T+04d:12h:44m",
         "phases": {
-            "launch_ascent": {"day_start": 0.0, "day_end": 0.00625, "desc": "Earth Lift-Off & Gravity Turn"},
-            "leo_parking_orbit": {"day_start": 0.00625, "day_end": 0.07292, "desc": "1.3 Orbits around Earth (185 km)"},
-            "tli_burn": {"day_start": 0.07292, "day_end": 0.090, "desc": "Translunar Injection (+3.05 km/s Delta-V)"},
-            "translunar_coast": {"day_start": 0.090, "day_end": 4.450, "desc": "384,400 km Translunar Coast"},
-            "loi_rev1": {"day_start": 4.450, "day_end": 4.530, "desc": "Lunar Orbit Rev 1 (100 km Circular Polar)"},
-            "orbit_rev2": {"day_start": 4.530, "day_end": 4.6136, "desc": "Lunar Orbit Rev 2 (15 km Perilune Lowering)"},
-            "powered_descent": {"day_start": 4.6136, "day_end": round(total_mission_days, 5), "desc": "PDI 12-Min Descent & Vertical Touchdown at Mons Mouton"}
+            "launch_ascent": {"day_start": 0.0, "day_end": 0.00694, "desc": "Earth Lift-Off & Gravity Turn"},
+            "leo_parking_orbit": {"day_start": 0.00694, "day_end": 0.07292, "desc": "1.3 Orbits around Earth (185 km)"},
+            "tli_burn": {"day_start": 0.07292, "day_end": 0.09028, "desc": "Translunar Injection (+3.05 km/s Delta-V)"},
+            "translunar_coast": {"day_start": 0.09028, "day_end": 4.380, "desc": "384,400 km Translunar Coast"},
+            "loi_rev1": {"day_start": 4.380, "day_end": 4.450, "desc": "Lunar Orbit Rev 1 (100 km Circular Polar)"},
+            "orbit_rev2": {"day_start": 4.450, "day_end": 4.52268, "desc": "Lunar Orbit Rev 2 (15 km Perilune Lowering)"},
+            "powered_descent": {"day_start": 4.52268, "day_end": round(total_mission_days, 5), "desc": "PDI 12-Min Descent & Vertical Touchdown at Mons Mouton"}
         }
     }
 
@@ -304,7 +301,6 @@ def main():
             f.write(f"  {json.dumps(pt)},\n")
         f.write("];\n\n")
 
-        # Interpolasi JS Function
         f.write("""export function getMissionPointByDay(day) {
   const pts = MISSION_TRAJECTORY_POINTS;
   if (!pts || pts.length === 0) return null;
@@ -331,23 +327,24 @@ def main():
       (1 - t) * p1.pos[1] + t * p2.pos[1],
       (1 - t) * p1.pos[2] + t * p2.pos[2]
     ],
+    moon_pos: (p1.moon_pos && p2.moon_pos) ? [
+      (1 - t) * p1.moon_pos[0] + t * p2.moon_pos[0],
+      (1 - t) * p1.moon_pos[1] + t * p2.moon_pos[1],
+      (1 - t) * p1.moon_pos[2] + t * p2.moon_pos[2]
+    ] : null,
     alt_km: (1 - t) * p1.alt_km + t * p2.alt_km,
     vel_kms: (1 - t) * p1.vel_kms + t * p2.vel_kms,
-    phase: t < 0.5 ? p1.phase : p2.phase,
-    fuel_kg: (1 - t) * (p1.fuel_kg || 450.0) + t * (p2.fuel_kg || 450.0),
-    throttle_pct: t < 0.5 ? (p1.throttle_pct || 0) : (p2.throttle_pct || 0),
-    pitch_deg: (1 - t) * (p1.pitch_deg || 0) + t * (p2.pitch_deg || 0),
-    g_force: (1 - t) * (p1.g_force || 1.0) + t * (p2.g_force || 1.0)
+    fuel_kg: (1 - t) * p1.fuel_kg + t * p2.fuel_kg,
+    throttle_pct: (1 - t) * p1.throttle_pct + t * p2.throttle_pct,
+    pitch_deg: (1 - t) * p1.pitch_deg + t * p2.pitch_deg,
+    g_force: (1 - t) * p1.g_force + t * p2.g_force,
+    phase: t < 0.5 ? p1.phase : p2.phase
   };
 }
 """)
 
     print(f"  -> web/synthetic_mission_trajectory.js berhasil diperbarui ({len(mission_points)} poin).")
-    print("=" * 78)
-    print("Kompilasi Trajektori NASA JPL Horizons Selesai dengan Sukses!")
-    print("=" * 78)
 
 
 if __name__ == "__main__":
     main()
-

@@ -460,14 +460,13 @@ body:active { cursor: grabbing; }
   white-space: nowrap;
 }
 
-/* Position markers at actual phase times on the slider */
-/* timeRange = 9.05 - 0.141 = 8.909 days (data ends at ~day 9.05) */
-#pm-orbit { left: 0%; transform: translateX(0); }
-#pm-tli { left: 10.2%; }     /* day 1.05: (1.05-0.141)/8.909 */
-#pm-coast { left: 22%; }     /* visual adjustment */
-#pm-flyby { left: 57.9%; }   /* day 5.3: (5.3-0.141)/8.909 */
-#pm-return { left: 69%; }    /* day 6.3: (6.3-0.141)/8.909 */
-#pm-entry { left: 100%; transform: translateX(-100%); }
+/* Position markers cleanly across the mission timeline slider */
+#pm-orbit { left: 1%; }
+#pm-tli { left: 12%; }
+#pm-coast { left: 38%; }
+#pm-loi { left: 68%; }
+#pm-pdi { left: 84%; }
+#pm-touchdown { left: 98%; transform: translateX(-100%); }
 
 .phase-marker.active {
   color: #00d4ff;
@@ -762,9 +761,9 @@ import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 import { Line2 } from 'three/addons/lines/Line2.js';
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
-import { NASA_TRAJ, NASA_MOON, TRAJ_START_DAY, TRAJ_END_DAY, TRAJ_STEP_DAYS, TRAJ_N, TLI_INDEX } from './trajectory.js';
-import { LANDING_SUMMARY, LANDING_POINTS, getLandingPointByTime } from './lunar_landing_trajectory.js';
-import { MISSION_SUMMARY, MISSION_TRAJECTORY_POINTS, getMissionPointByDay } from './synthetic_mission_trajectory.js';
+import { NASA_TRAJ, NASA_MOON, TRAJ_START_DAY, TRAJ_END_DAY, TRAJ_STEP_DAYS, TRAJ_N, TLI_INDEX } from './trajectory.js?v=30';
+import { LANDING_SUMMARY, LANDING_POINTS, getLandingPointByTime } from './lunar_landing_trajectory.js?v=30';
+import { MISSION_SUMMARY, MISSION_TRAJECTORY_POINTS, getMissionPointByDay } from './synthetic_mission_trajectory.js?v=30';
 
 // ═══════════════════════════════════════════
 // CONSTANTS
@@ -1191,13 +1190,14 @@ MANEUVERS.forEach(m => {
     }));
     burnSprite.position.set(p.x * SCALE, p.y * SCALE, p.z * SCALE);
     
-    // Scale based on thrust: min 1.5, max 5
-    const baseScale = 1.5 + intensity * 3.5;
+    // Refined compact scale for burn markers: min 0.15, max 0.4
+    const baseScale = 0.15 + intensity * 0.25;
     burnSprite.scale.set(baseScale, baseScale, 1);
     maneuverGroup.add(burnSprite);
   }
 });
 
+maneuverGroup.visible = false;
 scene.add(maneuverGroup);
 
 let showManeuvers = false;
@@ -1363,9 +1363,9 @@ let beaconSprite;
   ctx.fillRect(0, 0, 128, 128);
   const tex = new THREE.CanvasTexture(c);
   beaconSprite = new THREE.Sprite(new THREE.SpriteMaterial({
-    map: tex, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false
+    map: tex, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false
   }));
-  beaconSprite.scale.set(2, 2, 1);
+  beaconSprite.scale.set(0.12, 0.12, 1);
   orionGroup.add(beaconSprite);
 })();
 
@@ -1659,9 +1659,16 @@ function animate() {
       if (simDay > MISSION_DAYS) simDay = MISSION_DAYS;
     }
 
-    // Moon position
-    const moonKm = getMoonPos(simDay);
-    moonGroup.position.set(moonKm.x * SCALE, moonKm.y * SCALE, moonKm.z * SCALE);
+    // ═══ UNIFIED ASTRODYNAMICS TIMELINE ENGINE ═══
+    const mPoint = getMissionPointByDay(simDay);
+
+    // Moon position (100% physically synchronized with trajectory ephemeris)
+    if (mPoint && mPoint.moon_pos) {
+      moonGroup.position.set(mPoint.moon_pos[0], mPoint.moon_pos[1], mPoint.moon_pos[2]);
+    } else {
+      const moonKm = getMoonPos(simDay);
+      moonGroup.position.set(moonKm.x * SCALE, moonKm.y * SCALE, moonKm.z * SCALE);
+    }
     moonMesh.lookAt(moonGroup.worldToLocal(new THREE.Vector3(0, 0, 0)));
     moonMesh.rotateY(Math.PI);
 
@@ -1671,9 +1678,6 @@ function animate() {
     const pulseOuter = 1.0 + 0.45 * Math.sin(now * 0.003);
     beaconOuterRing.scale.set(pulseOuter, pulseOuter, 1);
     beaconOuterRing.material.opacity = 0.3 + 0.3 * Math.sin(now * 0.004);
-
-    // ═══ UNIFIED ASTRODYNAMICS TIMELINE ENGINE ═══
-    const mPoint = getMissionPointByDay(simDay);
     
     const orionSc = new THREE.Vector3(mPoint.pos[0], mPoint.pos[1], mPoint.pos[2]);
     orionGroup.position.copy(orionSc);
@@ -1723,17 +1727,35 @@ function animate() {
     const currentG = (typeof mPoint.g_force === 'number') ? mPoint.g_force : (mPoint.phase && mPoint.phase.includes('LAUNCH') ? 1.4 : 1.0);
     const currentPhaseStr = mPoint.phase || 'FLIGHT';
 
-    // Beacon pulse
+    // Spacecraft Beacon dot (scaled smoothly with camera distance, no giant halo)
     const camDist = camera.position.distanceTo(orionGroup.position);
-    const fade = Math.min(1, camDist / 3);
-    if (beaconSprite) beaconSprite.material.opacity = fade * (0.7 + 0.3 * Math.sin(now * 0.005));
+    if (beaconSprite) {
+      const bScale = Math.max(0.04, Math.min(0.20, camDist * 0.007));
+      beaconSprite.scale.set(bScale, bScale, 1);
+      const fade = Math.min(1.0, Math.max(0.2, (camDist - 0.2) / 3.0));
+      beaconSprite.material.opacity = fade * (0.6 + 0.4 * Math.sin(now * 0.005));
+    }
 
-    // Traveled path from Earth launch to current position
-    const progressRatio = Math.max(0, Math.min(1.0, simDay / MISSION_DAYS));
-    const traveledIdx = Math.min(trajPts.length, Math.max(2, Math.ceil(progressRatio * trajPts.length)));
-    const traveledPts = trajPts.slice(0, traveledIdx);
+    // Traveled path from Earth launch to current spacecraft position (ZERO lag, ZERO lead)
+    let currentIdx = 0;
+    let bLow = 0, bHigh = MISSION_TRAJECTORY_POINTS.length - 1;
+    while (bLow <= bHigh) {
+      const bMid = (bLow + bHigh) >> 1;
+      if (MISSION_TRAJECTORY_POINTS[bMid].day <= simDay) {
+        currentIdx = bMid;
+        bLow = bMid + 1;
+      } else {
+        bHigh = bMid - 1;
+      }
+    }
+    const traveledPts = trajPts.slice(0, Math.max(1, currentIdx + 1));
     const positions = [];
     traveledPts.forEach(p => positions.push(p.x, p.y, p.z));
+    // Always append exact current spacecraft position so the drawn line meets Orion flawlessly:
+    positions.push(orionSc.x, orionSc.y, orionSc.z);
+    if (positions.length < 6) {
+      positions.push(orionSc.x, orionSc.y, orionSc.z);
+    }
     traveledLine.geometry.dispose();
     traveledLine.geometry = new LineGeometry();
     traveledLine.geometry.setPositions(positions);
@@ -1817,10 +1839,10 @@ function animate() {
     // Phase markers (based on mission day)
     [['pm-orbit', 0.0, 0.073],
      ['pm-tli', 0.073, 0.09],
-     ['pm-coast', 0.09, 4.45],
-     ['pm-loi', 4.45, 4.613],
-     ['pm-pdi', 4.613, 4.62193],
-     ['pm-touchdown', 4.62193, MISSION_DAYS + 1]].forEach(([id, s, e]) => {
+     ['pm-coast', 0.09, 4.38],
+     ['pm-loi', 4.38, 4.52268],
+     ['pm-pdi', 4.52268, 4.53101],
+     ['pm-touchdown', 4.53101, MISSION_DAYS + 1]].forEach(([id, s, e]) => {
       const el = document.getElementById(id);
       if (el) el.classList.toggle('active', simDay >= s && simDay < e);
     });
@@ -1829,9 +1851,10 @@ function animate() {
     const phaseTextEl = document.getElementById('phase-text');
     if (phaseTextEl) phaseTextEl.textContent = currentPhaseStr;
 
-    // Telemetry HUD update
+    // Telemetry HUD update (Computed from physical 3D world positions)
     const dEarth = Math.max(0, orionKm.length() - EARTH_RADIUS_KM);
-    const dMoon = Math.max(0, orionKm.clone().sub(moonKm).length() - MOON_RADIUS_KM);
+    const moonWorldKm = moonGroup.position.clone().multiplyScalar(1 / SCALE);
+    const dMoon = Math.max(0, orionKm.distanceTo(moonWorldKm) - MOON_RADIUS_KM);
     const distEarthEl = document.getElementById('dist-earth');
     const distMoonEl = document.getElementById('dist-moon');
     if (distEarthEl) distEarthEl.textContent = formatKm(dEarth);
