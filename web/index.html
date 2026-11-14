@@ -60,6 +60,10 @@
       flex-direction: column;
       padding: 16px 24px;
       gap: 16px;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     /* 1. COMPACT HEADER BAR */
@@ -67,13 +71,15 @@
       background: var(--bg-surface);
       border: 1px solid var(--border-light);
       border-radius: var(--radius-md);
-      padding: 10px 20px;
+      padding: 12px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 12px;
       box-shadow: var(--shadow-sm);
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .brand-group {
@@ -182,12 +188,30 @@
     /* 2. BENTO CONTAINER */
     .bento-container {
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
+      grid-template-columns: 1fr;
       gap: 16px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .bento-row-split {
+      display: grid;
+      grid-template-columns: 1.28fr 0.72fr;
+      gap: 16px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    @media (max-width: 1024px) {
+      .bento-row-split {
+        grid-template-columns: 1fr;
+      }
     }
 
     .bento-full {
       grid-column: 1 / -1;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .bento-card {
@@ -200,6 +224,8 @@
       flex-direction: column;
       gap: 12px;
       position: relative;
+      box-sizing: border-box;
+      width: 100%;
     }
 
     .card-header {
@@ -313,7 +339,7 @@
     .dem-map-frame {
       position: relative;
       width: 100%;
-      height: 340px;
+      height: 560px;
       background: #0f172a;
       border-radius: var(--radius-sm);
       overflow: hidden;
@@ -374,7 +400,7 @@
 
     .radar-frame {
       width: 100%;
-      height: 340px;
+      height: 220px;
       background: var(--bg-surface);
       border-radius: var(--radius-sm);
       border: 1px solid var(--border-light);
@@ -382,10 +408,13 @@
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      box-sizing: border-box;
+      padding: 6px;
     }
 
     .radar-frame img {
       max-height: 100%;
+      max-width: 100%;
       width: auto;
       object-fit: contain;
     }
@@ -1392,10 +1421,10 @@
   <!-- VIEW 1: MISSION CONSOLE (DEFAULT) -->
   <main id="view-console" class="bento-container">
 
-    <!-- BENTO 1: SITES (3 HORIZONTAL CARDS) -->
+    <!-- BENTO 1: TARGET UTAMA & REKOMENDASI MCDA -->
     <div class="bento-card bento-full">
       <div class="card-header">
-        <span class="card-title">Kandidat Lokasi Pendaratan Mons Mouton</span>
+        <span class="card-title">Sasaran Lokasi Pendaratan: Mons Mouton Crest (-84.9°S, 33.3°W)</span>
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
           <div class="api-status-chip">
             <span class="dot-online"></span> NASA JPL: ONLINE
@@ -1406,57 +1435,45 @@
         </div>
       </div>
 
-      <!-- SMART FINDER CALLOUT BANNER (SANGAT MENCOLOK) -->
-      <div class="smart-finder-callout">
+      <!-- SMART FINDER CALLOUT BANNER -->
+      <div class="smart-finder-callout" style="margin-bottom: 0;">
         <div class="callout-left">
-          <div class="callout-badge"> FITUR REKOMENDASI PENDARATAN OTOMATIS (MCDA)</div>
+          <div class="callout-badge">FITUR REKOMENDASI PENDARATAN OTOMATIS (MCDA)</div>
           <div class="callout-title">Cari Tanggal, Waktu & Posisi Pendaratan Paling Tepat</div>
           <div class="callout-desc">
-            Sistem otomatis memindai seluruh durasi misi 336 jam untuk mencari kombinasi aman dengan pencahayaan surya 100%, lereng &lt; 10°, dan sinyal Bumi stabil.
+            Sistem otomatis memindai seluruh durasi jendela misi 336 jam untuk mencari kombinasi pendaratan optimal dengan pencahayaan surya 100%, lereng &lt; 10°, elevasi dataran tinggi +1.420 m datum LOLA, dan transmisi sinyal langsung ke Bumi tanpa halangan bibir kawah.
           </div>
         </div>
         <button class="btn-finder-hero" onclick="openSmartFinderModal()">
           CARI TANGGAL & POSISI OPTIMAL
         </button>
       </div>
-
-      <div class="sites-row" id="sites-grid">
-        <!-- Injected via JavaScript -->
-      </div>
     </div>
 
-    <!-- BENTO 2A: TOPOGRAFI MONS MOUTON & GLOBE BULAN 3D -->
-    <div class="bento-card">
+    <!-- BENTO 2: HERO TOPOGRAFI MONS MOUTON & GLOBE BULAN 3D (FULL-WIDTH & TINGGI 560PX) -->
+    <div class="bento-card bento-full" id="card-topography-hero">
       <div class="card-header">
         <span class="card-title">Topografi & Posisi Bulan</span>
-        <div style="display: flex; gap: 8px; align-items: center;">
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
           <div class="segmented-tabs" style="padding: 2px;">
-            <button class="tab-btn active" id="btn-view-dem" onclick="setMapView('dem')" style="padding: 3px 8px; font-size: 10px;">
+            <button class="tab-btn active" id="btn-view-dem" onclick="setMapView('dem')" style="padding: 4px 12px; font-size: 11px;">
               DEM Mons Mouton
             </button>
-            <button class="tab-btn" id="btn-view-globe" onclick="setMapView('globe')" style="padding: 3px 8px; font-size: 10px;">
-               Globe Bulan 3D
+            <button class="tab-btn" id="btn-view-globe" onclick="setMapView('globe')" style="padding: 4px 12px; font-size: 11px;">
+              Globe Bulan 3D
             </button>
           </div>
-          <span class="badge-slope-safe" id="lbl-active-coords">-84.9°S, -33.3°W</span>
+          <span class="badge-slope-safe" id="lbl-active-coords" style="font-size: 11px; padding: 4px 10px;">-84.9°S, -33.3°W (Mons Mouton Crest)</span>
         </div>
       </div>
       <div class="dem-map-frame" id="map-frame-box">
         <!-- 1. 2D LOLA DEM View -->
         <div id="dem-view-container" style="width: 100%; height: 100%; position: relative;">
           <img src="/data/quickmap-lroc.png" alt="Mons Mouton LOLA DEM" class="dem-img">
-          <!-- Pin Interaktif -->
+          <!-- Pin Interaktif Sasaran Utama Mons Mouton -->
           <div class="map-pin active" id="pin-ALPHA" style="top: 38%; left: 75%;" onclick="selectSite('ALPHA')">
-            <div class="pin-circle"></div>
-            <div class="pin-label">Site Alpha (5,920m)</div>
-          </div>
-          <div class="map-pin" id="pin-BETA" style="top: 26%; left: 89%;" onclick="selectSite('BETA')">
-            <div class="pin-circle"></div>
-            <div class="pin-label">Site Beta (5,640m)</div>
-          </div>
-          <div class="map-pin" id="pin-GAMMA" style="top: 51%; left: 52%;" onclick="selectSite('GAMMA')">
-            <div class="pin-circle"></div>
-            <div class="pin-label">Site Gamma (5,410m)</div>
+            <div class="pin-circle" style="width: 18px; height: 18px; box-shadow: 0 0 16px #10b981;"></div>
+            <div class="pin-label" style="font-size: 11px; padding: 4px 10px;">Mons Mouton Crest (-84.9°S, 33.3°W) · 5,920m (Elevasi +1,420m)</div>
           </div>
         </div>
 
@@ -1467,8 +1484,8 @@
           <div class="globe-hud-overlay">
             <div class="globe-hud-info">
               <span class="hud-tag">ORBITAL CAMERA 3D</span>
-              <span id="globe-alt-readout" class="hud-alt">ALTITUDE: 1,737 KM</span>
-              <span id="globe-target-readout" class="hud-coord">SASARAN: MONS MOUTON (-84.9°S, 33.3°W)</span>
+              <span id="globe-alt-readout" class="hud-alt">ALTITUDE: 15.0 KM [TARGET LOCKED]</span>
+              <span id="globe-target-readout" class="hud-coord">SASARAN: MONS MOUTON CREST (-84.9°S, 33.3°W)</span>
             </div>
             <div class="globe-hud-actions">
               <button class="btn-hud" onclick="triggerFlyToAnimation()">
@@ -1485,64 +1502,67 @@
         </div>
       </div>
       <div class="frame-caption">
-        <span id="map-caption-left">Resolusi: 250 meter / piksel</span>
-        <span id="map-caption-right">Kutub Selatan Bulan (-84.9°S, 33.3°W)</span>
+        <span id="map-caption-left">Resolusi: 250 meter / piksel (LOLA DEM Topografi)</span>
+        <span id="map-caption-right">Perspektif: 3D Satellite Moon Globe · Mons Mouton Beacon (-84.9°S, 33.3°W)</span>
       </div>
     </div>
 
-    <!-- BENTO 2B: 360° POLAR HORIZON SKY-PLOT -->
-    <div class="bento-card">
-      <div class="card-header">
-        <span class="card-title">360° Polar Horizon Sky-Plot (Rintangan Kawah)</span>
-        <span id="skyplot-badge" style="font-size: 11px; font-weight: 700; color: var(--emerald-safe);">Direct Line-of-Sight</span>
-      </div>
-      <div class="radar-frame" id="skyplot-box">
-        <div class="spinner"></div>
-      </div>
-      <div class="frame-caption">
-        <span id="skyplot-clearance-text">Direct-to-Earth Clearance: +6.8° di atas bibir kawah</span>
-        <span>Matahari: Terang Bebas Bayangan</span>
-      </div>
-    </div>
+    <!-- ROW 3: SPLIT GRID (TIMELINE MISI 14-HARI & 360° POLAR SKY-PLOT KOMPAK) -->
+    <div class="bento-row-split bento-full">
+      <!-- BENTO 3: TIMELINE SCRUBBER 14-HARI -->
+      <div class="bento-card" style="margin: 0;">
+        <div class="card-header">
+          <span class="card-title">Timeline Misi 14-Hari (0 - 336 Jam) — Evaluasi Surya & Sinyal Bumi</span>
+          <div class="time-readout-pill" id="timeline-time-badge">
+            2026-11-14 12:00 UTC (+0h)
+          </div>
+        </div>
 
-    <!-- BENTO 3: TIMELINE SCRUBBER 14-HARI -->
-    <div class="bento-card bento-full">
-      <div class="card-header">
-        <span class="card-title">Timeline Misi 14-Hari (0 - 336 Jam) — Evaluasi Surya & Sinyal Bumi</span>
-        <div class="time-readout-pill" id="timeline-time-badge">
-          2026-11-14 12:00 UTC (+0h)
+        <div class="timeline-controls">
+          <div class="slider-row">
+            <input type="range" min="0" max="336" value="0" step="3" class="clean-slider" id="timeline-slider">
+          </div>
+          <div class="timeline-scale">
+            <span>0h (Awal Misi)</span>
+            <span>84h (Hari 3.5)</span>
+            <span>168h (Puncak Penyinaran)</span>
+            <span>252h (Hari 10.5)</span>
+            <span>336h (Akhir Jendela)</span>
+          </div>
+        </div>
+
+        <div class="tiles-grid">
+          <div class="data-tile">
+            <div class="tile-lbl">Matahari (Azimuth / Elevasi)</div>
+            <div class="tile-val" id="tile-sun" style="color: #b45309;">45.0° / +2.1°</div>
+          </div>
+          <div class="data-tile">
+            <div class="tile-lbl">Bumi DTE (Azimuth / Elevasi)</div>
+            <div class="tile-val" id="tile-earth" style="color: #0284c7;">12.5° / +6.8°</div>
+          </div>
+          <div class="data-tile">
+            <div class="tile-lbl">Suplai Daya Panel Surya</div>
+            <div class="tile-val" id="tile-solar" style="color: var(--emerald-safe);">100% ACTIVE</div>
+          </div>
+          <div class="data-tile">
+            <div class="tile-lbl">Jalur Komunikasi Bumi</div>
+            <div class="tile-val" id="tile-dte" style="color: var(--emerald-safe);">DIRECT LINE-OF-SIGHT</div>
+          </div>
         </div>
       </div>
 
-      <div class="timeline-controls">
-        <div class="slider-row">
-          <input type="range" min="0" max="336" value="0" step="3" class="clean-slider" id="timeline-slider">
+      <!-- BENTO 2B: 360° POLAR HORIZON SKY-PLOT (KOMPAK & RAPI) -->
+      <div class="bento-card" style="margin: 0;">
+        <div class="card-header">
+          <span class="card-title">360° Polar Sky-Plot (Rintangan Kawah)</span>
+          <span id="skyplot-badge" style="font-size: 11px; font-weight: 700; color: var(--emerald-safe);">Direct Line-of-Sight</span>
         </div>
-        <div class="timeline-scale">
-          <span>0h (Awal Misi)</span>
-          <span>84h (Hari 3.5)</span>
-          <span>168h (Puncak Penyinaran)</span>
-          <span>252h (Hari 10.5)</span>
-          <span>336h (Akhir Jendela)</span>
+        <div class="radar-frame" id="skyplot-box">
+          <div class="spinner"></div>
         </div>
-      </div>
-
-      <div class="tiles-grid">
-        <div class="data-tile">
-          <div class="tile-lbl">Matahari (Azimuth / Elevasi)</div>
-          <div class="tile-val" id="tile-sun" style="color: #b45309;">45.0° / +2.1°</div>
-        </div>
-        <div class="data-tile">
-          <div class="tile-lbl">Bumi DTE (Azimuth / Elevasi)</div>
-          <div class="tile-val" id="tile-earth" style="color: #0284c7;">12.5° / +6.8°</div>
-        </div>
-        <div class="data-tile">
-          <div class="tile-lbl">Suplai Daya Panel Surya</div>
-          <div class="tile-val" id="tile-solar" style="color: var(--emerald-safe);">100% ACTIVE</div>
-        </div>
-        <div class="data-tile">
-          <div class="tile-lbl">Jalur Komunikasi Bumi</div>
-          <div class="tile-val" id="tile-dte" style="color: var(--emerald-safe);">DIRECT LINE-OF-SIGHT</div>
+        <div class="frame-caption" style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+          <span id="skyplot-clearance-text" style="color: var(--artemis-blue); font-weight: 700;">Direct-to-Earth Clearance: +10.25° di atas bibir kawah</span>
+          <span style="color: var(--emerald-safe); font-weight: 700;">Matahari: Terang Bebas Bayangan</span>
         </div>
       </div>
     </div>
@@ -2035,7 +2055,7 @@
 
       const coordElem = document.getElementById("globe-target-readout");
       if (coordElem) {
-        coordElem.textContent = `SASARAN: ${currentSite} (${lat.toFixed(1)}°S, ${lon.toFixed(1)}°W)`;
+        coordElem.textContent = `SASARAN: MONS MOUTON CREST (${lat.toFixed(1)}°S, ${lon.toFixed(1)}°W)`;
       }
     }
 
@@ -2121,6 +2141,7 @@
         const res = await fetch("/api/sites");
         const data = await res.json();
         const grid = document.getElementById("sites-grid");
+        if (!grid) return;
         grid.innerHTML = "";
 
         for (const [key, site] of Object.entries(data.sites)) {
