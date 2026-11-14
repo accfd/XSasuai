@@ -21,7 +21,7 @@
   "touchdown_time_s": 60.049999999998725,
   "touchdown_vz_ms": 1.1981684902715348,
   "trajectory_solved": true,
-  "last_updated": "2026-11-14T14:00:00.718096+00:00",
+  "last_updated": "2026-11-14T14:03:17.490858+00:00",
   "schema_version": "1.0.0",
   "last_written_by": "simulate_landing"
 }
