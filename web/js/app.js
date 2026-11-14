@@ -197,9 +197,7 @@
           }
         }, 30);
         if (ctaPill) {
-          ctaPill.innerHTML = `<span style="font-size: 15px;">✓</span> <span>Tantangan Pendaratan Terbuka</span> <span style="font-size: 14px;">&darr;</span>`;
-          ctaPill.style.background = "rgba(16, 185, 129, 0.1)";
-          ctaPill.style.borderColor = "rgba(16, 185, 129, 0.35)";
+          ctaPill.textContent = "Tantangan Pendaratan Terbuka ↓";
           ctaPill.style.color = "var(--emerald-safe)";
         }
       } else {
