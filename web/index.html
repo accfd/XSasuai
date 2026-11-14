@@ -1584,24 +1584,51 @@
 
   <!-- VIEW 2: DEDICATED FLIGHT TESTBED TAB (SEPARATE VIEW) -->
   <main id="view-testbed">
-    <div class="testbed-canvas-box">
-      <canvas id="cockpitCanvas"></canvas>
+    <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface); padding: 10px 16px; border: 1px solid var(--border-light); border-radius: var(--radius-md);">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 13px; font-weight: 800; color: var(--text-primary);">MODE SIMULATOR:</span>
+        <div class="segmented-tabs">
+          <button class="tab-btn active" id="btn-mode-3d" onclick="switchTestbedMode('3d')">
+            Simulator 3D Misi Penuh (Bumi ke Bulan)
+          </button>
+          <button class="tab-btn" id="btn-mode-2d" onclick="switchTestbedMode('2d')">
+            Uji Cockpit Manual (2D Physics)
+          </button>
+        </div>
+      </div>
+      <div>
+        <a href="/simulator.html" target="_blank" class="btn-finder-hero" style="padding: 6px 14px; font-size: 11px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          Buka Fullscreen di Tab Baru &rarr;
+        </a>
+      </div>
     </div>
 
-    <div class="testbed-bar">
-      <div>
-        Kendali Pendaratan: 
-        <span class="kbd-tag">SPACE / W</span> Main Engine &nbsp;•&nbsp; 
-        <span class="kbd-tag">A / D</span> RCS Roll &nbsp;•&nbsp; 
-        <span class="kbd-tag">R</span> Reset Posisi
+    <!-- SUBVIEW 1: 3D FULL MISSION SIMULATOR IFRAME EMBED -->
+    <div id="testbed-subview-3d" style="width: 100%; height: 680px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); background: #030712;">
+      <iframe src="/simulator.html" style="width: 100%; height: 100%; border: none; display: block;"></iframe>
+    </div>
+
+    <!-- SUBVIEW 2: 2D MANUAL FLIGHT COCKPIT -->
+    <div id="testbed-subview-2d" style="display: none; flex-direction: column; gap: 14px;">
+      <div class="testbed-canvas-box">
+        <canvas id="cockpitCanvas"></canvas>
       </div>
-      <div style="display: flex; gap: 8px;">
-        <button class="tab-btn" id="btn-sim-reset" style="background: var(--bg-subtle);">
-          ↺ Reset Posisi
-        </button>
-        <button class="tab-btn" id="btn-sim-auto" style="background: var(--bg-selected); color: var(--artemis-blue);">
-           Autopilot Descent
-        </button>
+
+      <div class="testbed-bar">
+        <div>
+          Kendali Pendaratan: 
+          <span class="kbd-tag">SPACE / W</span> Main Engine &nbsp;•&nbsp; 
+          <span class="kbd-tag">A / D</span> RCS Roll &nbsp;•&nbsp; 
+          <span class="kbd-tag">R</span> Reset Posisi
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button class="tab-btn" id="btn-sim-reset" style="background: var(--bg-subtle);">
+            [RESET] Posisi Awal
+          </button>
+          <button class="tab-btn" id="btn-sim-auto" style="background: var(--bg-selected); color: var(--artemis-blue);">
+            [AUTOPILOT] Descent Guidance
+          </button>
+        </div>
       </div>
     </div>
   </main>
@@ -2062,10 +2089,29 @@
       } else if (viewName === 'testbed') {
         testbedView.classList.add("active");
         btnTestbed.classList.add("active");
-        if (!testbedInitialized) initCockpitEngine();
       } else if (viewName === 'guide') {
         guideView.style.display = "flex";
         btnGuide.classList.add("active");
+      }
+    }
+
+    function switchTestbedMode(mode) {
+      const sub3d = document.getElementById("testbed-subview-3d");
+      const sub2d = document.getElementById("testbed-subview-2d");
+      const btn3d = document.getElementById("btn-mode-3d");
+      const btn2d = document.getElementById("btn-mode-2d");
+
+      if (mode === '3d') {
+        sub3d.style.display = "block";
+        sub2d.style.display = "none";
+        btn3d.classList.add("active");
+        btn2d.classList.remove("active");
+      } else {
+        sub3d.style.display = "none";
+        sub2d.style.display = "flex";
+        btn2d.classList.add("active");
+        btn3d.classList.remove("active");
+        if (!testbedInitialized) initCockpitEngine();
       }
     }
 

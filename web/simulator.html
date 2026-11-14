@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>XESUAI — Lunar Mission Simulator 3D (Earth Launch to Mons Mouton Touchdown)</title>
+  <script src="three.min.js"></script>
+  <style>
+    :root {
+      --bg-space: #030712;
+      --bg-panel: rgba(11, 19, 43, 0.82);
+      --bg-subtle: rgba(30, 41, 59, 0.7);
+      --border-line: rgba(56, 189, 248, 0.25);
+      --border-accent: #38bdf8;
+      --cyan-glow: #38bdf8;
+      --gold-accent: #facc15;
+      --emerald-safe: #10b981;
+      --coral-alert: #ef4444;
+      --text-main: #f8fafc;
+      --text-dim: #94a3b8;
+      --font-mono: "JetBrains Mono", "Roboto Mono", "Courier New", monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: var(--bg-space);
+      font-family: var(--font-sans);
+      color: var(--text-main);
+    }
+
+    #webgl-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* UI OVERLAYS */
+    .ui-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 16px;
+    }
+
+    .interactive {
+      pointer-events: auto;
+    }
+
+    /* TOP HEADER */
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--bg-panel);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-line);
+      border-radius: 8px;
+      padding: 10px 18px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      font-family: var(--font-mono);
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--border-accent);
+      color: var(--cyan-glow);
+      font-weight: 800;
+      font-size: 13px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-title {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: -0.2px;
+      color: #ffffff;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+    }
+
+    .header-center-info {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .status-pill {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid;
+    }
+
+    .status-go {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald-safe);
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
+    .status-warning {
+      background: rgba(250, 204, 21, 0.15);
+      color: var(--gold-accent);
+      border-color: rgba(250, 204, 21, 0.4);
+    }
+
+    .btn-nav-back {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-line);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+
+    .btn-nav-back:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--border-accent);
+      color: #ffffff;
+    }
+
+    /* MIDDLE CONTENT AREA (HUD PANELS) */
+    .middle-body {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-top: 12px;
+      margin-bottom: 12px;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .panel-hud {
+      background: var(--bg-panel);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-line);
+      border-radius: 8px;
+      padding: 14px;
+      width: 320px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .panel-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--cyan-glow);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--border-line);
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .telemetry-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+
+    .telemetry-label {
+      color: var(--text-dim);
+      font-size: 11px;
+    }
+
+    .telemetry-val {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: #ffffff;
+      text-shadow: 0 0 8px rgba(56, 189, 248, 0.4);
+    }
+
+    .val-highlight {
+      color: var(--gold-accent);
+    }
+
+    .val-safe {
+      color: var(--emerald-safe);
+    }
+
+    .phase-badge-large {
+      background: rgba(56, 189, 248, 0.12);
+      border-left: 3px solid var(--cyan-glow);
+      padding: 8px 10px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+
+    .phase-name {
+      font-size: 12px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 2px;
+    }
+
+    .phase-desc {
+      font-size: 10px;
+      color: var(--text-dim);
+      line-height: 1.4;
+    }
+
+    /* RIGHT CONTROLS PANEL */
+    .controls-panel {
+      width: 280px;
+    }
+
+    .ctrl-group {
+      margin-bottom: 12px;
+    }
+
+    .ctrl-group-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .btn-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .btn-ctrl {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-line);
+      color: var(--text-main);
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s ease;
+    }
+
+    .btn-ctrl:hover {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--border-accent);
+      color: #ffffff;
+    }
+
+    .btn-ctrl.active {
+      background: rgba(56, 189, 248, 0.3);
+      border-color: var(--cyan-glow);
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .phase-jump-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .btn-jump {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border-line);
+      color: var(--text-dim);
+      padding: 6px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      transition: all 0.15s ease;
+    }
+
+    .btn-jump:hover {
+      background: rgba(56, 189, 248, 0.15);
+      color: #ffffff;
+      border-color: var(--border-accent);
+    }
+
+    .btn-jump.active {
+      border-color: var(--gold-accent);
+      color: #ffffff;
+      background: rgba(250, 204, 21, 0.1);
+      font-weight: 700;
+    }
+
+    /* BOTTOM TIMELINE & CONTROL DOCK */
+    .bottom-dock {
+      background: var(--bg-panel);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-line);
+      border-radius: 8px;
+      padding: 12px 20px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .dock-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .timeline-slider-container {
+      position: relative;
+      width: 100%;
+      height: 28px;
+      display: flex;
+      align-items: center;
+    }
+
+    .timeline-range {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      background: rgba(56, 189, 248, 0.2);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .timeline-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--cyan-glow);
+      border: 2px solid #ffffff;
+      cursor: pointer;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+      transition: transform 0.1s;
+    }
+
+    .timeline-range::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .dock-bottom-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .playback-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-play {
+      background: var(--cyan-glow);
+      color: #030712;
+      border: none;
+      padding: 6px 16px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: var(--font-mono);
+    }
+
+    .btn-speed {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-line);
+      color: var(--text-main);
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: var(--font-mono);
+      cursor: pointer;
+    }
+
+    .btn-speed.active {
+      background: rgba(56, 189, 248, 0.25);
+      border-color: var(--cyan-glow);
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .ticks-container {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      padding-top: 2px;
+    }
+
+    /* HINT OVERLAY */
+    .mouse-hints {
+      position: absolute;
+      bottom: 110px;
+      right: 20px;
+      background: rgba(3, 7, 18, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    @media (max-width: 900px) {
+      .middle-body {
+        flex-direction: column;
+        gap: 10px;
+        overflow-y: auto;
+      }
+      .panel-hud, .controls-panel {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 3D WEBGL CANVAS -->
+  <div id="webgl-canvas"></div>
+
+  <!-- INTERACTIVE HUD OVERLAYS -->
+  <div class="ui-layer">
+    
+    <!-- TOP HEADER -->
+    <header class="top-header interactive">
+      <div class="brand-section">
+        <div class="brand-badge">[XE] SIMULATOR</div>
+        <div>
+          <div class="brand-title">XESUAI — Artemis Lunar Flight Simulator 3D</div>
+          <div class="brand-subtitle">Lintasan Lengkap: Peluncuran Bumi &rarr; TLI &rarr; Transit &rarr; PDI Mons Mouton (-84.9°S, 33.3°W)</div>
+        </div>
+      </div>
+
+      <div class="header-center-info">
+        <div class="status-pill status-go" id="mission-go-pill">STATUS: GO FOR DESCENT</div>
+        <a href="/" class="btn-nav-back">&larr; Kembali ke Konsol Misi</a>
+      </div>
+    </header>
+
+    <!-- MIDDLE BODY (TELEMETRY + CONTROLS) -->
+    <div class="middle-body">
+      
+      <!-- LEFT TELEMETRY PANEL -->
+      <div class="panel-hud interactive">
+        <div class="panel-title">
+          <span>Telemetri Misi Antariksa</span>
+          <span id="subsystem-code">SYS-OK</span>
+        </div>
+
+        <div class="phase-badge-large">
+          <div class="phase-name" id="hud-phase-name">[FASE 1] Peluncuran & Orbit Parkir Bumi</div>
+          <div class="phase-desc" id="hud-phase-desc">Wahana lepas landas dari Kennedy Space Center menuju LEO (185 km).</div>
+        </div>
+
+        <div class="telemetry-row">
+          <span class="telemetry-label">Mission Elapsed Time (MET):</span>
+          <span class="telemetry-val val-highlight" id="hud-met">T+00:00:00</span>
+        </div>
+        <div class="telemetry-row">
+          <span class="telemetry-label">Waktu Kalender (UTC):</span>
+          <span class="telemetry-val" id="hud-utc">2026-11-10 12:00:00 UTC</span>
+        </div>
+        <div class="telemetry-row">
+          <span class="telemetry-label">Ketinggian (Altitude):</span>
+          <span class="telemetry-val" id="hud-alt">0.0 KM</span>
+        </div>
+        <div class="telemetry-row">
+          <span class="telemetry-label">Kecepatan Orbital / Total:</span>
+          <span class="telemetry-val" id="hud-vel">0.00 KM/S</span>
+        </div>
+        <div class="telemetry-row">
+          <span class="telemetry-label">Kecepatan Turun (V_vertical):</span>
+          <span class="telemetry-val" id="hud-vz">0.0 M/S</span>
+        </div>
+        <div class="telemetry-row">
+          <span class="telemetry-label">Jarak dari Bumi:</span>
+          <span class="telemetry-val" id="hud-dist-earth">6,371 KM</span>
+        </div>
+        <div class="telemetry-row">
+          <span class="telemetry-label">Jarak dari Bulan:</span>
+          <span class="telemetry-val" id="hud-dist-moon">384,400 KM</span>
+        </div>
+        <div class="telemetry-row">
+          <span class="telemetry-label">Massa Propelan (Sisa):</span>
+          <span class="telemetry-val val-safe" id="hud-fuel">1,250.0 KG (100%)</span>
+        </div>
+        <div class="telemetry-row">
+          <span class="telemetry-label">Status Mesin Utama:</span>
+          <span class="telemetry-val" id="hud-engine">STANDBY</span>
+        </div>
+      </div>
+
+      <!-- RIGHT CONTROLS PANEL -->
+      <div class="panel-hud controls-panel interactive">
+        <div class="panel-title">
+          <span>Kontrol Navigasi & Kamera</span>
+          <span>3D VIEW</span>
+        </div>
+
+        <div class="ctrl-group">
+          <div class="ctrl-group-title">Sudut Pandang Kamera</div>
+          <div class="btn-grid">
+            <button class="btn-ctrl active" id="cam-system" onclick="setCameraMode('system')">Sistem Orbit</button>
+            <button class="btn-ctrl" id="cam-earth" onclick="setCameraMode('earth')">Fokus Bumi</button>
+            <button class="btn-ctrl" id="cam-moon" onclick="setCameraMode('moon')">Fokus Bulan</button>
+            <button class="btn-ctrl" id="cam-chase" onclick="setCameraMode('chase')">Ikuti Wahana</button>
+          </div>
+          <button class="btn-ctrl" id="cam-ground" style="width: 100%; margin-top: 6px;" onclick="setCameraMode('ground')">Kamera Permukaan Mons Mouton</button>
+        </div>
+
+        <div class="ctrl-group">
+          <div class="ctrl-group-title">Lompat Cepat ke Fase Kritis</div>
+          <div class="phase-jump-list">
+            <button class="btn-jump active" id="jump-1" onclick="jumpToPhase(1)">
+              <span>[FASE 1] Peluncuran KSC</span> <span>T+00:00</span>
+            </button>
+            <button class="btn-jump" id="jump-2" onclick="jumpToPhase(2)">
+              <span>[FASE 2] Injeksi TLI</span> <span>T+01:45</span>
+            </button>
+            <button class="btn-jump" id="jump-3" onclick="jumpToPhase(3)">
+              <span>[FASE 3] Transit Translunar</span> <span>T+48:00</span>
+            </button>
+            <button class="btn-jump" id="jump-4" onclick="jumpToPhase(4)">
+              <span>[FASE 4] Orbit Bulan (LOI)</span> <span>T+92:30</span>
+            </button>
+            <button class="btn-jump" id="jump-5" onclick="jumpToPhase(5)">
+              <span>[FASE 5] PDI Pendaratan</span> <span>T+96:00</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="ctrl-group" style="margin-bottom: 0;">
+          <div class="ctrl-group-title">Opsi Visualisasi</div>
+          <div class="btn-grid">
+            <button class="btn-ctrl active" id="btn-toggle-traj" onclick="toggleTrajectory()">Garis Orbit</button>
+            <button class="btn-ctrl active" id="btn-toggle-grid" onclick="toggleGrid()">Grid Polar</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MOUSE HINTS -->
+    <div class="mouse-hints">
+      Navigasi 3D: Klik Kiri + Geser (Rotasi) &bull; Scroll (Zoom) &bull; Klik Kanan + Geser (Pan)
+    </div>
+
+    <!-- BOTTOM TIMELINE & PLAYBACK CONTROLS -->
+    <footer class="bottom-dock interactive">
+      <div class="dock-top-row">
+        <span>KONTROL TIMELINE MISI ARTEMIS (10 - 14 NOVEMBER 2026)</span>
+        <span id="dock-time-status">PROGRESS MISI: 0.0% &bull; T+00:00:00</span>
+      </div>
+
+      <div class="timeline-slider-container">
+        <input type="range" id="mission-scrubber" class="timeline-range" min="0" max="346320" value="0" step="1">
+      </div>
+
+      <div class="ticks-container">
+        <span>T+00h (Launch KSC)</span>
+        <span>T+01.75h (TLI Burn)</span>
+        <span>T+48h (Mid-Course / L1)</span>
+        <span>T+92.5h (LOI Perilune)</span>
+        <span>T+96.0h (PDI Mons Mouton)</span>
+        <span>T+96.2h (Touchdown)</span>
+      </div>
+
+      <div class="dock-bottom-row">
+        <div class="playback-controls">
+          <button class="btn-play" id="btn-play-pause" onclick="togglePlay()">MULAI SIMULASI</button>
+          <button class="btn-speed active" id="spd-1" onclick="setSpeed(1)">1x</button>
+          <button class="btn-speed" id="spd-10" onclick="setSpeed(10)">10x</button>
+          <button class="btn-speed" id="spd-100" onclick="setSpeed(100)">100x</button>
+          <button class="btn-speed" id="spd-1000" onclick="setSpeed(1000)">1000x</button>
+          <button class="btn-speed" id="spd-5000" onclick="setSpeed(5000)">5000x</button>
+        </div>
+
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--text-dim);">
+          TARGET: MONS MOUTON CREST (-84.9°S, 33.3°W) &bull; ELEVASI DTE: +6.8° &bull; ILUMINASI: 100%
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- SIMULATOR CORE SCRIPT -->
+  <script>
+    // ==========================================
+    // 1. DATA MISI & TIMELINE PROFILE
+    // ==========================================
+    // Total Durasi: 96.2 Jam = 346,320 Detik
+    const TOTAL_MISSION_SECONDS = 346320; 
+    const LAUNCH_DATE_EPOCH = new Date("2026-11-10T12:00:00Z").getTime();
+
+    // 5 Fase Misi Kritis (dalam detik MET):
+    const PHASES = [
+      {
+        id: 1,
+        startSec: 0,
+        endSec: 6300, // 1 jam 45 menit
+        name: "[FASE 1] Peluncuran & Orbit Parkir Bumi (LEO)",
+        desc: "Wahana diluncurkan dari Cape Canaveral KSC, melepaskan booster dan stabil di orbit parkir 185 km dengan kecepatan 7.8 km/s.",
+        engineState: "ASCENT / INSERTION BURN",
+        goStatus: "GO FOR TLI"
+      },
+      {
+        id: 2,
+        startSec: 6300,
+        endSec: 9000, // 2.5 jam
+        name: "[FASE 2] Trans-Lunar Injection (TLI)",
+        desc: "Mesin tahap kedua menyala, mempercepat wahana dari 7.8 km/s menjadi 10.95 km/s untuk melepaskan diri dari orbit Bumi menuju Bulan.",
+        engineState: "TLI BURN ACTIVE (10.95 KM/S)",
+        goStatus: "INJECTION NOMINAL"
+      },
+      {
+        id: 3,
+        startSec: 9000,
+        endSec: 333000, // 92.5 jam
+        name: "[FASE 3] Transit Translunar (Coast Phase)",
+        desc: "Meluncur sejauh 384.400 km. Gravitasi Bumi melambat hingga titik L1, kemudian gravitasi Bulan mengambil alih menarik wahana.",
+        engineState: "COASTING (RCS ATTITUDE ONLY)",
+        goStatus: "TRAJECTORY NOMINAL"
+      },
+      {
+        id: 4,
+        startSec: 333000,
+        endSec: 345600, // 96.0 jam
+        name: "[FASE 4] Lunar Orbit Insertion (LOI) & Perilune",
+        desc: "Pengereman retro-burn memperlambat wahana menjadi 1.690 m/s untuk memasuki orbit polar eliptik dengan perilune 15 km di atas Kutub Selatan.",
+        engineState: "RETRO-BURN INSERTION",
+        goStatus: "GO FOR PDI"
+      },
+      {
+        id: 5,
+        startSec: 345600,
+        endSec: 346320, // 96.2 jam (12 menit pendaratan)
+        name: "[FASE 5] Powered Descent Initiation (PDI) ke Mons Mouton",
+        desc: "Pendaratan terminal: Deselerasi dari 15.000 m menuju sentuhan akhir di Mons Mouton (-84.9°S, 33.3°W) dengan kecepatan sentuh < 1.0 m/s.",
+        engineState: "TERMINAL THROTTLED DESCENT",
+        goStatus: "TOUCHDOWN NOMINAL (GO)"
+      }
+    ];
+
+    let simTime = 0; // dalam detik
+    let isPlaying = false;
+    let timeScale = 100; // default multiplier
+    let cameraMode = 'system'; // 'system', 'earth', 'moon', 'chase', 'ground'
+    let lastAnimTimestamp = null;
+
+    // ==========================================
+    // 2. THREE.JS INITIALIZATION
+    // ==========================================
+    const container = document.getElementById('webgl-canvas');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x030712);
+    scene.fog = new THREE.FogExp2(0x030712, 0.0003);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 15000);
+    camera.position.set(200, 180, 450);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.2;
+    container.appendChild(renderer.domElement);
+
+    // Pencahayaan
+    const ambientLight = new THREE.AmbientLight(0x223344, 0.7);
+    scene.add(ambientLight);
+
+    const sunLight = new THREE.DirectionalLight(0xffffff, 2.0);
+    sunLight.position.set(800, 200, 500);
+    scene.add(sunLight);
+
+    // Latar Belakang Bintang (Starfield)
+    const starsGeo = new THREE.BufferGeometry();
+    const starCount = 3500;
+    const starPositions = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount * 3; i += 3) {
+      const radius = 3000 + Math.random() * 2000;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(Math.random() * 2 - 1);
+      starPositions[i] = radius * Math.sin(phi) * Math.cos(theta);
+      starPositions[i+1] = radius * Math.sin(phi) * Math.sin(theta);
+      starPositions[i+2] = radius * Math.cos(phi);
+    }
+    starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3));
+    const starsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 2.2, transparent: true, opacity: 0.85 });
+    const starField = new THREE.Points(starsGeo, starsMat);
+    scene.add(starField);
+
+    // ==========================================
+    // 3. OBJEK BUMI, BULAN & LINTASAN
+    // ==========================================
+    // Posisi Skala:
+    // Bumi di (0, 0, 0), radius = 24
+    // Bulan di (380, 0, 80), radius = 6.8
+    const EARTH_POS = new THREE.Vector3(0, 0, 0);
+    const MOON_POS = new THREE.Vector3(380, 0, 80);
+
+    // --- BUMI (EARTH) ---
+    const earthGroup = new THREE.Group();
+    earthGroup.position.copy(EARTH_POS);
+    scene.add(earthGroup);
+
+    // Canvas Prosedural Tekstur Bumi (Biru Samudra & Hijau Benua)
+    const earthCanvas = document.createElement('canvas');
+    earthCanvas.width = 1024;
+    earthCanvas.height = 512;
+    const eCtx = earthCanvas.getContext('2d');
+    eCtx.fillStyle = '#0f2942'; // Samudra
+    eCtx.fillRect(0, 0, 1024, 512);
+    // Benua aproksimasi
+    eCtx.fillStyle = '#1e3a24';
+    eCtx.beginPath();
+    eCtx.arc(320, 200, 90, 0, Math.PI * 2); // Amerika Utara
+    eCtx.arc(360, 340, 70, 0, Math.PI * 2); // Amerika Selatan
+    eCtx.arc(580, 180, 100, 0, Math.PI * 2); // Eurasia
+    eCtx.arc(580, 300, 80, 0, Math.PI * 2); // Afrika
+    eCtx.arc(780, 340, 60, 0, Math.PI * 2); // Australia
+    eCtx.fill();
+    const earthTex = new THREE.CanvasTexture(earthCanvas);
+
+    const earthGeo = new THREE.SphereGeometry(24, 48, 48);
+    const earthMat = new THREE.MeshStandardMaterial({
+      map: earthTex,
+      roughness: 0.8,
+      metalness: 0.1
+    });
+    const earthMesh = new THREE.Mesh(earthGeo, earthMat);
+    earthGroup.add(earthMesh);
+
+    // Lapisan Atmosfer Bumi (Glow)
+    const atmosGeo = new THREE.SphereGeometry(24.8, 36, 36);
+    const atmosMat = new THREE.MeshBasicMaterial({
+      color: 0x38bdf8,
+      transparent: true,
+      opacity: 0.18,
+      side: THREE.BackSide
+    });
+    earthGroup.add(new THREE.Mesh(atmosGeo, atmosMat));
+
+    // LEO Orbit Ring (185 km scale)
+    const leoGeo = new THREE.RingGeometry(27.8, 28.2, 64);
+    const leoMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.4 });
+    const leoRing = new THREE.Mesh(leoGeo, leoMat);
+    leoRing.rotation.x = Math.PI / 2;
+    earthGroup.add(leoRing);
+
+    // --- BULAN (MOON) ---
+    const moonGroup = new THREE.Group();
+    moonGroup.position.copy(MOON_POS);
+    scene.add(moonGroup);
+
+    const textureLoader = new THREE.TextureLoader();
+    const moonTexture = textureLoader.load('/data/moon_1024.jpg');
+    const moonGeo = new THREE.SphereGeometry(6.8, 48, 48);
+    const moonMat = new THREE.MeshStandardMaterial({
+      map: moonTexture,
+      roughness: 0.95,
+      metalness: 0.05
+    });
+    const moonMesh = new THREE.Mesh(moonGeo, moonMat);
+    moonGroup.add(moonMesh);
+
+    // Target Beacon Mons Mouton (-84.9°S, 33.3°W)
+    function selenographicToCart(lat, lon, radius) {
+      const phi = (90 + lat) * (Math.PI / 180);
+      const theta = (lon + 180) * (Math.PI / 180);
+      return new THREE.Vector3(
+        -radius * Math.sin(phi) * Math.cos(theta),
+        radius * Math.cos(phi),
+        radius * Math.sin(phi) * Math.sin(theta)
+      );
+    }
+
+    const monsMoutonLocalPos = selenographicToCart(-84.9, -33.3, 6.85);
+    const beaconGroup = new THREE.Group();
+    beaconGroup.position.copy(monsMoutonLocalPos);
+
+    // Needle pin
+    const pinGeo = new THREE.CylinderGeometry(0.04, 0.04, 0.8, 8);
+    pinGeo.translate(0, 0.4, 0);
+    const pinMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
+    const pinMesh = new THREE.Mesh(pinGeo, pinMat);
+    pinMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), monsMoutonLocalPos.clone().normalize());
+    beaconGroup.add(pinMesh);
+
+    // Pulsing radar ring
+    const ringGeo = new THREE.RingGeometry(0.15, 0.35, 24);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.8 });
+    const pulseRing = new THREE.Mesh(ringGeo, ringMat);
+    pulseRing.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), monsMoutonLocalPos.clone().normalize());
+    beaconGroup.add(pulseRing);
+
+    moonGroup.add(beaconGroup);
+
+    // Moon Polar Orbit Ring (LOI)
+    const loiGeo = new THREE.RingGeometry(7.6, 7.8, 64);
+    const loiMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.35 });
+    const loiRing = new THREE.Mesh(loiGeo, loiMat);
+    loiRing.rotation.y = Math.PI / 2;
+    moonGroup.add(loiRing);
+
+    // --- MODEL WAHANA ANTARIKSA (SPACECRAFT) ---
+    const spacecraft = new THREE.Group();
+    scene.add(spacecraft);
+
+    // Badan Pendarat (Service Module & Cabin)
+    const landerBodyGeo = new THREE.CylinderGeometry(0.4, 0.55, 0.7, 8);
+    const landerBodyMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, metalness: 0.8, roughness: 0.2 });
+    const landerBody = new THREE.Mesh(landerBodyGeo, landerBodyMat);
+    spacecraft.add(landerBody);
+
+    // Gold Foil Base
+    const goldBaseGeo = new THREE.BoxGeometry(0.75, 0.25, 0.75);
+    const goldBaseMat = new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.9, roughness: 0.3 });
+    const goldBase = new THREE.Mesh(goldBaseGeo, goldBaseMat);
+    goldBase.position.y = -0.4;
+    spacecraft.add(goldBase);
+
+    // Thruster Bell
+    const engineBellGeo = new THREE.ConeGeometry(0.2, 0.35, 12, 1, true);
+    const engineBellMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.9, roughness: 0.1 });
+    const engineBell = new THREE.Mesh(engineBellGeo, engineBellMat);
+    engineBell.rotation.x = Math.PI;
+    engineBell.position.y = -0.6;
+    spacecraft.add(engineBell);
+
+    // Thruster Flame Plume (Cone menyala)
+    const flameGeo = new THREE.ConeGeometry(0.25, 0.9, 12);
+    const flameMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.0 });
+    const thrusterFlame = new THREE.Mesh(flameGeo, flameMat);
+    thrusterFlame.position.y = -1.1;
+    spacecraft.add(thrusterFlame);
+
+    // --- GARIS TRAJEKTORI 3D (LUNAR TRANSFER ARC & PDI DESCENT) ---
+    // 1. Translunar Transfer Curve (Bumi -> Bulan)
+    const tliCurvePoints = [];
+    const numPoints = 200;
+    for (let i = 0; i <= numPoints; i++) {
+      const u = i / numPoints;
+      // Kurva transfer eliptik 3D dengan lead angle
+      const px = THREE.MathUtils.lerp(EARTH_POS.x + 28, MOON_POS.x, u);
+      const pz = THREE.MathUtils.lerp(EARTH_POS.z, MOON_POS.z, u) + Math.sin(u * Math.PI) * 75;
+      const py = Math.sin(u * Math.PI) * 25;
+      tliCurvePoints.push(new THREE.Vector3(px, py, pz));
+    }
+    const tliCurve = new THREE.CatmullRomCurve3(tliCurvePoints);
+    const tliGeo = new THREE.BufferGeometry().setFromPoints(tliCurve.getPoints(300));
+    const tliMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.65 });
+    const tliLine = new THREE.Line(tliGeo, tliMat);
+    scene.add(tliLine);
+
+    // 2. Descent PDI Arc (Mons Mouton terminal curve)
+    const pdiCurvePoints = [];
+    for (let i = 0; i <= 60; i++) {
+      const u = i / 60;
+      const perilunePos = MOON_POS.clone().add(new THREE.Vector3(0, -9.5, 3.5));
+      const targetPos = MOON_POS.clone().add(monsMoutonLocalPos);
+      const pt = new THREE.Vector3().lerpVectors(perilunePos, targetPos, u);
+      pt.y += Math.sin((1 - u) * Math.PI * 0.5) * 1.5;
+      pdiCurvePoints.push(pt);
+    }
+    const pdiGeo = new THREE.BufferGeometry().setFromPoints(pdiCurvePoints);
+    const pdiMat = new THREE.LineBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.85, linewidth: 2 });
+    const pdiLine = new THREE.Line(pdiGeo, pdiMat);
+    scene.add(pdiLine);
+
+    // ==========================================
+    // 4. LOGIKA PERHITUNGAN FISIKA ORBIT (5 FASE)
+    // ==========================================
+    function calculateMissionState(tSeconds) {
+      let phaseId = 1;
+      let phaseInfo = PHASES[0];
+      for (const p of PHASES) {
+        if (tSeconds >= p.startSec && tSeconds <= p.endSec) {
+          phaseId = p.id;
+          phaseInfo = p;
+          break;
+        }
+      }
+      if (tSeconds >= TOTAL_MISSION_SECONDS) {
+        phaseId = 5;
+        phaseInfo = PHASES[4];
+      }
+
+      let pos = new THREE.Vector3();
+      let rot = new THREE.Euler(0, 0, 0);
+      let altitudeKm = 0;
+      let velKmS = 0;
+      let vzMS = 0;
+      let distEarthKm = 6371;
+      let distMoonKm = 384400;
+      let fuelKg = 1250;
+      let engineFiring = false;
+
+      // FASE 1: PELUNCURAN & LEO (0 - 6300 dtk)
+      if (phaseId === 1) {
+        const u = tSeconds / 6300;
+        const angle = u * Math.PI * 2.5;
+        const r = 24 + u * 4.0;
+        pos.set(Math.cos(angle) * r, Math.sin(angle * 0.4) * 3, Math.sin(angle) * r);
+        altitudeKm = u * 185;
+        velKmS = THREE.MathUtils.lerp(0, 7.8, Math.sqrt(u));
+        vzMS = u < 0.1 ? 250 : (u < 0.3 ? 120 : 0);
+        distEarthKm = 6371 + altitudeKm;
+        distMoonKm = 384400 - (u * 185);
+        fuelKg = 1250 - (u * 220);
+        engineFiring = (u < 0.25 || (u > 0.85 && u < 0.98));
+      }
+      // FASE 2: TLI INJECTION (6300 - 9000 dtk)
+      else if (phaseId === 2) {
+        const u = (tSeconds - 6300) / 2700;
+        const pt = tliCurve.getPoint(u * 0.08);
+        pos.copy(pt);
+        altitudeKm = 185 + u * 1200;
+        velKmS = THREE.MathUtils.lerp(7.8, 10.95, u);
+        vzMS = 450 * u;
+        distEarthKm = 6371 + altitudeKm;
+        distMoonKm = 384400 - altitudeKm;
+        fuelKg = 1030 - (u * 180);
+        engineFiring = true;
+      }
+      // FASE 3: COASTING TRANSIT (9000 - 333000 dtk)
+      else if (phaseId === 3) {
+        const u = (tSeconds - 9000) / 324000;
+        const curveT = THREE.MathUtils.lerp(0.08, 0.95, u);
+        pos.copy(tliCurve.getPoint(curveT));
+        
+        // Perlambatan gravitasi Bumi hingga L1 lalu percepatan oleh Bulan
+        distEarthKm = 6371 + (u * 365000);
+        distMoonKm = Math.max(100, 384400 - distEarthKm);
+        altitudeKm = distEarthKm - 6371;
+
+        if (u < 0.75) {
+          velKmS = THREE.MathUtils.lerp(10.95, 1.15, Math.pow(u / 0.75, 0.4));
+        } else {
+          velKmS = THREE.MathUtils.lerp(1.15, 2.38, Math.pow((u - 0.75) / 0.25, 1.5));
+        }
+        vzMS = 0;
+        fuelKg = 850;
+        engineFiring = false;
+      }
+      // FASE 4: LOI ORBIT BULAN (333000 - 345600 dtk)
+      else if (phaseId === 4) {
+        const u = (tSeconds - 333000) / 12600;
+        const angle = u * Math.PI * 4;
+        const orbR = THREE.MathUtils.lerp(8.2, 7.3, u);
+        pos.set(
+          MOON_POS.x + Math.sin(angle) * orbR * 0.2,
+          MOON_POS.y + Math.cos(angle) * orbR,
+          MOON_POS.z + Math.sin(angle) * orbR
+        );
+        altitudeKm = THREE.MathUtils.lerp(100, 15, u);
+        velKmS = THREE.MathUtils.lerp(2.38, 1.69, u);
+        vzMS = -12.5;
+        distEarthKm = 384400;
+        distMoonKm = 1737 + altitudeKm;
+        fuelKg = 850 - (u * 320);
+        engineFiring = (u < 0.35); // Retro burn LOI
+      }
+      // FASE 5: POWERED DESCENT PDI KE MONS MOUTON (345600 - 346320 dtk = 12 MENIT)
+      else {
+        const u = Math.min(1.0, (tSeconds - 345600) / 720);
+        const idx = Math.min(pdiCurvePoints.length - 1, Math.floor(u * (pdiCurvePoints.length - 1)));
+        pos.copy(pdiCurvePoints[idx]);
+
+        // Ketinggian pendaratan terminal (Meter)
+        const altMeters = (1 - u) * (1 - u) * 15000;
+        altitudeKm = altMeters / 1000;
+        velKmS = THREE.MathUtils.lerp(1.69, 0.0008, Math.pow(u, 0.7));
+        vzMS = (1 - u) * 28.5; // Turun perlahan hingga < 1.0 m/s
+        distEarthKm = 384400;
+        distMoonKm = 1737 + altitudeKm;
+        fuelKg = 530 - (u * 125);
+        engineFiring = (u < 0.98); // Engine fires constantly during powered descent
+      }
+
+      return {
+        phaseId,
+        phaseInfo,
+        pos,
+        altitudeKm,
+        velKmS,
+        vzMS,
+        distEarthKm,
+        distMoonKm,
+        fuelKg,
+        engineFiring
+      };
+    }
+
+    // ==========================================
+    // 5. UPDATE LOOP & TELEMETRY SYNC
+    // ==========================================
+    function formatMET(sec) {
+      const d = Math.floor(sec / 86400);
+      const h = Math.floor((sec % 86400) / 3600);
+      const m = Math.floor((sec % 3600) / 60);
+      const s = Math.floor(sec % 60);
+      const pad = (n) => String(n).padStart(2, '0');
+      return `T+${pad(d * 24 + h)}:${pad(m)}:${pad(s)}`;
+    }
+
+    function formatUTC(sec) {
+      const date = new Date(LAUNCH_DATE_EPOCH + sec * 1000);
+      return date.toISOString().replace('T', ' ').replace('.000Z', ' UTC');
+    }
+
+    function updateSimulation(tSec) {
+      simTime = Math.max(0, Math.min(TOTAL_MISSION_SECONDS, tSec));
+      const state = calculateMissionState(simTime);
+
+      // Posisi wahana
+      spacecraft.position.copy(state.pos);
+
+      // Orientasi hadap wahana
+      if (state.phaseId === 5) {
+        // Pada fase descent, wahana menghadap vertikal terhadap permukaan Mons Mouton
+        const upVec = monsMoutonLocalPos.clone().normalize();
+        spacecraft.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), upVec);
+      } else {
+        // Menghadap arah gerak
+        const nextState = calculateMissionState(Math.min(TOTAL_MISSION_SECONDS, simTime + 10));
+        const dir = nextState.pos.clone().sub(state.pos).normalize();
+        if (dir.length() > 0.001) {
+          spacecraft.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir);
+        }
+      }
+
+      // Efek semburan roket
+      if (state.engineFiring) {
+        thrusterFlame.material.opacity = 0.85 + Math.sin(performance.now() * 0.03) * 0.15;
+        thrusterFlame.scale.set(1 + Math.sin(performance.now() * 0.05) * 0.2, 1 + Math.random() * 0.3, 1);
+      } else {
+        thrusterFlame.material.opacity = 0.0;
+      }
+
+      // Update UI Telemetri
+      document.getElementById('hud-phase-name').textContent = state.phaseInfo.name;
+      document.getElementById('hud-phase-desc').textContent = state.phaseInfo.desc;
+      document.getElementById('hud-met').textContent = formatMET(simTime);
+      document.getElementById('hud-utc').textContent = formatUTC(simTime);
+
+      // Format Altitude
+      if (state.altitudeKm < 15) {
+        const meters = Math.round(state.altitudeKm * 1000);
+        document.getElementById('hud-alt').textContent = `${meters.toLocaleString()} METER`;
+        document.getElementById('hud-alt').classList.add('val-highlight');
+      } else {
+        document.getElementById('hud-alt').textContent = `${Math.round(state.altitudeKm).toLocaleString()} KM`;
+        document.getElementById('hud-alt').classList.remove('val-highlight');
+      }
+
+      document.getElementById('hud-vel').textContent = `${state.velKmS.toFixed(2)} KM/S`;
+      document.getElementById('hud-vz').textContent = `${state.vzMS.toFixed(1)} M/S`;
+      document.getElementById('hud-dist-earth').textContent = `${Math.round(state.distEarthKm).toLocaleString()} KM`;
+      document.getElementById('hud-dist-moon').textContent = `${Math.round(state.distMoonKm).toLocaleString()} KM`;
+
+      const fuelPct = ((state.fuelKg / 1250) * 100).toFixed(1);
+      document.getElementById('hud-fuel').textContent = `${state.fuelKg.toFixed(1)} KG (${fuelPct}%)`;
+      document.getElementById('hud-engine').textContent = state.engineFiring ? "FIRING ACTIVE (THRUST ON)" : "OFF / RCS STANDBY";
+      document.getElementById('hud-engine').style.color = state.engineFiring ? "var(--cyan-glow)" : "var(--text-dim)";
+
+      document.getElementById('subsystem-code').textContent = state.phaseInfo.engineState;
+      document.getElementById('mission-go-pill').textContent = `STATUS: ${state.phaseInfo.goStatus}`;
+
+      // Update Slider Scrubber
+      const scrubber = document.getElementById('mission-scrubber');
+      if (document.activeElement !== scrubber) {
+        scrubber.value = simTime;
+      }
+      const pct = ((simTime / TOTAL_MISSION_SECONDS) * 100).toFixed(1);
+      document.getElementById('dock-time-status').textContent = `PROGRESS MISI: ${pct}% • ${formatMET(simTime)}`;
+
+      // Update Active Jump Button
+      for (let i = 1; i <= 5; i++) {
+        const btn = document.getElementById(`jump-${i}`);
+        if (btn) {
+          if (state.phaseId === i) btn.classList.add('active');
+          else btn.classList.remove('active');
+        }
+      }
+
+      // Pulse Target Ring
+      const pulseScale = 1 + Math.sin(performance.now() * 0.005) * 0.35;
+      pulseRing.scale.set(pulseScale, pulseScale, 1);
+
+      // Rotasi pelan Bumi & Bulan
+      earthMesh.rotation.y += 0.0008;
+      moonMesh.rotation.y += 0.0003;
+    }
+
+    // ==========================================
+    // 6. KAMERA & KONTROL ORBIT INTERAKTIF
+    // ==========================================
+    let isMouseDown = false;
+    let mouseButton = 0;
+    let prevMouseX = 0;
+    let prevMouseY = 0;
+    let camSpherical = { radius: 520, theta: 0.8, phi: 1.1 };
+    let camTarget = new THREE.Vector3(190, 0, 40); // default tengah Bumi-Bulan
+
+    function updateCameraPosition() {
+      if (cameraMode === 'system') {
+        camTarget.lerp(new THREE.Vector3(190, 0, 40), 0.05);
+      } else if (cameraMode === 'earth') {
+        camTarget.lerp(EARTH_POS, 0.08);
+      } else if (cameraMode === 'moon') {
+        camTarget.lerp(MOON_POS, 0.08);
+      } else if (cameraMode === 'chase') {
+        camTarget.lerp(spacecraft.position, 0.1);
+      } else if (cameraMode === 'ground') {
+        const monsWorldPos = MOON_POS.clone().add(monsMoutonLocalPos);
+        camTarget.lerp(monsWorldPos, 0.1);
+      }
+
+      const x = camTarget.x + camSpherical.radius * Math.sin(camSpherical.phi) * Math.sin(camSpherical.theta);
+      const y = camTarget.y + camSpherical.radius * Math.cos(camSpherical.phi);
+      const z = camTarget.z + camSpherical.radius * Math.sin(camSpherical.phi) * Math.cos(camSpherical.theta);
+
+      camera.position.set(x, y, z);
+      camera.lookAt(camTarget);
+    }
+
+    window.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.interactive')) return;
+      isMouseDown = true;
+      mouseButton = e.button;
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
+    });
+
+    window.addEventListener('mouseup', () => {
+      isMouseDown = false;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isMouseDown) return;
+      const dx = e.clientX - prevMouseX;
+      const dy = e.clientY - prevMouseY;
+      prevMouseX = e.clientX;
+      prevMouseY = e.clientY;
+
+      if (mouseButton === 0) {
+        // Rotasi
+        camSpherical.theta -= dx * 0.005;
+        camSpherical.phi = Math.max(0.1, Math.min(Math.PI - 0.1, camSpherical.phi - dy * 0.005));
+      } else if (mouseButton === 2) {
+        // Pan
+        camTarget.x -= dx * 0.2;
+        camTarget.y += dy * 0.2;
+      }
+    });
+
+    window.addEventListener('wheel', (e) => {
+      camSpherical.radius = Math.max(8, Math.min(3000, camSpherical.radius + e.deltaY * 0.4));
+    });
+
+    window.addEventListener('contextmenu', (e) => {
+      if (!e.target.closest('.interactive')) e.preventDefault();
+    });
+
+    function setCameraMode(mode) {
+      cameraMode = mode;
+      document.querySelectorAll('.controls-panel .btn-ctrl').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(`cam-${mode}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      if (mode === 'system') {
+        camSpherical.radius = 550;
+      } else if (mode === 'earth') {
+        camSpherical.radius = 80;
+      } else if (mode === 'moon') {
+        camSpherical.radius = 28;
+      } else if (mode === 'chase') {
+        camSpherical.radius = 12;
+      } else if (mode === 'ground') {
+        camSpherical.radius = 5.5;
+      }
+    }
+
+    // ==========================================
+    // 7. KONTROL INTERAKSI UI & SLIDER
+    // ==========================================
+    const scrubberInput = document.getElementById('mission-scrubber');
+    scrubberInput.addEventListener('input', (e) => {
+      updateSimulation(parseFloat(e.target.value));
+    });
+
+    function togglePlay() {
+      isPlaying = !isPlaying;
+      const btn = document.getElementById('btn-play-pause');
+      btn.textContent = isPlaying ? "JEDA SIMULASI" : "LANJUTKAN SIMULASI";
+      btn.style.background = isPlaying ? "var(--gold-accent)" : "var(--cyan-glow)";
+    }
+
+    function setSpeed(spd) {
+      timeScale = spd;
+      document.querySelectorAll('.btn-speed').forEach(b => b.classList.remove('active'));
+      const btn = document.getElementById(`spd-${spd}`);
+      if (btn) btn.classList.add('active');
+    }
+
+    function jumpToPhase(phaseNum) {
+      const p = PHASES.find(item => item.id === phaseNum);
+      if (p) {
+        updateSimulation(p.startSec);
+        if (phaseNum === 1) setCameraMode('earth');
+        else if (phaseNum === 2) setCameraMode('earth');
+        else if (phaseNum === 3) setCameraMode('system');
+        else if (phaseNum === 4) setCameraMode('moon');
+        else if (phaseNum === 5) setCameraMode('ground');
+      }
+    }
+
+    function toggleTrajectory() {
+      const active = tliLine.visible;
+      tliLine.visible = !active;
+      pdiLine.visible = !active;
+      leoRing.visible = !active;
+      loiRing.visible = !active;
+      document.getElementById('btn-toggle-traj').classList.toggle('active', !active);
+    }
+
+    function toggleGrid() {
+      const active = pulseRing.visible;
+      pulseRing.visible = !active;
+      pinMesh.visible = !active;
+      document.getElementById('btn-toggle-grid').classList.toggle('active', !active);
+    }
+
+    // ==========================================
+    // 8. ANIMATION RENDER LOOP
+    // ==========================================
+    function animate(timestamp) {
+      requestAnimationFrame(animate);
+
+      if (!lastAnimTimestamp) lastAnimTimestamp = timestamp;
+      const deltaSec = (timestamp - lastAnimTimestamp) / 1000;
+      lastAnimTimestamp = timestamp;
+
+      if (isPlaying) {
+        simTime += deltaSec * timeScale;
+        if (simTime >= TOTAL_MISSION_SECONDS) {
+          simTime = TOTAL_MISSION_SECONDS;
+          isPlaying = false;
+          document.getElementById('btn-play-pause').textContent = "SIMULASI SELESAI (RESET)";
+        }
+        updateSimulation(simTime);
+      }
+
+      updateCameraPosition();
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Inisialisasi awal
+    updateSimulation(0);
+    requestAnimationFrame(animate);
+  </script>
+</body>
+</html>
