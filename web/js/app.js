@@ -786,10 +786,10 @@
         const deltaUnits = Math.max(0.069, dist - 8.0);
         const altKm = Math.round(deltaUnits * (1737.4 / 8.0));
         if (altKm <= 35) {
-          altElem.textContent = `ALTITUDE: 15.0 KM [TARGET LOCKED]`;
+          altElem.textContent = `Ketinggian: 15,0 km | Target: Terkunci`;
           altElem.style.color = "#00ffaa";
         } else {
-          altElem.textContent = `ALTITUDE: ${altKm.toLocaleString('en-US')} KM`;
+          altElem.textContent = `Ketinggian: ${altKm.toLocaleString('id-ID')} km`;
           altElem.style.color = "#ffffff";
         }
       }
@@ -886,7 +886,7 @@
           const altKm = Math.round(50000 - ease * (50000 - 15));
           const altElem = document.getElementById("globe-alt-readout");
           if (altElem) {
-            altElem.textContent = progress < 1.0 ? `ALTITUDE: ${altKm.toLocaleString()} KM` : `ALTITUDE: 15.0 KM [TARGET LOCKED]`;
+            altElem.textContent = progress < 1.0 ? `Ketinggian: ${altKm.toLocaleString('id-ID')} km` : `Ketinggian: 15,0 km | Target: Terkunci`;
             altElem.style.color = progress < 1.0 ? "#facc15" : "#38bdf8";
           }
 
@@ -925,7 +925,7 @@
 
       const coordElem = document.getElementById("globe-target-readout");
       if (coordElem) {
-        coordElem.textContent = `SASARAN: MONS MOUTON CREST (${lat.toFixed(1)}°S, ${lon.toFixed(1)}°W)`;
+        coordElem.textContent = `Sasaran: Mons Mouton Crest (${lat.toFixed(1).replace('.', ',')}°S, ${lon.toFixed(1).replace('.', ',')}°W)`;
       }
     }
 
@@ -951,7 +951,7 @@
       threeCamera.lookAt(0, -2, 0);
       const altElem = document.getElementById("globe-alt-readout");
       if (altElem) {
-        altElem.textContent = "ALTITUDE: 1,737 KM [ORBIT BEBAS]";
+        altElem.textContent = "Ketinggian: 1.737 km | Orbit Bebas";
         altElem.style.color = "#ffffff";
       }
     }
