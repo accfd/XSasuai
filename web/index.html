@@ -6,7 +6,7 @@
   <title>XASUAI — Sistem Navigasi Lokasi Pendaratan di Bulan</title>
   <link rel="icon" type="image/png" href="/logo.png">
   <script src="/three.min.js"></script>
-  <link rel="stylesheet" href="/css/style.css?v=20">
+  <link rel="stylesheet" href="/css/style.css?v=21">
 </head>
 <body>
 
@@ -785,43 +785,32 @@
           <div style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; flex: 1; min-height: 0; margin-bottom: 8px;">
             
             <!-- Left Column: Real 3D Terrain Canvas & Controls (1 Titik Konsisten: Mons Mouton Crest) -->
-            <div style="background: #030712; border: 1px solid #1e293b; border-radius: var(--radius-md); padding: 8px; position: relative; overflow: hidden; height: 100%; display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
+            <div style="background: #030712; border: 1px solid #1e293b; border-radius: var(--radius-md); padding: 8px; position: relative; overflow: hidden; height: 100%; display: flex; flex-direction: column; box-sizing: border-box;">
               
-              <!-- 3D Header Toolbar (Layer Switcher & View Reset) -->
-              <div style="display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 6px; z-index: 10;">
-                <!-- Layer Buttons -->
-                <div style="display: flex; gap: 6px; align-items: center;">
-                  <span style="font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-right: 2px;">Lapisan:</span>
-                  <button id="btn-layer-mcda" class="btn-hud active" onclick="switch3DLayer('mcda')" style="font-size: 10.5px; padding: 4px 10px; background: #0284c7; color: #fff;">
-                    Kelayakan (1)
-                  </button>
-                  <button id="btn-layer-dem" class="btn-hud" onclick="switch3DLayer('dem')" style="font-size: 10.5px; padding: 4px 10px;">
-                    Elevasi (2)
-                  </button>
-                  <button id="btn-layer-slope" class="btn-hud" onclick="switch3DLayer('slope')" style="font-size: 10.5px; padding: 4px 10px;">
-                    Lereng (3)
-                  </button>
+              <!-- 3D Header Toolbar (Dropdown Layer Switcher & View Reset) -->
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; z-index: 10;">
+                <!-- Layer Dropdown -->
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <label for="select-3d-layer" style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px;">Lapisan Peta:</label>
+                  <select id="select-3d-layer" onchange="switch3DLayer(this.value)" style="background: #0b1329; color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); border-radius: 6px; padding: 5px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; outline: none; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+                    <option value="mcda">✦ Lapisan 1: Zona Kelayakan (MCDA Viridis)</option>
+                    <option value="dem">✦ Lapisan 2: Topografi Elevasi (NASA LOLA DEM)</option>
+                    <option value="slope">✦ Lapisan 3: Kemiringan Lereng (Slope Safety &le; 10°)</option>
+                  </select>
                 </div>
                 <!-- Controls -->
-                <div style="display: flex; gap: 6px; align-items: center;">
-                  <span style="font-size: 10px; font-weight: 800; color: #facc15; background: rgba(250, 204, 21, 0.12); border: 1px solid rgba(250, 204, 21, 0.35); padding: 3px 8px; border-radius: 4px;">
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <span style="font-size: 10.5px; font-weight: 800; color: #facc15; background: rgba(250, 204, 21, 0.12); border: 1px solid rgba(250, 204, 21, 0.35); padding: 4px 10px; border-radius: 6px;">
                     📍 Mons Mouton Crest (-84.9°S, 33.3°W)
                   </span>
-                  <button class="btn-hud" onclick="reset3DView()" title="Kembalikan Sudut Pandang Awal" style="font-size: 10.5px; padding: 4px 10px;">
-                    ⟳ Reset View
+                  <button class="btn-hud" onclick="reset3DView()" title="Kembalikan Sudut Pandang Awal" style="font-size: 11px; padding: 4px 12px; background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2);">
+                    ⟳ Reset Kamera
                   </button>
                 </div>
               </div>
 
-              <!-- 3D Canvas Viewport -->
-              <div id="threeHorizonContainer" style="width: 100%; flex: 1; min-height: 230px; position: relative; border-radius: 6px; overflow: hidden;"></div>
-              
-              <!-- 3D Footer Status Readout -->
-              <div style="background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(56, 189, 248, 0.3); border-radius: var(--radius-sm); padding: 6px 12px; font-size: 11px; font-weight: 700; color: #38bdf8; margin-top: 6px; display: flex; justify-content: space-between; align-items: center;">
-                <span id="readout-3d-status" style="color: #34d399;">● STATUS PENDARATAN: OPTIMAL &amp; AMAN</span>
-                <span id="readout-3d-elev">Elevasi: +5.920 m (Puncak Dataran Tinggi)</span>
-                <span id="readout-3d-margin" style="color: #34d399;">✓ Klirens Sinyal: +12.35° [BEBAS TEBING]</span>
-              </div>
+              <!-- 3D Canvas Viewport (Expanded Full Height, no footer clutter) -->
+              <div id="threeHorizonContainer" style="width: 100%; flex: 1; min-height: 320px; position: relative; border-radius: 6px; overflow: hidden;"></div>
             </div>
 
             <!-- Right Column: Penjelasan Ramah Awam (Menggantikan Kode / Grafik Rumit) -->
@@ -1096,6 +1085,6 @@
   </div>
 
   <!-- JAVASCRIPT SYSTEM ENGINE -->
-  <script src="/js/app.js?v=20"></script>
+  <script src="/js/app.js?v=21"></script>
 </body>
 </html>

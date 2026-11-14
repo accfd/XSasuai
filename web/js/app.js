@@ -1014,6 +1014,12 @@
         setTimeout(() => {
           if (!threeGlobeInitialized) initThreeMoonGlobe();
           else onWindowResizeGlobe();
+
+          // Pre-initialize 3D Terrain in background so it's 100% ready immediately on scroll!
+          if (!horizonViewerInitialized) initThreeHorizonViewer();
+          else onWindowResizeHorizon();
+
+          setupTerrainScrollObserver();
         }, 120);
       } else if (viewName === 'simulasi') {
         if (simView) simView.style.display = "grid";
@@ -1725,9 +1731,10 @@
         terrainMeshMat.map = terrainTextures[layerKey];
         terrainMeshMat.needsUpdate = true;
       }
-      document.querySelectorAll("#btn-layer-mcda, #btn-layer-dem, #btn-layer-slope").forEach(b => b.classList.remove("active"));
-      const btn = document.getElementById(`btn-layer-${layerKey}`);
-      if (btn) btn.classList.add("active");
+      const sel = document.getElementById("select-3d-layer");
+      if (sel && sel.value !== layerKey) {
+        sel.value = layerKey;
+      }
     }
 
     function reset3DView() {
@@ -1772,10 +1779,64 @@
       const container = document.getElementById("threeHorizonContainer");
       if (!container) return;
       const w = container.clientWidth || 540;
-      const h = container.clientHeight || 260;
-      horizonCamera.aspect = w / h;
-      horizonCamera.updateProjectionMatrix();
-      horizonRenderer.setSize(w, h);
+      const h = container.clientHeight || 320;
+      if (w > 20 && h > 20) {
+        horizonCamera.aspect = w / h;
+        horizonCamera.updateProjectionMatrix();
+        horizonRenderer.setSize(w, h);
+      }
+    }
+
+    let scrollObserverSetup = false;
+    function setupTerrainScrollObserver() {
+      if (scrollObserverSetup) return;
+      scrollObserverSetup = true;
+
+      const terrainSec = document.getElementById("vis-slide-terrain");
+      const globeSec = document.getElementById("vis-slide-globe");
+      const slidesContainer = document.getElementById("visualisasi-slides");
+
+      if (window.IntersectionObserver) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              if (entry.target === terrainSec) {
+                if (!horizonViewerInitialized) {
+                  initThreeHorizonViewer();
+                } else {
+                  setTimeout(onWindowResizeHorizon, 50);
+                }
+              } else if (entry.target === globeSec) {
+                if (!threeGlobeInitialized) {
+                  initThreeMoonGlobe();
+                } else {
+                  setTimeout(onWindowResizeGlobe, 50);
+                }
+              }
+            }
+          });
+        }, {
+          threshold: 0.1
+        });
+
+        if (terrainSec) observer.observe(terrainSec);
+        if (globeSec) observer.observe(globeSec);
+      }
+
+      if (slidesContainer) {
+        slidesContainer.addEventListener("scroll", () => {
+          if (terrainSec) {
+            const rect = terrainSec.getBoundingClientRect();
+            if (rect.top < window.innerHeight && rect.bottom > 0) {
+              if (!horizonViewerInitialized) {
+                initThreeHorizonViewer();
+              } else {
+                onWindowResizeHorizon();
+              }
+            }
+          }
+        }, { passive: true });
+      }
     }
 
 
