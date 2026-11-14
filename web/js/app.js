@@ -1204,17 +1204,24 @@
       let pt = timelineData.find(d => d.hour_offset >= hourOffset) || timelineData[0];
       if (!pt) return;
 
-      document.getElementById("timeline-time-badge").innerText = `${pt.datetime_utc} UTC (+${hourOffset}h)`;
-      document.getElementById("tile-sun").innerText = `${pt.sun_az}° / ${pt.sun_el}°`;
-      document.getElementById("tile-earth").innerText = `${pt.earth_az}° / ${pt.earth_el}°`;
+      const badge = document.getElementById("timeline-time-badge");
+      if (badge) badge.innerText = `${pt.datetime_utc} UTC (+${hourOffset}h)`;
+      const tileSun = document.getElementById("tile-sun");
+      if (tileSun) tileSun.innerText = `${pt.sun_az}° / ${pt.sun_el}°`;
+      const tileEarth = document.getElementById("tile-earth");
+      if (tileEarth) tileEarth.innerText = `${pt.earth_az}° / ${pt.earth_el}°`;
 
       const solarTile = document.getElementById("tile-solar");
-      solarTile.innerText = pt.solar_ok ? "100% ACTIVE" : "0% SHADOWED";
-      solarTile.style.color = pt.solar_ok ? "var(--emerald-safe)" : "var(--coral-crit)";
+      if (solarTile) {
+        solarTile.innerText = pt.solar_ok ? "100% ACTIVE" : "0% SHADOWED";
+        solarTile.style.color = pt.solar_ok ? "var(--emerald-safe)" : "var(--coral-crit)";
+      }
 
       const dteTile = document.getElementById("tile-dte");
-      dteTile.innerText = pt.dte_ok ? "DIRECT LINE-OF-SIGHT" : "BLOCKED BY CRATER";
-      dteTile.style.color = pt.dte_ok ? "var(--emerald-safe)" : "var(--coral-crit)";
+      if (dteTile) {
+        dteTile.innerText = pt.dte_ok ? "DIRECT LINE-OF-SIGHT" : "BLOCKED BY CRATER";
+        dteTile.style.color = pt.dte_ok ? "var(--emerald-safe)" : "var(--coral-crit)";
+      }
 
       // Update Global Status Pill
       const pill = document.getElementById("global-status-pill");
@@ -1275,42 +1282,50 @@
     }
 
     // 4. Trajectory PDI Calculation
-    document.getElementById("btn-recalc-pdi").onclick = async () => {
-      const box = document.getElementById("pdi-chart-box");
-      box.innerHTML = `<div class="spinner"></div>`;
+    const recalcPdiBtn = document.getElementById("btn-recalc-pdi");
+    if (recalcPdiBtn) {
+      recalcPdiBtn.onclick = async () => {
+        const box = document.getElementById("pdi-chart-box");
+        if (box) box.innerHTML = `<div class="spinner"></div>`;
 
-      try {
-        const res = await fetch("/api/trajectory", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ site: currentSite })
-        });
-        const traj = await res.json();
+        try {
+          const res = await fetch("/api/trajectory", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ site: currentSite })
+          });
+          const traj = await res.json();
 
-        document.getElementById("m-dv").innerText = `${traj.total_delta_v_ms} m/s`;
-        document.getElementById("m-prop").innerText = `${traj.prop_remaining_kg} kg (${traj.prop_margin_pct}%)`;
-        document.getElementById("m-vz").innerText = `${traj.touchdown_vz_ms} m/s (Aman)`;
-        if (traj.crater_rim_clearance_m) {
-          const clrElem = document.getElementById("m-clearance");
-          if (clrElem) clrElem.innerText = `> ${Math.round(traj.crater_rim_clearance_m)} m (Aman)`;
+          const mDv = document.getElementById("m-dv");
+          if (mDv) mDv.innerText = `${traj.total_delta_v_ms} m/s`;
+          const mProp = document.getElementById("m-prop");
+          if (mProp) mProp.innerText = `${traj.prop_remaining_kg} kg (${traj.prop_margin_pct}%)`;
+          const mVz = document.getElementById("m-vz");
+          if (mVz) mVz.innerText = `${traj.touchdown_vz_ms} m/s (Aman)`;
+          if (traj.crater_rim_clearance_m) {
+            const clrElem = document.getElementById("m-clearance");
+            if (clrElem) clrElem.innerText = `> ${Math.round(traj.crater_rim_clearance_m)} m (Aman)`;
+          }
+
+          if (traj.chart_b64 && box) {
+            box.innerHTML = `<img src="${traj.chart_b64}" alt="Trajectory Chart">`;
+          }
+        } catch (e) {
+          if (box) box.innerHTML = `<span style="color: var(--coral-crit); font-size: 12px;">Kalkulasi gagal: ${e}</span>`;
         }
-
-        if (traj.chart_b64) {
-          box.innerHTML = `<img src="${traj.chart_b64}" alt="Trajectory Chart">`;
-        }
-      } catch (e) {
-        box.innerHTML = `<span style="color: var(--coral-crit); font-size: 12px;">Kalkulasi gagal: ${e}</span>`;
-      }
-    };
+      };
+    }
 
     // 5. Dedicated Cockpit Testbed Engine
     let testbedInitialized = false;
     function initCockpitEngine() {
       testbedInitialized = true;
       const canvas = document.getElementById("cockpitCanvas");
+      if (!canvas) return;
       const ctx = canvas.getContext("2d");
 
       function resize() {
+        if (!canvas.parentElement) return;
         canvas.width = canvas.parentElement.clientWidth;
         canvas.height = canvas.parentElement.clientHeight;
       }
@@ -1327,15 +1342,21 @@
       });
       window.addEventListener("keyup", (e) => { keys[e.code] = false; });
 
-      document.getElementById("btn-sim-reset").onclick = () => {
-        lander = { x: 0, y: 380, vx: 12, vy: -6, angle: 0, fuel: 350.0, status: "FLYING" };
-      };
+      const simResetBtn = document.getElementById("btn-sim-reset");
+      if (simResetBtn) {
+        simResetBtn.onclick = () => {
+          lander = { x: 0, y: 380, vx: 12, vy: -6, angle: 0, fuel: 350.0, status: "FLYING" };
+        };
+      }
 
       let autopilot = false;
-      document.getElementById("btn-sim-auto").onclick = () => {
-        autopilot = !autopilot;
-        document.getElementById("btn-sim-auto").style.background = autopilot ? "#bbf7d0" : "var(--bg-selected)";
-      };
+      const simAutoBtn = document.getElementById("btn-sim-auto");
+      if (simAutoBtn) {
+        simAutoBtn.onclick = () => {
+          autopilot = !autopilot;
+          simAutoBtn.style.background = autopilot ? "#bbf7d0" : "var(--bg-selected)";
+        };
+      }
 
       let particles = [];
 
