@@ -226,6 +226,7 @@
       }
 
       // Smooth scroll to top of view-home container
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       const homeView = document.getElementById("view-home");
       if (homeView) homeView.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }

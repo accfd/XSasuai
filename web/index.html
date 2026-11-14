@@ -6,7 +6,7 @@
   <title>XASUAI — Sistem Navigasi Lokasi Pendaratan di Bulan</title>
   <link rel="icon" type="image/png" href="/logo.png">
   <script src="/three.min.js"></script>
-  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/style.css?v=3">
 </head>
 <body>
 
@@ -44,14 +44,14 @@
   <!-- LAYAR 0: BERANDA / SISTEM OPERASI KENDALI MISI (FLIGHT DYNAMICS) -->
   <!-- ===================================================================== -->
   <main id="view-home" class="bento-container" style="display: grid;">
-    <div class="bento-card bento-full" style="background: var(--bg-surface); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); color: var(--text-primary); padding: 24px 32px; border-radius: var(--radius-lg); min-height: calc(100vh - 120px); display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
+    <div class="bento-card bento-full" style="background: var(--bg-surface); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); color: var(--text-primary); padding: 18px 28px; border-radius: var(--radius-lg); min-height: calc(100vh - 130px); display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
 
       <!-- =================================================================== -->
       <!-- ONBOARDING LANGKAH 1: PENGANTAR SISTEM & MODEL 3D BULAN -->
       <!-- =================================================================== -->
-      <div id="onboarding-step-1" class="onboarding-step-view" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; min-height: calc(100vh - 170px); text-align: center;">
+      <div id="onboarding-step-1" class="onboarding-step-view" style="display: flex;">
         <!-- Konten Utama -->
-        <div style="max-width: 960px; margin: 0 auto; width: 100%;">
+        <div class="onboarding-inner-center" style="max-width: 960px;">
           <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(37,99,235,0.08); color: var(--artemis-blue); padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-bottom: 8px;">
             <span>LANGKAH 1 DARI 3 &bull; PENGANTAR SISTEM</span>
           </div>
@@ -72,7 +72,7 @@
         </div>
 
         <!-- Onboarding Navigation Bar -->
-        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-light); padding-top: 14px; margin-top: 12px; width: 100%; max-width: 1080px; margin-left: auto; margin-right: auto;">
+        <div class="onboarding-nav-bar">
           <div style="font-size: 12px; font-weight: 700; color: var(--text-muted);">
             Langkah 1 / 3
           </div>
@@ -93,13 +93,13 @@
       <!-- =================================================================== -->
       <!-- ONBOARDING LANGKAH 2: TANTANGAN UTAMA PENDARATAN (3 MASALAH) -->
       <!-- =================================================================== -->
-      <div id="onboarding-step-2" class="onboarding-step-view" style="display: none; opacity: 0; flex-direction: column; justify-content: space-between; height: 100%; min-height: calc(100vh - 170px); text-align: center;">
-        <!-- Konten Utama -->
-        <div style="max-width: 1080px; margin: 0 auto; width: 100%;">
+      <div id="onboarding-step-2" class="onboarding-step-view" style="display: none; opacity: 0;">
+        <!-- Konten Utama (Full di Tengah Layar) -->
+        <div class="onboarding-inner-center" style="max-width: 1140px;">
           <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(220,38,38,0.08); color: #b91c1c; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-bottom: 8px;">
             <span>LANGKAH 2 DARI 3 &bull; IDENTIFIKASI TANTANGAN</span>
           </div>
-          <h2 style="font-size: 23px; font-weight: 900; color: var(--text-primary); margin: 0 0 6px; letter-spacing: -0.5px;">
+          <h2 style="font-size: 24px; font-weight: 900; color: var(--text-primary); margin: 0 0 6px; letter-spacing: -0.5px;">
             Tantangan Utama Pendaratan di Kutub Selatan Bulan
           </h2>
           <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0 auto 18px; max-width: 760px;">
@@ -107,7 +107,7 @@
           </p>
 
           <!-- 3 Cards Masalah (Horizontal Grid 3 Kolom) -->
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: left;">
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: left; width: 100%;">
             <!-- Masalah 1: Merah/Coral -->
             <div style="background: #fffafa; border: 1px solid #fecaca; border-top: 4px solid #b91c1c; border-radius: var(--radius-md); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm);">
               <div>
@@ -198,7 +198,7 @@
         </div>
 
         <!-- Onboarding Navigation Bar -->
-        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-light); padding-top: 14px; margin-top: 12px; width: 100%; max-width: 1080px; margin-left: auto; margin-right: auto;">
+        <div class="onboarding-nav-bar">
           <div>
             <button class="btn-onboarding-prev" onclick="goToOnboarding(1)">
               <span>&larr;</span>
@@ -222,13 +222,13 @@
       <!-- =================================================================== -->
       <!-- ONBOARDING LANGKAH 3: ALUR KERJA XASUAI (3 TAHAP AKSI) -->
       <!-- =================================================================== -->
-      <div id="onboarding-step-3" class="onboarding-step-view" style="display: none; opacity: 0; flex-direction: column; justify-content: space-between; height: 100%; min-height: calc(100vh - 170px); text-align: center;">
-        <!-- Konten Utama -->
-        <div style="max-width: 1080px; margin: 0 auto; width: 100%;">
+      <div id="onboarding-step-3" class="onboarding-step-view" style="display: none; opacity: 0;">
+        <!-- Konten Utama (Full di Tengah Layar) -->
+        <div class="onboarding-inner-center" style="max-width: 1140px;">
           <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(37,99,235,0.08); color: var(--artemis-blue); padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 800; margin-bottom: 8px;">
             <span>LANGKAH 3 DARI 3 &bull; ALUR PENYELESAIAN TERPADU</span>
           </div>
-          <h2 style="font-size: 23px; font-weight: 900; color: var(--text-primary); margin: 0 0 6px; letter-spacing: -0.5px;">
+          <h2 style="font-size: 24px; font-weight: 900; color: var(--text-primary); margin: 0 0 6px; letter-spacing: -0.5px;">
             Alur Kerja XASUAI — 3 Tahap Penyelesaian
           </h2>
           <p style="font-size: 13.5px; color: var(--text-secondary); margin: 0 auto 12px; max-width: 760px;">
@@ -342,7 +342,7 @@
         </div>
 
         <!-- Onboarding Navigation Bar -->
-        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-light); padding-top: 14px; margin-top: 12px; width: 100%; max-width: 1080px; margin-left: auto; margin-right: auto;">
+        <div class="onboarding-nav-bar">
           <div>
             <button class="btn-onboarding-prev" onclick="goToOnboarding(2)">
               <span>&larr;</span>
@@ -839,6 +839,6 @@
   </div>
 
   <!-- JAVASCRIPT SYSTEM ENGINE -->
-  <script src="/js/app.js"></script>
+  <script src="/js/app.js?v=3"></script>
 </body>
 </html>
