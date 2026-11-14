@@ -51,6 +51,47 @@
     let homeMoonRotating = true;
     let homeMoonInitialized = false;
 
+    // Helper: Buat tekstur Bulan prosedural instan (0 ms render) agar bola Bulan langsung muncul seketika tanpa jeda download
+    function createInstantLunarCanvasTexture() {
+      const cvs = document.createElement("canvas");
+      cvs.width = 512;
+      cvs.height = 256;
+      const ctx = cvs.getContext("2d");
+
+      // Warna dasar regolith Bulan
+      ctx.fillStyle = "#c2c6cc";
+      ctx.fillRect(0, 0, 512, 256);
+
+      // Bercak kawah besar & dataran basal (Lunar Maria)
+      ctx.fillStyle = "#6e737c";
+      const maria = [
+        [160, 95, 45, 30], [210, 80, 55, 38], [275, 95, 40, 28],
+        [190, 130, 42, 32], [140, 115, 32, 24], [320, 110, 32, 22],
+        [240, 140, 38, 25], [360, 90, 28, 20]
+      ];
+      maria.forEach(([x, y, rx, ry]) => {
+        ctx.beginPath();
+        ctx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Tekstur bintik kawah detail
+      for (let i = 0; i < 280; i++) {
+        const x = Math.random() * 512;
+        const y = Math.random() * 256;
+        const r = 1 + Math.random() * 3.5;
+        ctx.fillStyle = Math.random() > 0.45 ? "#e2e5eb" : "#555860";
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      const tex = new THREE.CanvasTexture(cvs);
+      tex.wrapS = THREE.RepeatWrapping;
+      tex.wrapT = THREE.ClampToEdgeWrapping;
+      return tex;
+    }
+
     function initHomeMoonGlobe() {
       if (homeMoonInitialized) return;
       const container = document.getElementById("homeMoonContainer");
@@ -81,17 +122,25 @@
       sunLight.position.set(22, 12, 20);
       homeMoonScene.add(sunLight);
 
-      // 4. Lunar Sphere with NASA Texture (Pure Floating Moon - Instant Display)
+      // 4. Lunar Sphere with Instant Canvas Texture & Progressive High-Res NASA Map
       const moonGeo = new THREE.SphereGeometry(7.5, 64, 64);
-      const moonTexture = new THREE.TextureLoader().load('/data/moon_1024.jpg');
+      const instantTex = createInstantLunarCanvasTexture();
       const moonMat = new THREE.MeshStandardMaterial({
         color: 0xd4d4d8,
-        map: moonTexture,
+        map: instantTex,
         roughness: 0.88,
         metalness: 0.02
       });
       homeMoonMesh = new THREE.Mesh(moonGeo, moonMat);
       homeMoonScene.add(homeMoonMesh);
+
+      // Upgrade mulus ke foto tekstur NASA beresolusi tinggi saat file selesai di-decode
+      const moonTexLoader = new THREE.TextureLoader();
+      moonTexLoader.load('/data/moon_1024.jpg', (nasaTex) => {
+        nasaTex.anisotropy = 4;
+        moonMat.map = nasaTex;
+        moonMat.needsUpdate = true;
+      });
 
       // 5. Mouse & Touch Drag Controls with Click Detection
       let isDragging = false;
@@ -703,17 +752,25 @@
       const starMat = new THREE.PointsMaterial({ color: 0xffffff, size: 1.2, transparent: true, opacity: 0.8 });
       threeScene.add(new THREE.Points(starGeo, starMat));
 
-      // 5. Moon Sphere with Official NASA Lunar Texture
+      // 5. Moon Sphere with Instant Base Texture & High-Res NASA Map
       const moonGeo = new THREE.SphereGeometry(8, 64, 64);
-      const textureLoader = new THREE.TextureLoader();
-      const moonTexture = textureLoader.load('/data/moon_1024.jpg');
+      const instantTex = createInstantLunarCanvasTexture();
       const moonMat = new THREE.MeshStandardMaterial({
-        map: moonTexture,
+        color: 0xd4d4d8,
+        map: instantTex,
         roughness: 0.88,
         metalness: 0.05
       });
       moonGlobeMesh = new THREE.Mesh(moonGeo, moonMat);
       threeScene.add(moonGlobeMesh);
+
+      // Upgrade mulus ke foto NASA saat file gambar siap
+      const textureLoader = new THREE.TextureLoader();
+      textureLoader.load('/data/moon_1024.jpg', (nasaTex) => {
+        nasaTex.anisotropy = 4;
+        moonMat.map = nasaTex;
+        moonMat.needsUpdate = true;
+      });
 
       // 6. South Pole Coordinate Parallels (-70°, -80°, -85°)
       const gridMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.35 });
@@ -987,18 +1044,23 @@
         if (homeView) homeView.style.display = "block";
         if (btnHome) btnHome.classList.add("active");
         try { history.pushState(null, '', '/'); } catch(e){}
-        if (!homeMoonInitialized) {
-          initHomeMoonGlobe();
-        } else if (homeMoonRenderer && homeMoonCamera) {
-          const container = document.getElementById("homeMoonContainer");
-          if (container) {
-            const nw = container.clientWidth || 900;
-            const nh = container.clientHeight || 320;
-            homeMoonCamera.aspect = nw / nh;
-            homeMoonCamera.updateProjectionMatrix();
-            homeMoonRenderer.setSize(nw, nh);
+        const refreshHomeCanvas = () => {
+          if (!homeMoonInitialized) {
+            initHomeMoonGlobe();
+          } else if (homeMoonRenderer && homeMoonCamera) {
+            const container = document.getElementById("homeMoonContainer");
+            if (container) {
+              const nw = container.clientWidth || 900;
+              const nh = container.clientHeight || 320;
+              homeMoonCamera.aspect = nw / nh;
+              homeMoonCamera.updateProjectionMatrix();
+              homeMoonRenderer.setSize(nw, nh);
+            }
           }
-        }
+        };
+        refreshHomeCanvas();
+        requestAnimationFrame(refreshHomeCanvas);
+        setTimeout(refreshHomeCanvas, 60);
       } else if (viewName === 'rekomendasi') {
         if (recView) recView.style.display = "grid";
         if (btnRec) btnRec.classList.add("active");

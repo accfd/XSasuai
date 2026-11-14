@@ -4,9 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>XASUAI — Sistem Navigasi Lokasi Pendaratan di Bulan</title>
-  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png">
+  <link rel="icon" type="image/png" sizes="256x256" href="/favicon-256.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="preload" as="image" href="/data/moon_1024.jpg">
   <script src="/three.min.js"></script>
-  <link rel="stylesheet" href="/css/style.css?v=21">
+  <link rel="stylesheet" href="/css/style.css?v=22">
 </head>
 <body>
 
@@ -65,7 +68,7 @@
           </p>
 
           <!-- Pure Cinematic 3D Moon Canvas -->
-          <div style="background: transparent; border: none; margin: 0 auto 8px; overflow: visible; position: relative; height: 320px; cursor: pointer; filter: drop-shadow(0 20px 28px rgba(15, 23, 42, 0.22));" id="homeMoonContainer" onclick="slideHomeTo(2)" title="Klik Bulan untuk Eksplorasi Tantangan"></div>
+          <div style="background: transparent; border: none; margin: 0 auto 8px; overflow: visible; position: relative; width: 100%; max-width: 900px; height: 320px; cursor: pointer; filter: drop-shadow(0 20px 28px rgba(15, 23, 42, 0.22));" id="homeMoonContainer" onclick="slideHomeTo(2)" title="Klik Bulan untuk Eksplorasi Tantangan"></div>
 
           <!-- Teks Simpel Petunjuk -->
           <p id="homeMoonCtaPill" onclick="slideHomeTo(2)" style="font-size: 13px; color: var(--text-muted); margin: 0 auto; cursor: pointer; transition: color 0.2s ease; user-select: none; font-weight: 600;" onmouseover="this.style.color='var(--artemis-blue)';" onmouseout="this.style.color='var(--text-muted)';">

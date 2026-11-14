@@ -237,6 +237,12 @@ class NoCacheStaticFileHandler(tornado.web.StaticFileHandler):
         self.set_header("Expires", "0")
 
 
+class CacheStaticFileHandler(tornado.web.StaticFileHandler):
+    """Memberikan cache browser untuk file data statis besar seperti tekstur gambar 3D Bulan."""
+    def set_extra_headers(self, path):
+        self.set_header("Cache-Control", "public, max-age=86400")
+
+
 def make_app():
     web_dir = os.path.dirname(os.path.abspath(__file__))
     data_dir = os.path.join(BASE_DIR, "data")
@@ -253,7 +259,7 @@ def make_app():
         (r"/api/trajectory", TrajectoryHandler),
         (r"/api/launch_sim", LaunchSimHandler),
         (r"/web_data/(.*)", NoCacheStaticFileHandler, {"path": os.path.join(web_dir, "data")}),
-        (r"/data/(.*)", tornado.web.StaticFileHandler, {"path": data_dir}),
+        (r"/data/(.*)", CacheStaticFileHandler, {"path": data_dir}),
         (r"/(.*)", NoCacheStaticFileHandler, {"path": web_dir, "default_filename": "index.html"}),
     ])
 
