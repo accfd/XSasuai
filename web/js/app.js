@@ -887,14 +887,19 @@
     }
 
     function onWindowResizeGlobe() {
-      if (!threeRenderer || !threeCamera) return;
-      const container = document.getElementById("threeMoonContainer");
-      if (!container) return;
-      const nw = container.clientWidth || 450;
-      const nh = container.clientHeight || 340;
-      threeCamera.aspect = nw / nh;
-      threeCamera.updateProjectionMatrix();
-      threeRenderer.setSize(nw, nh);
+      if (threeRenderer && threeCamera) {
+        const container = document.getElementById("threeMoonContainer");
+        if (container) {
+          const nw = container.clientWidth || 450;
+          const nh = container.clientHeight || 340;
+          threeCamera.aspect = nw / nh;
+          threeCamera.updateProjectionMatrix();
+          threeRenderer.setSize(nw, nh);
+        }
+      }
+      if (typeof onWindowResizeHorizon === 'function') {
+        onWindowResizeHorizon();
+      }
     }
 
     function updateTargetBeaconPosition(lat, lon) {
@@ -984,12 +989,27 @@
         if (btnRec) btnRec.classList.add("active");
         try { history.pushState(null, '', '/rekomendasi'); } catch(e){}
       } else if (viewName === 'visualisasi') {
-        if (visView) visView.style.display = "grid";
+        if (visView) visView.style.display = "block";
         if (btnVis) btnVis.classList.add("active");
         try { history.pushState(null, '', '/visualisasi'); } catch(e){}
+
+        // Ensure visualisasi starts at Slide 1 (3D Globe)
+        scrollToVisSlide(1);
+
         setTimeout(() => {
-          onWindowResizeGlobe();
-        }, 100);
+          if (!threeGlobeInitialized) {
+            initThreeMoonGlobe();
+          } else {
+            onWindowResizeGlobe();
+          }
+          // Immediate dramatic cinematic Fly-To animation towards Mons Mouton Crest!
+          setTimeout(() => {
+            triggerFlyToAnimation();
+          }, 300);
+
+          // Initialize 3D Horizon & Signal Beam Viewer in Slide 3
+          initThreeHorizonViewer();
+        }, 120);
       } else if (viewName === 'simulasi') {
         if (simView) simView.style.display = "grid";
         if (btnSim) btnSim.classList.add("active");
@@ -1376,6 +1396,218 @@
       }
       requestAnimationFrame(loop);
     }
+
+        // 3D Horizon & Direct-to-Earth Signal Beam Visualizer (Slide 3)
+    let horizonViewerInitialized = false;
+    let horizonScene, horizonCamera, horizonRenderer;
+    let horizonMeshGroup;
+
+    function initThreeHorizonViewer() {
+      if (horizonViewerInitialized) {
+        onWindowResizeHorizon();
+        return;
+      }
+      const container = document.getElementById("threeHorizonContainer");
+      if (!container) return;
+
+      const w = container.clientWidth || 480;
+      const h = container.clientHeight || 320;
+
+      // 1. Scene & Camera
+      horizonScene = new THREE.Scene();
+      horizonScene.background = new THREE.Color(0x030712);
+
+      horizonCamera = new THREE.PerspectiveCamera(45, w / h, 0.1, 100);
+      horizonCamera.position.set(-16, 12, 22);
+      horizonCamera.lookAt(0, 2, 0);
+
+      // 2. Renderer
+      horizonRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+      horizonRenderer.setSize(w, h);
+      horizonRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(horizonRenderer.domElement);
+
+      // 3. Lights
+      const ambLight = new THREE.AmbientLight(0xffffff, 0.55);
+      horizonScene.add(ambLight);
+
+      const dirLight = new THREE.DirectionalLight(0xfffbeb, 1.3);
+      dirLight.position.set(20, 18, 12);
+      horizonScene.add(dirLight);
+
+      horizonMeshGroup = new THREE.Group();
+      horizonScene.add(horizonMeshGroup);
+
+      // 4. Procedural Crater & Mountain Terrain Mesh
+      const terrainGeo = new THREE.PlaneGeometry(26, 26, 48, 48);
+      terrainGeo.rotateX(-Math.PI / 2);
+      const posAttr = terrainGeo.attributes.position;
+      for (let i = 0; i < posAttr.count; i++) {
+        const x = posAttr.getX(i);
+        const z = posAttr.getZ(i);
+        const dist = Math.sqrt(x * x + z * z);
+        let y = 0;
+        // Central elevated plateau (Mons Mouton Crest)
+        if (dist < 3.2) {
+          y = 3.6 - (dist / 3.2) * 0.3;
+        } else if (dist < 7.2) {
+          // Surrounding crater depression
+          y = 1.0 - Math.sin(((dist - 3.2) / 4.0) * Math.PI) * 0.8;
+        } else if (dist < 11.0) {
+          // Elevated crater rim ridge
+          const rimFactor = Math.sin(((dist - 7.2) / 3.8) * Math.PI);
+          y = 1.4 + rimFactor * 2.2;
+        } else {
+          y = 1.2;
+        }
+        // Surface roughness
+        y += (Math.sin(x * 1.4) + Math.cos(z * 1.4)) * 0.12;
+        posAttr.setY(i, y);
+      }
+      terrainGeo.computeVertexNormals();
+
+      const terrainMat = new THREE.MeshStandardMaterial({
+        color: 0x334155,
+        roughness: 0.9,
+        metalness: 0.1,
+        flatShading: true
+      });
+      const terrainMesh = new THREE.Mesh(terrainGeo, terrainMat);
+      horizonMeshGroup.add(terrainMesh);
+
+      // Wireframe overlay for aerospace aesthetic
+      const wireMat = new THREE.MeshBasicMaterial({ color: 0x64748b, wireframe: true, transparent: true, opacity: 0.22 });
+      const wireMesh = new THREE.Mesh(terrainGeo, wireMat);
+      horizonMeshGroup.add(wireMesh);
+
+      // 5. Lander on Mons Mouton Crest
+      const landerGroup = new THREE.Group();
+      landerGroup.position.set(0, 3.6, 0);
+
+      const landerGeo = new THREE.CylinderGeometry(0.32, 0.48, 0.75, 8);
+      const landerMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.2 });
+      const landerMesh = new THREE.Mesh(landerGeo, landerMat);
+      landerMesh.position.y = 0.38;
+      landerGroup.add(landerMesh);
+
+      const beaconLightGeo = new THREE.SphereGeometry(0.18, 16, 16);
+      const beaconLightMat = new THREE.MeshBasicMaterial({ color: 0x10b981 });
+      const beaconLight = new THREE.Mesh(beaconLightGeo, beaconLightMat);
+      beaconLight.position.y = 0.9;
+      landerGroup.add(beaconLight);
+
+      horizonMeshGroup.add(landerGroup);
+
+      // 6. Direct-to-Earth Signal Beam (Laser Beam to Earth at +10.25° elevation)
+      const beamAngleRad = 10.25 * Math.PI / 180;
+      const beamLength = 22;
+      const beamEndX = Math.cos(beamAngleRad) * beamLength;
+      const beamEndY = 3.6 + 0.9 + Math.sin(beamAngleRad) * beamLength;
+      const beamEndZ = 0;
+
+      const beamCurve = new THREE.LineCurve3(
+        new THREE.Vector3(0, 3.6 + 0.9, 0),
+        new THREE.Vector3(beamEndX, beamEndY, beamEndZ)
+      );
+      const beamGeo = new THREE.TubeGeometry(beamCurve, 20, 0.08, 8, false);
+      const beamMat = new THREE.MeshBasicMaterial({
+        color: 0x38bdf8,
+        transparent: true,
+        opacity: 0.85
+      });
+      const beamMesh = new THREE.Mesh(beamGeo, beamMat);
+      horizonMeshGroup.add(beamMesh);
+
+      // Halo tube
+      const haloGeo = new THREE.TubeGeometry(beamCurve, 20, 0.22, 8, false);
+      const haloMat = new THREE.MeshBasicMaterial({
+        color: 0x0284c7,
+        transparent: true,
+        opacity: 0.35,
+        wireframe: true
+      });
+      const haloMesh = new THREE.Mesh(haloGeo, haloMat);
+      horizonMeshGroup.add(haloMesh);
+
+      // 7. Earth Sphere at the end of the beam
+      const earthGeo = new THREE.SphereGeometry(1.2, 24, 24);
+      const earthMat = new THREE.MeshStandardMaterial({
+        color: 0x2563eb,
+        roughness: 0.4,
+        emissive: 0x1d4ed8,
+        emissiveIntensity: 0.35
+      });
+      const earthSphere = new THREE.Mesh(earthGeo, earthMat);
+      earthSphere.position.set(beamEndX + 1.2, beamEndY + 0.3, beamEndZ);
+      horizonMeshGroup.add(earthSphere);
+
+      const atmosGeo = new THREE.SphereGeometry(1.4, 24, 24);
+      const atmosMat = new THREE.MeshBasicMaterial({
+        color: 0x38bdf8,
+        transparent: true,
+        opacity: 0.3,
+        wireframe: true
+      });
+      const atmosMesh = new THREE.Mesh(atmosGeo, atmosMat);
+      atmosMesh.position.copy(earthSphere.position);
+      horizonMeshGroup.add(atmosMesh);
+
+      // 8. Interactive Mouse Rotation Drag
+      let isDraggingHorizon = false;
+      let prevMouseX = 0, prevMouseY = 0;
+      const dom = horizonRenderer.domElement;
+      dom.style.cursor = "grab";
+
+      dom.addEventListener("mousedown", (e) => {
+        isDraggingHorizon = true;
+        prevMouseX = e.clientX;
+        prevMouseY = e.clientY;
+        dom.style.cursor = "grabbing";
+      });
+
+      window.addEventListener("mouseup", () => {
+        isDraggingHorizon = false;
+        if (dom) dom.style.cursor = "grab";
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!isDraggingHorizon || !horizonMeshGroup) return;
+        const dx = e.clientX - prevMouseX;
+        const dy = e.clientY - prevMouseY;
+        horizonMeshGroup.rotation.y += dx * 0.008;
+        horizonCamera.position.y = Math.max(4, Math.min(25, horizonCamera.position.y - dy * 0.08));
+        horizonCamera.lookAt(0, 2, 0);
+        prevMouseX = e.clientX;
+        prevMouseY = e.clientY;
+      });
+
+      // 9. Render Loop
+      function animateHorizon() {
+        requestAnimationFrame(animateHorizon);
+        if (!isDraggingHorizon && horizonMeshGroup) {
+          horizonMeshGroup.rotation.y += 0.0015;
+        }
+        const time = performance.now() * 0.005;
+        beamMat.opacity = 0.7 + Math.sin(time) * 0.25;
+        beaconLight.scale.setScalar(1 + Math.sin(time * 2) * 0.3);
+
+        horizonRenderer.render(horizonScene, horizonCamera);
+      }
+      animateHorizon();
+      horizonViewerInitialized = true;
+    }
+
+    function onWindowResizeHorizon() {
+      if (!horizonRenderer || !horizonCamera) return;
+      const container = document.getElementById("threeHorizonContainer");
+      if (!container) return;
+      const w = container.clientWidth || 480;
+      const h = container.clientHeight || 320;
+      horizonCamera.aspect = w / h;
+      horizonCamera.updateProjectionMatrix();
+      horizonRenderer.setSize(w, h);
+    }
+
 
     // 6. Inisialisasi Tampilan Seketika (Instant Render First Paint)
     const timelineSlider = document.getElementById("timeline-slider");
