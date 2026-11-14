@@ -2084,19 +2084,19 @@
 
         home_step2_badge: "TAHAP 2",
         home_step2_sol: "Solusi Masalah 2",
-        home_step2_title: "Memeriksa Kondisi Medan",
-        home_step2_eng: "Portal Visualisasi & Analisis Topografi",
-        home_step2_d1: "Menyajikan 3 mode visualisasi: globe orbital 3D dari luar angkasa, peta kelerengan 2D dari LOLA DEM, dan model elevasi 3D interaktif.",
-        home_step2_d2: "Memverifikasi kemiringan lereng aman (0,08°) dan memastikan jalur sinyal radio ke Bumi bebas hambatan tebing kawah.",
-        home_step2_btn: "BUKA PORTAL VISUALISASI &rarr;",
+        home_step2_title: "Memeriksa Kondisi Permukaan",
+        home_step2_eng: "Visualisasi Topografi (2D, 3D &amp; Horizon)",
+        home_step2_d1: "Sistem menampilkan model permukaan Mons Mouton dalam tampilan peta kontur 2D interaktif, medan 3D dinamis, dan mask horizon elevasi tebing.",
+        home_step2_d2: "Menyajikan inspeksi detail kemiringan lereng zona pendaratan untuk mencegah wahana terbalik serta memverifikasi ketiadaan rintangan fisik pada garis pandang antena.",
+        home_step2_btn: "BUKA VISUALISASI 2D/3D &rarr;",
 
         home_step3_badge: "TAHAP 3",
         home_step3_sol: "Solusi Masalah 3",
-        home_step3_title: "Menguji Dinamika Pendaratan",
-        home_step3_eng: "Simulator Penerbangan & Pendaratan 3D",
-        home_step3_d1: "Menyimulasikan seluruh fase penerbangan dari peluncuran Bumi (TLI), transit translunar 384.400 km, orbit polar Bulan, hingga Powered Descent Initiation (PDI).",
-        home_step3_d2: "Menguji manuver pendaratan vertikal SpaceX Starship HLS hingga menyentuh Mons Mouton Crest dengan kecepatan aman 0,80 m/s.",
-        home_step3_btn: "BUKA SIMULATOR PENERBANGAN &rarr;",
+        home_step3_title: "Menguji Proses Pendaratan",
+        home_step3_eng: "Simulasi Penerbangan (6-DOF Flight Dynamics)",
+        home_step3_d1: "Sistem menyimulasikan dinamika penerbangan 6-derajat kebebasan (6-DOF) secara real-time berdasarkan medan gravitasi Bulan dan parameter mekanika orbital wahana Artemis.",
+        home_step3_d2: "Menguji panduan pengereman bertenaga (powered descent guidance), kestabilan sikap wahana, serta cadangan propelan hingga touchdown vertikal aman.",
+        home_step3_btn: "LUNCURKAN SIMULATOR 3D &rarr;",
 
         // Solusi 1 - Rekomendasi
         sol1_tag: "SOLUSI 1 — REKOMENDASI WAKTU PENDARATAN",
@@ -2216,7 +2216,37 @@
         sol3_target_header: "TARGET PENDARATAN TERPILIH",
         sol3_target_name: "Mons Mouton Crest (-84,9°S, 33,3°W)",
         sol3_target_elev: "Elevasi: +5.920 m",
-        sol3_target_status: "Status: VERIFIKASI GO (AMAN)"
+        sol3_target_status: "Status: VERIFIKASI GO (AMAN)",
+
+        // Telemetri scan status
+        rec_status_waiting: "MENUNGGU",
+
+        // Smart Finder Modal
+        modal_rec_badge: "Automated Decision Matrix • NASA JPL Horizons & LOLA DEM",
+        modal_rec_title: "Rekomendasi Tanggal, Waktu & Lokasi Pendaratan Optimal",
+        modal_rec_desc: "Sistem menganalisis kombinasi 3 lokasi pendaratan dan durasi 336 jam untuk menemukan titik dengan batas aman cakrawala, iluminasi maksimum, dan koneksi DTE stabil:",
+        modal_p1_badge: "[PRIORITAS 1] REKOMENDASI UTAMA — GOLDEN SOLAR WINDOW",
+        modal_p1_title: "Site Alpha — Mons Mouton Crest (Dataran Tinggi Utama)",
+        modal_p1_time: "Waktu Optimal: <strong>14 November 2026, 12:00 UTC</strong> (+0 Jam Operasi)",
+        modal_p1_s1: "Kemiringan Lereng: <strong>0.08°</strong> (Sangat Datar &lt; 10°)",
+        modal_p1_s2: "Iluminasi Surya: <strong>100% Aktif</strong> (168 Jam Cahaya Maksimal)",
+        modal_p1_s3: "Elevasi Bumi (DTE): <strong>+6.8°</strong> (Clearance Bibir Kawah Aman)",
+        modal_p1_s4: "Skor MCDA: <strong>92 / 100 (SANGAT AMAN)</strong>",
+        modal_p2_badge: "[PRIORITAS 2] KONEKTIVITAS BUMI MAKSIMAL — PEAK EARTH LINK",
+        modal_p2_title: "Site Beta — Plateau North Rim (Tebing Utara)",
+        modal_p2_time: "Waktu Optimal: <strong>17 November 2026, 06:00 UTC</strong> (+66 Jam Operasi)",
+        modal_p2_s1: "Kemiringan Lereng: <strong>0.06°</strong> (Paling Datar)",
+        modal_p2_s2: "Iluminasi Surya: <strong>95% Aktif</strong> (Bebas Bayangan)",
+        modal_p2_s3: "Elevasi Bumi (DTE): <strong>+8.4°</strong> (Elevasi Terjernih Tanpa Halangan)",
+        modal_p2_s4: "Skor MCDA: <strong>88 / 100 (AMAN)</strong>",
+        modal_p3_badge: "[PRIORITAS 3] CADANGAN KONTINJENSI — SHIELDED BASIN",
+        modal_p3_title: "Site Gamma — West Basin Ridge (Punggung Cekungan Barat)",
+        modal_p3_time: "Waktu Optimal: <strong>21 November 2026, 18:00 UTC</strong> (+174 Jam Operasi)",
+        modal_p3_s1: "Kemiringan Lereng: <strong>0.17°</strong> (Stabil &lt; 10°)",
+        modal_p3_s2: "Iluminasi Surya: <strong>82% Aktif</strong>",
+        modal_p3_s3: "Elevasi Bumi (DTE): <strong>+4.5°</strong> di atas rintangan",
+        modal_p3_s4: "Skor MCDA: <strong>79 / 100 (LAYAK - KONTINJENSI)</strong>",
+        modal_btn_apply: "Tinjau Lokasi & Visualisasi"
       },
       en: {
         brand_title: "XASUAI — Lunar Landing Site Navigation System",
@@ -2273,19 +2303,19 @@
 
         home_step2_badge: "STAGE 2",
         home_step2_sol: "Solution for Problem 2",
-        home_step2_title: "Inspecting Lunar Terrain Conditions",
-        home_step2_eng: "Topography & Horizon Visualization Portal",
-        home_step2_d1: "Features 3 interactive modes: orbital 3D globe, 2D LOLA slope safety map, and real 3D terrain elevation.",
-        home_step2_d2: "Verifies safe slopes (0.08°) and validates antenna line-of-sight elevation over surrounding crater crests.",
-        home_step2_btn: "OPEN VISUALIZATION PORTAL &rarr;",
+        home_step2_title: "Inspect Surface Conditions",
+        home_step2_eng: "Topographic Visualization (2D, 3D &amp; Horizon)",
+        home_step2_d1: "The system displays the Mons Mouton surface model across interactive 2D contour maps, dynamic 3D terrain, and crater elevation horizon masks.",
+        home_step2_d2: "Provides detailed slope gradient inspection of the landing zone to prevent lander tip-over and verifies zero physical obstructions along antenna line-of-sight.",
+        home_step2_btn: "OPEN 2D/3D VISUALIZATION &rarr;",
 
         home_step3_badge: "STAGE 3",
         home_step3_sol: "Solution for Problem 3",
-        home_step3_title: "Testing Flight & Landing Dynamics",
-        home_step3_eng: "3D Flight & Descent Landing Simulator",
-        home_step3_d1: "Simulates the entire flight trajectory: Earth launch (TLI), 384,400 km translunar transit, polar orbit insertion, down to PDI.",
-        home_step3_d2: "Validates SpaceX Starship HLS powered descent and vertical soft touchdown at Mons Mouton Crest at a gentle 0.80 m/s.",
-        home_step3_btn: "OPEN FLIGHT SIMULATOR &rarr;",
+        home_step3_title: "Test Landing Dynamics",
+        home_step3_eng: "Flight Simulation (6-DOF Flight Dynamics)",
+        home_step3_d1: "The system simulates 6-degree-of-freedom (6-DOF) flight dynamics in real-time based on the Moon's gravitational field and Artemis spacecraft orbital mechanics.",
+        home_step3_d2: "Evaluates powered descent guidance, spacecraft attitude stability, and propellant reserves through to a safe vertical touchdown.",
+        home_step3_btn: "LAUNCH 3D SIMULATOR &rarr;",
 
         // Solution 1 - Recommendation
         sol1_tag: "SOLUTION 1 — LANDING SCHEDULE RECOMMENDATION",
@@ -2405,7 +2435,37 @@
         sol3_target_header: "SELECTED LANDING TARGET",
         sol3_target_name: "Mons Mouton Crest (-84.9°S, 33.3°W)",
         sol3_target_elev: "Elevation: +5,920 m",
-        sol3_target_status: "Status: VERIFIED GO (SAFE)"
+        sol3_target_status: "Status: VERIFIED GO (SAFE)",
+
+        // Telemetri scan status
+        rec_status_waiting: "WAITING",
+
+        // Smart Finder Modal
+        modal_rec_badge: "Automated Decision Matrix • NASA JPL Horizons & LOLA DEM",
+        modal_rec_title: "Optimal Landing Date, Time & Site Recommendations",
+        modal_rec_desc: "The system analyzes combinations of 3 candidate landing sites over 336 hours to identify safe horizon clearance, maximum illumination, and continuous DTE links:",
+        modal_p1_badge: "[PRIORITY 1] PRIMARY RECOMMENDATION — GOLDEN SOLAR WINDOW",
+        modal_p1_title: "Site Alpha — Mons Mouton Crest (Primary Plateau)",
+        modal_p1_time: "Optimal Time: <strong>14 November 2026, 12:00 UTC</strong> (+0 Op Hours)",
+        modal_p1_s1: "Slope Gradient: <strong>0.08°</strong> (Extremely Flat &lt; 10°)",
+        modal_p1_s2: "Solar Illumination: <strong>100% Active</strong> (168 Hrs Maximum Daylight)",
+        modal_p1_s3: "Earth Elevation (DTE): <strong>+6.8°</strong> (Safe Crater Rim Clearance)",
+        modal_p1_s4: "MCDA Score: <strong>92 / 100 (EXTREMELY SAFE)</strong>",
+        modal_p2_badge: "[PRIORITY 2] MAXIMUM EARTH CONNECTIVITY — PEAK EARTH LINK",
+        modal_p2_title: "Site Beta — Plateau North Rim (North Ridge)",
+        modal_p2_time: "Optimal Time: <strong>17 November 2026, 06:00 UTC</strong> (+66 Op Hours)",
+        modal_p2_s1: "Slope Gradient: <strong>0.06°</strong> (Flattest Surface)",
+        modal_p2_s2: "Solar Illumination: <strong>95% Active</strong> (Shadow-Free)",
+        modal_p2_s3: "Earth Elevation (DTE): <strong>+8.4°</strong> (Clear Line-of-Sight Elevation)",
+        modal_p2_s4: "MCDA Score: <strong>88 / 100 (SAFE)</strong>",
+        modal_p3_badge: "[PRIORITY 3] CONTINGENCY BACKUP — SHIELDED BASIN",
+        modal_p3_title: "Site Gamma — West Basin Ridge (West Basin Ridge)",
+        modal_p3_time: "Optimal Time: <strong>21 November 2026, 18:00 UTC</strong> (+174 Op Hours)",
+        modal_p3_s1: "Slope Gradient: <strong>0.17°</strong> (Stable &lt; 10°)",
+        modal_p3_s2: "Solar Illumination: <strong>82% Active</strong>",
+        modal_p3_s3: "Earth Elevation (DTE): <strong>+4.5°</strong> above terrain",
+        modal_p3_s4: "MCDA Score: <strong>79 / 100 (VIABLE - CONTINGENCY)</strong>",
+        modal_btn_apply: "Review Site & Visualization"
       }
     };
 
