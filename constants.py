@@ -366,6 +366,14 @@ def date_to_day_offset(dt: datetime) -> float:
         >>> date_to_day_offset(datetime(2026, 11, 14))
         5.0  # (35 hari dari epoch) % 29.53059 ≈ 5.47
     """
+    if isinstance(dt, str):
+        try:
+            if " " in dt:
+                dt = datetime.strptime(dt, "%Y-%m-%d %H:%M")
+            else:
+                dt = datetime.strptime(dt, "%Y-%m-%d")
+        except Exception:
+            dt = datetime.fromisoformat(dt)
     delta_seconds = (dt - MISSION_EPOCH).total_seconds()
     delta_days = delta_seconds / 86400.0
     return delta_days % LUNAR_SYNODIC_DAYS
@@ -390,6 +398,14 @@ def date_to_absolute_day(dt: datetime) -> float:
         >>> date_to_absolute_day(datetime(2026, 11, 14))
         35.0  # 35 hari penuh dari MISSION_EPOCH
     """
+    if isinstance(dt, str):
+        try:
+            if " " in dt:
+                dt = datetime.strptime(dt, "%Y-%m-%d %H:%M")
+            else:
+                dt = datetime.strptime(dt, "%Y-%m-%d")
+        except Exception:
+            dt = datetime.fromisoformat(dt)
     delta_seconds = (dt - MISSION_EPOCH).total_seconds()
     return delta_seconds / 86400.0
 

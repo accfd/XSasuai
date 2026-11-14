@@ -33,6 +33,17 @@ logging.basicConfig(level=logging.INFO, format="[%(asctime)s] %(levelname)s — 
 logger = logging.getLogger("XSasuai.WebServer")
 
 
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, (np.floating, np.float32, np.float64)):
+            return float(obj)
+        if isinstance(obj, (np.integer, np.int32, np.int64)):
+            return int(obj)
+        return super().default(obj)
+
+
 class BaseApiHandler(tornado.web.RequestHandler):
     def set_default_headers(self):
         self.set_header("Access-Control-Allow-Origin", "*")
@@ -46,7 +57,7 @@ class BaseApiHandler(tornado.web.RequestHandler):
     def write_json(self, data, status=200):
         self.set_status(status)
         self.set_header("Content-Type", "application/json")
-        self.write(json.dumps(data, indent=2))
+        self.write(json.dumps(data, indent=2, cls=NumpyEncoder))
 
 
 class StateHandler(BaseApiHandler):
@@ -222,9 +233,20 @@ def make_app():
 
 def run_server(port=8888):
     app = make_app()
-    app.listen(port)
-    logger.info(f"🚀 XSasuai Web Application aktif di: http://127.0.0.1:{port}")
-    tornado.ioloop.IOLoop.current().start()
+    max_retries = 5
+    for attempt in range(max_retries):
+        target_port = port + attempt
+        try:
+            app.listen(target_port)
+            logger.info(f"🚀 XSasuai Web Application aktif di: http://127.0.0.1:{target_port}")
+            tornado.ioloop.IOLoop.current().start()
+            break
+        except OSError as e:
+            if attempt < max_retries - 1:
+                logger.warning(f"Port {target_port} sedang sibuk, mencoba port {target_port + 1}...")
+            else:
+                logger.error(f"Gagal mengikat port setelah {max_retries} percobaan: {e}")
+                raise
 
 
 if __name__ == "__main__":
