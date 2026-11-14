@@ -1855,6 +1855,166 @@
     const timelineSlider = document.getElementById("timeline-slider");
     if (timelineSlider) timelineSlider.oninput = updateEvaluationFromSlider;
 
+    // =========================================================================
+    // SISTEM MULTI-BAHASA (INTERNATIONALIZATION / i18n: ID & EN)
+    // =========================================================================
+    const I18N_DICT = {
+      id: {
+        brand_title: "XASUAI — Sistem Navigasi Lokasi Pendaratan di Bulan",
+        nav_home: "Beranda",
+        nav_recommendation: "Rekomendasi",
+        nav_visualization: "Visualisasi",
+        nav_simulation: "Simulasi",
+        
+        // Solusi 1
+        sol1_tag: "SOLUSI 1 — REKOMENDASI WAKTU PENDARATAN",
+        sol1_title: "Pencarian Jadwal Peluncuran & Pendaratan Terbaik",
+        sol1_desc: "Pilih bulan dan tahun rencana misi. Sistem akan menganalisis lintasan orbit Matahari dan posisi Bumi untuk menemukan momen pencahayaan optimal dan komunikasi langsung bebas rintangan tebing kawah.",
+        sol1_lbl_month: "Bulan:",
+        sol1_lbl_year: "Tahun:",
+        sol1_btn_calc: "HITUNG JADWAL REKOMENDASI",
+        sol1_lnk_saved: "Lihat Hasil Rekomendasi Tersimpan",
+        
+        // Solusi 2
+        sol2_tag: "SOLUSI 2 — VISUALISASI & ANALISIS TOPOGRAFI",
+        sol2_title: "Eksplorasi Medan dan Pemeriksaan Lokasi Pendaratan",
+        sol2_desc: "Pilih mode visualisasi berikut untuk memeriksa kondisi permukaan Mons Mouton secara detail. Mulai dari tampilan Bulan dari orbit, peta kemiringan lereng 2D, hingga model topografi 3D untuk memeriksa jalur sinyal yang bebas hambatan tebing.",
+        sol2_c1_tag: "MODE 1",
+        sol2_c1_title: "Navigasi Orbital 3D",
+        sol2_c1_desc: "Lihat posisi Mons Mouton di Kutub Selatan Bulan melalui tampilan globe 3D dari luar angkasa. Gunakan kamera Fly-To untuk menuju lokasi target secara langsung.",
+        sol2_c1_btn: "Buka Globe 3D &rarr;",
+        sol2_c2_tag: "MODE 2",
+        sol2_c2_title: "Peta Kelerengan 2D",
+        sol2_c2_desc: "Periksa kemiringan permukaan melalui peta elevasi beresolusi tinggi dari NASA LOLA DEM. Hasil analisis menunjukkan kemiringan sebesar 0,08°, tergolong sangat datar dan aman.",
+        sol2_c2_btn: "Buka Peta 2D &rarr;",
+        sol2_c3_tag: "MODE 3",
+        sol2_c3_title: "Topografi 3D dan Jalur Sinyal",
+        sol2_c3_desc: "Jelajahi model permukaan Bulan dalam bentuk 3D untuk memeriksa ketinggian tebing kawah dan memastikan jalur sinyal antena ke Bumi tidak terhalang. Hasil analisis menunjukkan jarak bebas pandang sebesar +12,35° di atas bibir tebing.",
+        sol2_c3_btn: "Buka Topografi 3D &rarr;",
+        sol2_target_pill: "Target Pendaratan Terpilih: <strong>Mons Mouton Crest (-84,9°S, 33,3°W)</strong> • Elevasi: <strong>+5.920 m</strong>",
+
+        // Solusi 3
+        sol3_tag: "SOLUSI 3 — SIMULASI MISI PENUH & DINAMIKA PENDARATAN",
+        sol3_title: "Simulator 3D Misi Penuh (Bumi ke Bulan & HLS)",
+        sol3_desc: "Simulasi interaktif 60 FPS lintasan lengkap dari peluncuran Bumi (TLI), transit translunar, orbit lunar polar, hingga Powered Descent Initiation (PDI) mendarat mulus di Mons Mouton Crest.",
+        sol3_c1_tag: "FASE 1",
+        sol3_c1_title: "Peluncuran & Translunar",
+        sol3_c1_desc: "Lepas landas dari KSC LC-39B, 1.3 putaran orbit parkir LEO 185 km, pembakaran TLI (+3,05 km/s), dan transfer translunar 384.400 km.",
+        sol3_c2_tag: "FASE 2",
+        sol3_c2_title: "Orbit Polar & Perilune",
+        sol3_c2_desc: "Penangkapan gravitasi halus di kutub utara Bulan, penyesuaian bidang orbit polar, dan penurunan ketinggian perilune hingga 15 km di atas Kutub Selatan.",
+        sol3_c3_tag: "FASE 3",
+        sol3_c3_title: "PDI & Pendaratan HLS",
+        sol3_c3_desc: "Inisiasi pengereman bertenaga (PDI) 720 detik, manuver pitch-up terkontrol, dan touchdown vertikal lembut di Mons Mouton Crest (V_z 0,80 m/s).",
+        sol3_btn_launch: "LUNCURKAN SIMULATOR 3D MISI PENUH (TAB BARU)",
+        sol3_bottom_pill: "Mode Layar Penuh 60 FPS • Telemetri Real-Time • Visualisasi Efemeris NASA SPICE"
+      },
+      en: {
+        brand_title: "XASUAI — Lunar Landing Site Navigation System",
+        nav_home: "Home",
+        nav_recommendation: "Recommendation",
+        nav_visualization: "Visualization",
+        nav_simulation: "Simulation",
+        
+        // Solusi 1
+        sol1_tag: "SOLUTION 1 — LANDING SCHEDULE RECOMMENDATION",
+        sol1_title: "Optimal Launch & Landing Schedule Search",
+        sol1_desc: "Select mission target month and year. The system analyzes solar illumination and Earth direct line-of-sight to find optimal sunlight and crater-clear communication windows.",
+        sol1_lbl_month: "Month:",
+        sol1_lbl_year: "Year:",
+        sol1_btn_calc: "CALCULATE OPTIMAL SCHEDULE",
+        sol1_lnk_saved: "View Saved Recommendations",
+        
+        // Solusi 2
+        sol2_tag: "SOLUTION 2 — TOPOGRAPHY VISUALIZATION & ANALYSIS",
+        sol2_title: "Terrain Exploration and Landing Site Inspection",
+        sol2_desc: "Select a visualization mode to examine Mons Mouton surface conditions in detail: from orbital 3D Moon globe, 2D slope safety map, to 3D terrain line-of-sight elevation.",
+        sol2_c1_tag: "MODE 1",
+        sol2_c1_title: "3D Orbital Navigation",
+        sol2_c1_desc: "View Mons Mouton at the Lunar South Pole via an interactive 3D space globe. Use Fly-To camera to navigate directly to the target.",
+        sol2_c1_btn: "Open 3D Globe &rarr;",
+        sol2_c2_tag: "MODE 2",
+        sol2_c2_title: "2D Slope Safety Map",
+        sol2_c2_desc: "Inspect surface slopes via high-resolution NASA LOLA DEM elevation. Analysis confirms 0.08° slope, classified as exceptionally flat and safe.",
+        sol2_c2_btn: "Open 2D Map &rarr;",
+        sol2_c3_tag: "MODE 3",
+        sol2_c3_title: "3D Topography & Signal Path",
+        sol2_c3_desc: "Explore 3D lunar terrain to check crater rim heights and ensure antenna line-of-sight to Earth. Analysis shows +12.35° clear elevation margin above rim.",
+        sol2_c3_btn: "Open 3D Topography &rarr;",
+        sol2_target_pill: "Selected Landing Site: <strong>Mons Mouton Crest (-84.9°S, 33.3°W)</strong> • Elevation: <strong>+5,920 m</strong>",
+
+        // Solusi 3
+        sol3_tag: "SOLUTION 3 — FULL MISSION SIMULATION & LANDING DYNAMICS",
+        sol3_title: "Full-Mission 3D Simulator (Earth-to-Moon & HLS)",
+        sol3_desc: "Interactive 60 FPS simulation of the complete trajectory from Earth launch (TLI), translunar transit, lunar polar insertion, down to Powered Descent Initiation (PDI) at Mons Mouton Crest.",
+        sol3_c1_tag: "PHASE 1",
+        sol3_c1_title: "Launch & Translunar Transit",
+        sol3_c1_desc: "Launch from KSC LC-39B, 1.3 LEO parking orbits at 185 km, TLI burn (+3.05 km/s), and 384,400 km translunar transfer.",
+        sol3_c2_tag: "PHASE 2",
+        sol3_c2_title: "Polar Orbit & Perilune",
+        sol3_c2_desc: "Smooth gravitational capture at lunar north pole, polar plane alignment, and perilune lowering to 15 km above South Pole.",
+        sol3_c3_tag: "PHASE 3",
+        sol3_c3_title: "PDI & HLS Touchdown",
+        sol3_c3_desc: "Powered Descent Initiation (PDI) 720s, controlled pitch-up maneuver, and soft vertical touchdown at Mons Mouton Crest (V_z 0.80 m/s).",
+        sol3_btn_launch: "LAUNCH FULL MISSION 3D SIMULATOR (NEW TAB)",
+        sol3_bottom_pill: "60 FPS Fullscreen Mode • Real-Time Telemetry • NASA SPICE Ephemeris Visualization"
+      }
+    };
+
+    const MONTH_NAMES_I18N = {
+      id: ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"],
+      en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    };
+
+    let currentAppLanguage = localStorage.getItem('xasuai_lang') || 'id';
+
+    function setLanguage(lang) {
+      if (!I18N_DICT[lang]) lang = 'id';
+      currentAppLanguage = lang;
+      localStorage.setItem('xasuai_lang', lang);
+      document.documentElement.lang = lang;
+
+      // Update button state
+      const btnId = document.getElementById("btn-lang-id");
+      const btnEn = document.getElementById("btn-lang-en");
+      if (btnId && btnEn) {
+        if (lang === 'id') {
+          btnId.classList.add("active");
+          btnEn.classList.remove("active");
+        } else {
+          btnEn.classList.add("active");
+          btnId.classList.remove("active");
+        }
+      }
+
+      // Update data-i18n DOM elements
+      const dict = I18N_DICT[lang];
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const key = el.getAttribute("data-i18n");
+        if (dict[key]) {
+          el.innerHTML = dict[key];
+        }
+      });
+
+      // Update month select options preserving selection
+      const monthSelect = document.getElementById("select-mission-month");
+      if (monthSelect) {
+        const currentVal = monthSelect.value;
+        const months = MONTH_NAMES_I18N[lang];
+        monthSelect.innerHTML = "";
+        months.forEach((name, idx) => {
+          const opt = document.createElement("option");
+          opt.value = idx + 1;
+          opt.textContent = name;
+          if (parseInt(currentVal) === (idx + 1)) opt.selected = true;
+          monthSelect.appendChild(opt);
+        });
+      }
+    }
+
+    // Terapkan bahasa saat runtime awal
+    setLanguage(currentAppLanguage);
+
     // Rute awal dieksekusi langsung tanpa menunggu panggilan API
     const initialPath = window.location.pathname.toLowerCase();
     if (initialPath.includes('rekomendasi')) {

@@ -183,6 +183,54 @@
       box-shadow: 0 2px 10px rgba(37, 99, 235, 0.5);
     }
 
+    /* Language Switcher Widget (Cosmic Aerospace HUD) */
+    .lang-switcher {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.65);
+      padding: 3px 5px;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      gap: 2px;
+      margin-left: 6px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .lang-btn {
+      padding: 5px 11px;
+      font-size: 11px;
+      font-weight: 800;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s ease;
+      line-height: 1;
+      letter-spacing: 0.6px;
+    }
+
+    .lang-btn:hover {
+      color: #38bdf8;
+    }
+
+    .lang-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.6);
+    }
+
+    .lang-divider {
+      color: rgba(255, 255, 255, 0.25);
+      font-size: 11px;
+      user-select: none;
+      line-height: 1;
+    }
+
     /* 2. BENTO CONTAINER */
     .bento-container {
       display: grid;
