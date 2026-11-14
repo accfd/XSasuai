@@ -1741,6 +1741,9 @@
       terrainOrbitAngle = -Math.PI / 4;
       terrainCamPitch = 14;
       terrainCamDist = 28;
+      if (terrainMeshGroup) {
+        terrainMeshGroup.rotation.y = 0;
+      }
       updateHorizonCameraPos();
     }
 
