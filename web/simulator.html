@@ -685,11 +685,58 @@
     })();
 
     // ═══════════════════════════════════════════
-    // 5. BULAN (NASA LOLA / LROC + MONS MOUTON TARGET)
+    // 5. BULAN (ORBIT DINAMIS MENGITARI BUMI + NASA LOLA TEXTURE)
     // ═══════════════════════════════════════════
+    // Orbit Bulan mengitari Bumi (periode 27.32 hari = 2,360,591 detik).
+    // Selama 4 hari misi (96 jam), Bulan bergerak menempuh busur ~52.7 derajat!
+    const MOON_ORBIT_RADIUS = 260;
+    const LUNAR_PERIOD_SECONDS = 27.32166 * 86400;
+    const LUNAR_OMEGA = (2 * Math.PI) / LUNAR_PERIOD_SECONDS;
+    const LUNAR_INCLINATION = 5.14 * (Math.PI / 180); // Kemiringan bidang orbit Bulan 5.14°
+    const T_ARRIVAL = 345600; // Detik saat tiba di Bulan (96 Jam)
+    const THETA_ARRIVAL = 0.55; // Sudut azimuth Bulan saat intersepsi wahana
+
+    function getMoonOrbitPosition(sec) {
+      const theta = THETA_ARRIVAL - LUNAR_OMEGA * (T_ARRIVAL - sec);
+      return new THREE.Vector3(
+        Math.cos(theta) * MOON_ORBIT_RADIUS,
+        Math.sin(theta) * MOON_ORBIT_RADIUS * Math.sin(LUNAR_INCLINATION),
+        Math.sin(theta) * MOON_ORBIT_RADIUS * Math.cos(LUNAR_INCLINATION)
+      );
+    }
+
+    // Cincin Lintasan Orbit Bulan Mengitari Bumi (360 derajat)
+    (() => {
+      const orbitPts = [];
+      for (let i = 0; i <= 144; i++) {
+        const th = (i / 144) * Math.PI * 2;
+        orbitPts.push(new THREE.Vector3(
+          Math.cos(th) * MOON_ORBIT_RADIUS,
+          Math.sin(th) * MOON_ORBIT_RADIUS * Math.sin(LUNAR_INCLINATION),
+          Math.sin(th) * MOON_ORBIT_RADIUS * Math.cos(LUNAR_INCLINATION)
+        ));
+      }
+      const g = new THREE.BufferGeometry().setFromPoints(orbitPts);
+      const m = new THREE.LineDashedMaterial({
+        color: 0xffffff, transparent: true, opacity: 0.16, dashSize: 4, gapSize: 3
+      });
+      const orbitLine = new THREE.Line(g, m);
+      orbitLine.computeLineDistances();
+      scene.add(orbitLine);
+    })();
+
+    // Garis Vektor Koneksi Bumi-Bulan (Dinamis Berputar dengan Gerak Bulan)
+    const emLineGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), getMoonOrbitPosition(0)]);
+    const emLineMat = new THREE.LineDashedMaterial({
+      color: 0x00d4ff, transparent: true, opacity: 0.18, dashSize: 3, gapSize: 2
+    });
+    const emLine = new THREE.Line(emLineGeo, emLineMat);
+    emLine.computeLineDistances();
+    scene.add(emLine);
+
+    // Objek 3D Bulan
     const moonGroup = new THREE.Group();
-    const MOON_POS = new THREE.Vector3(260, 0, 70);
-    moonGroup.position.copy(MOON_POS);
+    moonGroup.position.copy(getMoonOrbitPosition(0));
     scene.add(moonGroup);
 
     const mR = 5.2;
@@ -742,30 +789,31 @@
     // ═══════════════════════════════════════════
     // 6. LINTASAN 3D & WAHANA (TRAJECTORY & LANDER)
     // ═══════════════════════════════════════════
-    // Kurva Transfer Translunar (Earth -> Moon)
+    // Kurva Transfer Translunar (Earth -> Moon Intercept Point)
+    const moonArrivalPos = getMoonOrbitPosition(T_ARRIVAL);
     const tliPoints = [];
     const tliSteps = 300;
     for (let i = 0; i <= tliSteps; i++) {
       const u = i / tliSteps;
-      const x = THREE.MathUtils.lerp(eR * 1.18, MOON_POS.x, u);
-      const z = THREE.MathUtils.lerp(0, MOON_POS.z, u) + Math.sin(u * Math.PI) * 55;
-      const y = Math.sin(u * Math.PI) * 18;
+      const x = THREE.MathUtils.lerp(eR * 1.18, moonArrivalPos.x, u);
+      const z = THREE.MathUtils.lerp(0, moonArrivalPos.z, u) + Math.sin(u * Math.PI) * 45;
+      const y = THREE.MathUtils.lerp(0, moonArrivalPos.y, u) + Math.sin(u * Math.PI) * 16;
       tliPoints.push(new THREE.Vector3(x, y, z));
     }
     const tliSpline = new THREE.CatmullRomCurve3(tliPoints);
 
-    // Kurva PDI Pendaratan Mons Mouton (Orbit 15 km -> Permukaan)
-    const pdiPoints = [];
+    // Kurva PDI Pendaratan Mons Mouton (Lokal relatif terhadap Bulan)
+    const pdiLocalPoints = [];
     const pdiSteps = 100;
-    const perilunePos = MOON_POS.clone().add(new THREE.Vector3(0, -mR * 1.5, 2.5));
-    const touchdownPos = MOON_POS.clone().add(monsMoutonLocal);
+    const periluneLocal = new THREE.Vector3(0, -mR * 1.5, 2.5);
+    const touchdownLocal = monsMoutonLocal.clone();
     for (let i = 0; i <= pdiSteps; i++) {
       const u = i / pdiSteps;
-      const pt = new THREE.Vector3().lerpVectors(perilunePos, touchdownPos, u);
+      const pt = new THREE.Vector3().lerpVectors(periluneLocal, touchdownLocal, u);
       pt.y += Math.sin((1 - u) * Math.PI * 0.5) * 1.2;
-      pdiPoints.push(pt);
+      pdiLocalPoints.push(pt);
     }
-    const pdiSpline = new THREE.CatmullRomCurve3(pdiPoints);
+    const pdiLocalSpline = new THREE.CatmullRomCurve3(pdiLocalPoints);
 
     // Garis Lintasan Penuh (Dashed Prediksi)
     const fullTrajGeo = new THREE.BufferGeometry().setFromPoints(tliPoints);
@@ -776,8 +824,11 @@
     fullTrajLine.computeLineDistances();
     scene.add(fullTrajLine);
 
-    // Garis PDI Descent Arc (Emas)
-    const pdiTrajGeo = new THREE.BufferGeometry().setFromPoints(pdiPoints);
+    // Garis PDI Descent Arc di Moon Group (menempel langsung pada Bulan sehingga ikut bergerak)
+    const pdiTrajGeo = new THREE.BufferGeometry().setFromPoints(pdiLocalPoints);
+    const pdiTrajMat = new THREE.LineBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.85, linewidth: 2 });
+    const pdiLine = new THREE.Line(pdiTrajGeo, pdiTrajMat);
+    moonGroup.add(pdiLine);
     const pdiTrajMat = new THREE.LineBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.85, linewidth: 2 });
     scene.add(new THREE.Line(pdiTrajGeo, pdiTrajMat));
 
@@ -908,10 +959,11 @@
         const u = (p - 8800) / 800;
         const ang = u * Math.PI * 4;
         const orbR = THREE.MathUtils.lerp(mR * 1.8, mR * 1.15, u);
+        const moonPosNow = getMoonOrbitPosition(currentSeconds);
         pos.set(
-          MOON_POS.x + Math.sin(ang) * orbR * 0.2,
-          MOON_POS.y + Math.cos(ang) * orbR,
-          MOON_POS.z + Math.sin(ang) * orbR
+          moonPosNow.x + Math.sin(ang) * orbR * 0.2,
+          moonPosNow.y + Math.cos(ang) * orbR,
+          moonPosNow.z + Math.sin(ang) * orbR
         );
         dEarthKm = 384400;
         const altK = THREE.MathUtils.lerp(100, 15, u);
@@ -927,7 +979,9 @@
       // 5. PDI MONS MOUTON DESCENT (9600 - 10000)
       else {
         const u = Math.min(1.0, (p - 9600) / 400);
-        pos.copy(pdiSpline.getPoint(u));
+        const moonPosNow = getMoonOrbitPosition(currentSeconds);
+        const relPt = pdiLocalSpline.getPoint(u);
+        pos.copy(moonPosNow).add(relPt);
         dEarthKm = 384400;
         const altMeters = Math.max(0, Math.round((1 - u) * (1 - u) * 15000));
         dMoonKm = 1737 + Math.round(altMeters / 1000);
@@ -959,6 +1013,17 @@
     function updateSimulation(p) {
       simProgress = Math.max(0, Math.min(10000, p));
       const state = getSimState(simProgress);
+
+      // Update Posisi Fisik Orbit Bulan Mengitari Bumi (Real Orbital Mechanics)
+      const moonPosNow = getMoonOrbitPosition(state.currentSeconds);
+      moonGroup.position.copy(moonPosNow);
+      moonMesh.lookAt(moonGroup.worldToLocal(new THREE.Vector3(0, 0, 0)));
+      moonMesh.rotateY(Math.PI); // Tidal locking (sisi dekat selalu menghadap Bumi)
+
+      // Update Garis Vektor Koneksi Bumi-Bulan
+      emLine.geometry.dispose();
+      emLine.geometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), moonPosNow.clone()]);
+      emLine.computeLineDistances();
 
       // Posisi wahana
       landerGroup.position.copy(state.pos);
@@ -1031,20 +1096,22 @@
       if (btn) btn.classList.add('active');
 
       if (mode === 'overview') {
-        targetCameraPos = new THREE.Vector3(160, 140, 360);
-        targetCameraLook = new THREE.Vector3(120, 0, 30);
+        const mid = getMoonOrbitPosition(T_ARRIVAL).clone().multiplyScalar(0.45);
+        targetCameraPos = new THREE.Vector3(mid.x + 80, 100, mid.z + 160);
+        targetCameraLook = new THREE.Vector3(mid.x, 0, mid.z);
       } else if (mode === 'earth') {
         targetCameraPos = new THREE.Vector3(0, eR * 2.5, eR * 4.2);
         targetCameraLook = earthGroup.position.clone();
       } else if (mode === 'moon') {
-        targetCameraPos = new THREE.Vector3(MOON_POS.x, MOON_POS.y + mR * 3.5, MOON_POS.z + mR * 4.5);
-        targetCameraLook = MOON_POS.clone();
+        const mp = moonGroup.position;
+        targetCameraPos = new THREE.Vector3(mp.x, mp.y + mR * 3.5, mp.z + mR * 4.5);
+        targetCameraLook = mp.clone();
       } else if (mode === 'lander') {
         const lp = landerGroup.position.clone();
         targetCameraPos = lp.clone().add(new THREE.Vector3(3, 2, 4));
         targetCameraLook = lp;
       } else if (mode === 'mons') {
-        const mp = MOON_POS.clone().add(monsMoutonLocal);
+        const mp = moonGroup.position.clone().add(monsMoutonLocal);
         targetCameraPos = mp.clone().add(new THREE.Vector3(0.8, 1.2, 1.2));
         targetCameraLook = mp;
       }
@@ -1109,12 +1176,17 @@
         updateSimulation(simProgress);
       }
 
-      // Smooth camera lerping
+      // Smooth camera lerping & dynamic tracking
       if (targetCameraPos && targetCameraLook) {
         camera.position.lerp(targetCameraPos, 0.05);
         controls.target.lerp(targetCameraLook, 0.05);
+      } else if (cameraMode === 'moon') {
+        controls.target.copy(moonGroup.position);
+      } else if (cameraMode === 'mons') {
+        const mp = moonGroup.position.clone().add(monsMoutonLocal);
+        controls.target.copy(mp);
       } else if (cameraMode === 'lander') {
-        controls.target.lerp(landerGroup.position, 0.1);
+        controls.target.copy(landerGroup.position);
       }
 
       controls.update();
