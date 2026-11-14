@@ -1481,11 +1481,6 @@
       // Setup Mouse Orbit Controls
       setupHorizonControls(container);
 
-      // Render 2D Scientific Cards (Panorama 360 & Prakiraan 14d)
-      renderHorizon360Canvas();
-      renderForecast14dCanvas();
-      updateCandidateTableVisual();
-
       // Render Loop
       function animateHorizon() {
         requestAnimationFrame(animateHorizon);
@@ -1612,60 +1607,55 @@
     function placeRealSitePins(meshW, meshH) {
       if (!realTerrainData || !realTerrainData.sites) return;
 
-      const pinColors = {
-        ALPHA: 0xfacc15, // Yellow
-        BETA: 0x00e5ff,  // Cyan
-        GAMMA: 0xff4d4d  // Red
-      };
+      // 1 Titik Tunggal Konsisten: Mons Mouton Crest (Site Alpha)
+      const site = realTerrainData.sites.find(s => s.key === "ALPHA") || realTerrainData.sites[0];
+      if (!site) return;
 
-      realTerrainData.sites.forEach((site) => {
-        const pinGroup = new THREE.Group();
+      const pinGroup = new THREE.Group();
+      const worldX = (site.norm_x - 0.5) * meshW;
+      const worldZ = (site.norm_y - 0.5) * meshH;
+      const worldY = site.elev_ratio * 5.8;
 
-        const worldX = (site.norm_x - 0.5) * meshW;
-        const worldZ = (site.norm_y - 0.5) * meshH;
-        const worldY = site.elev_ratio * 5.8;
+      pinGroup.position.set(worldX, worldY, worldZ);
 
-        pinGroup.position.set(worldX, worldY, worldZ);
+      // Gold Pole
+      const poleGeo = new THREE.CylinderGeometry(0.08, 0.08, 2.8, 8);
+      const poleMat = new THREE.MeshBasicMaterial({ color: 0xfacc15 });
+      const pole = new THREE.Mesh(poleGeo, poleMat);
+      pole.position.y = 1.4;
+      pinGroup.add(pole);
 
-        // Pole
-        const poleGeo = new THREE.CylinderGeometry(0.08, 0.08, 2.8, 8);
-        const poleMat = new THREE.MeshBasicMaterial({ color: pinColors[site.key] || 0xffffff });
-        const pole = new THREE.Mesh(poleGeo, poleMat);
-        pole.position.y = 1.4;
-        pinGroup.add(pole);
-
-        // Glowing Beacon Sphere
-        const sphereGeo = new THREE.SphereGeometry(0.35, 16, 16);
-        const sphereMat = new THREE.MeshStandardMaterial({
-          color: pinColors[site.key] || 0xffffff,
-          emissive: pinColors[site.key] || 0xffffff,
-          emissiveIntensity: 0.8
-        });
-        const sphere = new THREE.Mesh(sphereGeo, sphereMat);
-        sphere.position.y = 2.8;
-        pinGroup.add(sphere);
-
-        // Floating Label Sprite
-        const sprite = createHorizonTextSprite(`${site.label} (${Math.round(site.elev)}m)`, "rgba(9, 13, 22, 0.9)", `#${pinColors[site.key].toString(16)}`);
-        sprite.position.set(0, 3.8, 0);
-        sprite.scale.set(4.8, 1.2, 1);
-        pinGroup.add(sprite);
-
-        terrainMeshGroup.add(pinGroup);
-        sitePinsMap[site.key] = { group: pinGroup, x: worldX, y: worldY, z: worldZ, site: site };
+      // Glowing Emerald Beacon Sphere
+      const sphereGeo = new THREE.SphereGeometry(0.38, 16, 16);
+      const sphereMat = new THREE.MeshStandardMaterial({
+        color: 0x10b981,
+        emissive: 0x10b981,
+        emissiveIntensity: 0.95
       });
+      const sphere = new THREE.Mesh(sphereGeo, sphereMat);
+      sphere.position.y = 2.8;
+      pinGroup.add(sphere);
+
+      // Floating Label Sprite (1 Titik Tunggal Konsisten dengan Slide 1 & 2)
+      const sprite = createHorizonTextSprite("📍 Mons Mouton Crest (-84.9°S, 33.3°W) · 5.920 m", "rgba(9, 13, 22, 0.92)", "#10b981");
+      sprite.position.set(0, 4.0, 0);
+      sprite.scale.set(6.4, 1.6, 1);
+      pinGroup.add(sprite);
+
+      terrainMeshGroup.add(pinGroup);
+      sitePinsMap["ALPHA"] = { group: pinGroup, x: worldX, y: worldY, z: worldZ, site: site };
     }
 
     function updateActiveSiteBeams(meshW, meshH) {
       if (earthBeamGroup) terrainMeshGroup.remove(earthBeamGroup);
       if (sunBeamGroup) terrainMeshGroup.remove(sunBeamGroup);
 
-      const activePin = sitePinsMap[active3DSiteKey];
+      const activePin = sitePinsMap["ALPHA"];
       if (!activePin || !realTerrainData) return;
 
       const origin = new THREE.Vector3(activePin.x, activePin.y + 2.8, activePin.z);
 
-      // 1. Direct-to-Earth Cyan Laser Beam
+      // 1. Direct-to-Earth Cyan Laser Beam (+12.35° klirens di atas tebing)
       earthBeamGroup = new THREE.Group();
       const earthAzRad = THREE.MathUtils.degToRad(realTerrainData.ephemeris.earth_az);
       const earthElRad = THREE.MathUtils.degToRad(realTerrainData.ephemeris.earth_elev);
@@ -1690,9 +1680,9 @@
       earthBeamGroup.add(earthSphere);
 
       // Earth Label Sprite
-      const earthLabel = createHorizonTextSprite(`BUMI DTE (+${realTerrainData.ephemeris.earth_elev.toFixed(1)}°)`, "rgba(15, 23, 42, 0.9)", "#38bdf8");
+      const earthLabel = createHorizonTextSprite(`BUMI DTE (Garis Pandang Langsung)`, "rgba(15, 23, 42, 0.9)", "#38bdf8");
       earthLabel.position.copy(earthTarget).add(new THREE.Vector3(0, 1.8, 0));
-      earthLabel.scale.set(4.4, 1.1, 1);
+      earthLabel.scale.set(5.2, 1.3, 1);
       earthBeamGroup.add(earthLabel);
 
       terrainMeshGroup.add(earthBeamGroup);
@@ -1735,269 +1725,11 @@
       if (btn) btn.classList.add("active");
     }
 
-    function select3DSite(siteKey) {
-      active3DSiteKey = siteKey;
-      document.querySelectorAll("#btn-site-alpha, #btn-site-beta, #btn-site-gamma").forEach(b => b.classList.remove("active"));
-      const btn = document.getElementById(`btn-site-${siteKey.toLowerCase()}`);
-      if (btn) btn.classList.add("active");
-
-      // Update 3D beams
-      const meshW = 36.0, meshH = 36.0 * (180 / 369);
-      updateActiveSiteBeams(meshW, meshH);
-
-      // Smooth camera focus onto active site pin
-      const pin = sitePinsMap[siteKey];
-      if (pin) {
-        terrainOrbitAngle = Math.atan2(pin.x, pin.z) + 0.4;
-        updateHorizonCameraPos();
-      }
-
-      // Update 2D Scientific Cards & Readout
-      renderHorizon360Canvas();
-      renderForecast14dCanvas();
-      updateCandidateTableVisual();
-    }
-
     function reset3DView() {
       terrainOrbitAngle = -Math.PI / 4;
       terrainCamPitch = 14;
       terrainCamDist = 28;
       updateHorizonCameraPos();
-    }
-
-    function updateCandidateTableVisual() {
-      if (!realTerrainData || !realTerrainData.sites) return;
-      const curSite = realTerrainData.sites.find(s => s.key === active3DSiteKey) || realTerrainData.sites[0];
-
-      // Update Table Highlight
-      ["ALPHA", "BETA", "GAMMA"].forEach((k) => {
-        const row = document.getElementById(`row-${k}`);
-        if (!row) return;
-        if (k === active3DSiteKey) {
-          row.style.background = "#0f2942";
-          row.style.color = "#38bdf8";
-          row.style.fontWeight = "800";
-        } else {
-          row.style.background = "transparent";
-          row.style.color = "#cbd5e1";
-          row.style.fontWeight = "normal";
-        }
-      });
-
-      // Update 3D Footer Status
-      const statusElem = document.getElementById("readout-3d-status");
-      const elevElem = document.getElementById("readout-3d-elev");
-      const marginElem = document.getElementById("readout-3d-margin");
-
-      if (statusElem) {
-        statusElem.innerHTML = curSite.is_go
-          ? `● GO FOR LANDING | ${curSite.label} • Skor ${Math.round(curSite.score_100)}/100`
-          : `● NO-GO | ${curSite.label} • Skor ${Math.round(curSite.score_100)}/100`;
-        statusElem.style.color = curSite.is_go ? "#34d399" : "#f87171";
-      }
-      if (elevElem) elevElem.innerText = `Elevasi: ${Math.round(curSite.elev).toLocaleString()} m`;
-      if (marginElem) marginElem.innerText = `Surya: ${curSite.sun_margin >= 0 ? '+' : ''}${curSite.sun_margin.toFixed(1)}° | DTE: ${curSite.earth_margin >= 0 ? '+' : ''}${curSite.earth_margin.toFixed(1)}°`;
-
-      // Update Card 1 Header
-      const c1Title = document.getElementById("card1-title");
-      const c1Clear = document.getElementById("card1-clearance");
-      if (c1Title) c1Title.innerText = `PANORAMA UFUK 360° (LOCAL HORIZON VIEW) — ${curSite.label.toUpperCase()}`;
-      if (c1Clear) {
-        c1Clear.innerText = `Klirens Tebing: +${curSite.earth_margin.toFixed(1)}° [${curSite.earth_margin >= 1.5 ? 'BEBAS' : 'TERHALANG'}]`;
-        c1Clear.style.color = curSite.earth_margin >= 1.5 ? "#10b981" : "#f87171";
-      }
-
-      // Update Card 2 Header
-      const c2Title = document.getElementById("card2-title");
-      if (c2Title) {
-        c2Title.innerText = `PRAKIRAAN 14 HARI: Surya ${Math.round(curSite.solar_cont_pct)}% • Sinyal DTE ${Math.round(curSite.dte_cont_pct)}% • Suhu ≈ ${Math.round(curSite.est_temp_k)} K`;
-      }
-    }
-
-    // Canvas 1: Panorama Ufuk 360° (Exact scan_terrain.py logic)
-    function renderHorizon360Canvas() {
-      const canvas = document.getElementById("canvas-horizon-360");
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-      canvas.width = canvas.parentElement.clientWidth || 440;
-      canvas.height = canvas.parentElement.clientHeight || 110;
-
-      const w = canvas.width;
-      const h = canvas.height;
-
-      // Dark background
-      ctx.fillStyle = "#050a14";
-      ctx.fillRect(0, 0, w, h);
-
-      if (!realTerrainData || !realTerrainData.sites) return;
-      const site = realTerrainData.sites.find(s => s.key === active3DSiteKey) || realTerrainData.sites[0];
-      const hor = site.horizon_deg || [];
-      const ep = realTerrainData.ephemeris;
-
-      // Coordinate mapping: Azimuth (0..360) -> X, Elev (-5..+14) -> Y
-      const minEl = -5.0, maxEl = 14.0;
-      const mapX = (az) => ((az % 360) / 360.0) * w;
-      const mapY = (el) => h - ((el - minEl) / (maxEl - minEl)) * h;
-
-      // 1. Grid & Azimuth Ticks
-      ctx.strokeStyle = "#1e293b";
-      ctx.lineWidth = 1;
-      [0, 90, 180, 270, 360].forEach((az) => {
-        const x = mapX(az);
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, h);
-        ctx.stroke();
-      });
-
-      // 0° reference line
-      const y0 = mapY(0);
-      ctx.strokeStyle = "#334155";
-      ctx.setLineDash([4, 4]);
-      ctx.beginPath();
-      ctx.moveTo(0, y0);
-      ctx.lineTo(w, y0);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // 2. Kontur Tebing LOLA (Dark Blue Polygon)
-      ctx.fillStyle = "#0f2942";
-      ctx.strokeStyle = "#0284c7";
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.moveTo(0, h);
-      for (let az = 0; az < 360; az++) {
-        const el = hor[az] !== undefined ? hor[az] : 0;
-        ctx.lineTo(mapX(az), mapY(el));
-      }
-      ctx.lineTo(w, h);
-      ctx.closePath();
-      ctx.fill();
-      ctx.stroke();
-
-      // 3. Librasi Bumi (28h Dotted Loop)
-      if (ep.lib_az && ep.lib_el && ep.lib_az.length > 0) {
-        ctx.strokeStyle = "#38bdf8";
-        ctx.lineWidth = 1.2;
-        ctx.setLineDash([2, 3]);
-        ctx.beginPath();
-        for (let i = 0; i < ep.lib_az.length; i++) {
-          const lx = mapX(ep.lib_az[i]);
-          const ly = mapY(ep.lib_el[i]);
-          if (i === 0) ctx.moveTo(lx, ly);
-          else ctx.lineTo(lx, ly);
-        }
-        ctx.stroke();
-        ctx.setLineDash([]);
-      }
-
-      // 4. Sun Marker (Yellow Circle)
-      const sunX = mapX(ep.sun_az);
-      const sunY = mapY(ep.sun_elev);
-      ctx.fillStyle = "#facc15";
-      ctx.beginPath();
-      ctx.arc(sunX, sunY, 5.5, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.strokeStyle = "#ffffff";
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      ctx.fillStyle = "#fde047";
-      ctx.font = "bold 9px monospace";
-      ctx.fillText(`Matahari (+${ep.sun_elev.toFixed(1)}°)`, Math.min(w - 95, sunX + 8), sunY - 4);
-
-      // 5. Earth DTE Marker (Green Diamond)
-      const earthX = mapX(ep.earth_az);
-      const earthY = mapY(ep.earth_elev);
-      ctx.fillStyle = site.earth_margin >= 1.5 ? "#10b981" : "#f97316";
-      ctx.beginPath();
-      ctx.moveTo(earthX, earthY - 6);
-      ctx.lineTo(earthX + 6, earthY);
-      ctx.lineTo(earthX, earthY + 6);
-      ctx.lineTo(earthX - 6, earthY);
-      ctx.closePath();
-      ctx.fill();
-      ctx.strokeStyle = "#ffffff";
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-
-      ctx.fillStyle = "#7dd3fc";
-      ctx.font = "bold 9px monospace";
-      ctx.fillText(`Bumi (+${ep.earth_elev.toFixed(1)}°)`, Math.max(8, earthX - 70), earthY - 4);
-    }
-
-    // Canvas 2: Prakiraan 14 Hari Pasca-Pendaratan (Exact scan_terrain.py logic)
-    function renderForecast14dCanvas() {
-      const canvas = document.getElementById("canvas-forecast-14d");
-      if (!canvas) return;
-      const ctx = canvas.getContext("2d");
-      canvas.width = canvas.parentElement.clientWidth || 440;
-      canvas.height = canvas.parentElement.clientHeight || 95;
-
-      const w = canvas.width;
-      const h = canvas.height;
-
-      // Dark background
-      ctx.fillStyle = "#060a14";
-      ctx.fillRect(0, 0, w, h);
-
-      if (!realTerrainData || !realTerrainData.sites) return;
-      const site = realTerrainData.sites.find(s => s.key === active3DSiteKey) || realTerrainData.sites[0];
-      const sunEl = site.sun_el_series || [];
-      const sunHor = site.sun_hor_series || [];
-      const earthEl = site.earth_el_series || [];
-      const earthHor = site.earth_hor_series || [];
-
-      const n = sunEl.length;
-      if (n === 0) return;
-
-      const minM = -4.0, maxM = 10.0;
-      const mapX = (idx) => (idx / (n - 1)) * w;
-      const mapY = (val) => h - ((val - minM) / (maxM - minM)) * h;
-
-      // 0° dashed line (Batas Terhalang Bukit)
-      const y0 = mapY(0);
-      ctx.strokeStyle = "#ef4444";
-      ctx.setLineDash([4, 4]);
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(0, y0);
-      ctx.lineTo(w, y0);
-      ctx.stroke();
-      ctx.setLineDash([]);
-
-      // Curve 1: Margin Matahari (Yellow)
-      ctx.strokeStyle = "#facc15";
-      ctx.lineWidth = 1.8;
-      ctx.beginPath();
-      for (let i = 0; i < n; i++) {
-        const m = sunEl[i] - sunHor[i];
-        const x = mapX(i);
-        const y = mapY(m);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-
-      // Curve 2: Margin Bumi DTE (Cyan)
-      ctx.strokeStyle = "#38bdf8";
-      ctx.lineWidth = 1.8;
-      ctx.beginPath();
-      for (let i = 0; i < n; i++) {
-        const m = earthEl[i] - earthHor[i];
-        const x = mapX(i);
-        const y = mapY(m);
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-
-      // Axis label
-      ctx.fillStyle = "#64748b";
-      ctx.font = "8px sans-serif";
-      ctx.fillText("Hari 0 (Touchdown)", 4, h - 3);
-      ctx.fillText("Hari 7", w / 2 - 12, h - 3);
-      ctx.fillText("Hari 14", w - 32, h - 3);
     }
 
     function createHorizonTextSprite(text, bgColor, borderColor) {
@@ -2039,9 +1771,6 @@
       horizonCamera.aspect = w / h;
       horizonCamera.updateProjectionMatrix();
       horizonRenderer.setSize(w, h);
-
-      renderHorizon360Canvas();
-      renderForecast14dCanvas();
     }
 
 
